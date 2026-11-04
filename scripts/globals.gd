@@ -48,9 +48,17 @@ func _ready() -> void:
 	_load()
 
 
+var _textures := {}  # nome -> Texture2D ou null
+
+
+## Imagem de assets/images/<name>.png, ou null se não existir.
+## Fica guardada: uma textura carregada só dentro de um _draw() era libertada
+## logo a seguir e aparecia como um quadrado branco.
 func texture(name: String) -> Texture2D:
-	var path := "res://assets/images/%s.png" % name
-	return load(path) if ResourceLoader.exists(path) else null
+	if not _textures.has(name):
+		var path := "res://assets/images/%s.png" % name
+		_textures[name] = load(path) if ResourceLoader.exists(path) else null
+	return _textures[name]
 
 
 func is_done(i: int) -> bool:

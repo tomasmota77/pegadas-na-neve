@@ -19,12 +19,19 @@ static func has(name: String) -> bool:
 	return Game.texture(name) != null
 
 
+## Desenha uma textura centrada em `c` com `s` de lado.
+static func draw_tex(ci: CanvasItem, tex: Texture2D, c: Vector2, s: float, mod := Color.WHITE) -> void:
+	ci.draw_set_transform(c)
+	ci.draw_texture_rect(tex, Rect2(-s * 0.5, -s * 0.5, s, s), false, mod)
+	ci.draw_set_transform(Vector2.ZERO)
+
+
 ## Desenha o ícone `name` centrado em `c`, com `s` de lado.
 ## Se a imagem não existir, escreve o texto de FALLBACK com a cor `col`.
 static func draw_icon(ci: CanvasItem, name: String, c: Vector2, s: float, col: Color) -> void:
 	var tex := Game.texture(name)
 	if tex:
-		ci.draw_texture_rect(tex, Rect2(c - Vector2(s, s) * 0.5, Vector2(s, s)), false, Color(1, 1, 1, col.a))
+		draw_tex(ci, tex, c, s, Color(1, 1, 1, col.a))
 		return
 	var txt: String = FALLBACK.get(name, "")
 	if txt == "":

@@ -40,7 +40,6 @@ func _draw() -> void:
 			var local := clampf((_t - 0.25 - i * 0.28) / 0.35, 0.0, 1.0)
 			pop = local * (1.0 + 0.3 * sin(local * PI))
 		# vazia: a mesma estrela, cinzenta e transparente
-		draw_texture_rect(tex, Rect2(c - Vector2(k, k) * 0.5, Vector2(k, k)), false, Color(0.55, 0.62, 0.72, 0.35))
+		Icons.draw_tex(self, tex, c, k, Color(0.55, 0.62, 0.72, 0.35))
 		if pop > 0.0:
-			var kk := k * pop
-			draw_texture_rect(tex, Rect2(c - Vector2(kk, kk) * 0.5, Vector2(kk, kk)), false)
+			Icons.draw_tex(self, tex, c, k * pop)

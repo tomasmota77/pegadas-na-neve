@@ -34,6 +34,8 @@ Todas as imagens ficam em `assets/images/`. Põe lá o ficheiro **com o nome da 
 
 PNG com **fundo transparente** (exceto `fundo.png` e `icon.png`), tudo no mesmo estilo. Os prompts para gerar cada uma estão em [`docs/imagens.md`](docs/imagens.md).
 
+Depois de juntar ou trocar imagens, corre `python tools/prep_images.py`: corta as margens vazias, centra cada imagem num quadrado (para não ficar esticada) e reduz para o tamanho da tabela. Não faz mal correr mais do que uma vez.
+
 | Ficheiro | Tamanho | O quê |
 |---|---|---|
 | `ourico.png` | 512×512 | Ouriço, corpo inteiro, centrado |

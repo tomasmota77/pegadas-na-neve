@@ -76,7 +76,7 @@ func _draw() -> void:
 		for i in 3:
 			var p := Vector2(c.x + (i - 1) * ss * 1.05, r.end.y - ss * 0.8)
 			var tint := Color.WHITE if i < stars else Color(1, 1, 1, 0.22)
-			draw_texture_rect(star, Rect2(p - Vector2(ss, ss) * 0.5, Vector2(ss, ss)), false, tint)
+			Icons.draw_tex(self, star, p, ss, tint)
 
 
 func _box(col: Color, rad: int) -> StyleBoxFlat:
