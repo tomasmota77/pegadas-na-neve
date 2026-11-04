@@ -24,6 +24,7 @@ scripts/ui_theme.gd     tema da interface (cores, fontes, botões)
 scripts/round_button.gd botão redondo com ícone e contador
 scripts/level_tile.gd   quadrado de nível do menu
 scripts/icons.gd        ícones da interface (imagem ou texto provisório)
+scripts/sfx.gd          autoload "Sfx": efeitos sonoros e música
 tests/                  testes da lógica e capturas automáticas
 tools/                  gerador de níveis e marcadores provisórios
 ```
@@ -65,6 +66,10 @@ Depois de juntar ou trocar imagens, corre `python tools/prep_images.py`: corta a
 | `icon.png` (raiz) | 1024×1024 | Ícone da app, **sem** transparência |
 
 Paleta: fundo `#E7EFF6`, texto `#20304A`, ouriço `#2E8C7E`, coelho `#C2477A`, raposa `#E3801F`.
+
+## Sons
+
+Os sons ficam em `assets/sounds/` (`.ogg`, `.mp3` ou `.wav`). A lista, quando toca cada um e os prompts para os gerar estão em [`docs/sons.md`](docs/sons.md). Um som que não exista não toca. Sons e música desligam-se em separado nas Definições.
 
 ## Línguas
 

@@ -37,7 +37,7 @@ const LANGS := {"pt": "Português", "en": "English", "es": "Español", "fr": "Fr
 var levels: Array = []
 ## done: índice (texto) -> {"t": melhor tempo em s, "s": melhores estrelas}
 ## lang: "" segue a língua do telemóvel
-var progress := {"done": {}, "seen": [], "vibrate": true, "lang": ""}
+var progress := {"done": {}, "seen": [], "vibrate": true, "lang": "", "music": true, "sfx": true}
 var current := 0
 
 
@@ -170,6 +170,17 @@ func set_vibrate(on: bool) -> void:
 	_save()
 
 
+func set_music(on: bool) -> void:
+	progress.music = on
+	_save()
+	Sfx.refresh_music()
+
+
+func set_sfx(on: bool) -> void:
+	progress.sfx = on
+	_save()
+
+
 func vibrate(ms: int) -> void:
 	if progress.vibrate:
 		Input.vibrate_handheld(ms)
@@ -198,6 +209,8 @@ func _load() -> void:
 		progress.seen = seen
 	progress.vibrate = bool(data.get("vibrate", true))
 	progress.lang = str(data.get("lang", ""))
+	progress.music = bool(data.get("music", true))
+	progress.sfx = bool(data.get("sfx", true))
 
 
 func _save() -> void:

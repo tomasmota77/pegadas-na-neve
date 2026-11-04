@@ -10,9 +10,18 @@ var _current: Control
 func _ready() -> void:
 	theme = UITheme.build()
 	_make_snow()
+	# todos os botões fazem um "toque" suave ao carregar
+	get_tree().node_added.connect(func(n: Node):
+		if n is BaseButton and not n.pressed.is_connected(_on_any_button):
+			n.pressed.connect(_on_any_button))
+	Sfx.refresh_music()
 	show_menu()
 	if "--shots" in OS.get_cmdline_user_args():
 		add_child(load("res://tests/shots.gd").new())
+
+
+func _on_any_button() -> void:
+	Sfx.play("toque")
 
 
 func show_menu() -> void:

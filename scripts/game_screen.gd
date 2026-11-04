@@ -10,6 +10,8 @@ var index := 0
 var st := PuzzleState.new()
 var elapsed := 0.0
 var running := false
+var _lines_ok := -1      # linhas + colunas certas (para o som "linha"); -1 ao começar
+var _was_wrong := false
 
 @onready var board: Board = %Board
 
@@ -19,9 +21,11 @@ func _ready() -> void:
 	%HelpBtn.pressed.connect(_show_rules)
 	%UndoBtn.pressed.connect(func():
 		st.undo()
+		Sfx.play("desfazer")
 		_after_change())
 	%ClearBtn.pressed.connect(func():
 		st.clear_all()
+		Sfx.play("limpar")
 		_after_change())
 	%HintBtn.pressed.connect(_on_hint)
 	board.changed.connect(_refresh)
@@ -37,6 +41,8 @@ func start(i: int) -> void:
 	%NameLabel.text = Game.level_name(i)
 	elapsed = 0.0
 	running = true
+	_lines_ok = -1
+	_was_wrong = false
 	_build_chips()
 	_refresh()
 	_intro.call_deferred()
@@ -115,6 +121,27 @@ func _refresh() -> void:
 	%HintBtn.disabled = left <= 0 or st.is_solved()
 	%ProgressLabel.text = "%d/%d" % [st.complete_count(), st.animals.size()]
 	%ProgressLabel.add_theme_color_override("font_color", Game.COLORS.ok if st.all_complete() else Game.COLORS.ink)
+	_refresh_sounds()
+
+
+## Som quando mais uma linha ou coluna bate certo, e um aviso suave quando
+## todos chegaram à comida mas a solução está errada (só uma vez de cada vez).
+func _refresh_sounds() -> void:
+	var ok := 0
+	for r in st.height:
+		if st.row_count(r) == st.row_targets[r]:
+			ok += 1
+	for c in st.width:
+		if st.col_count(c) == st.col_targets[c]:
+			ok += 1
+	var wrong := st.all_complete() and not st.is_solved()
+	if _lines_ok >= 0:
+		if wrong and not _was_wrong:
+			Sfx.play("errado")
+		elif ok > _lines_ok and not st.is_solved():
+			Sfx.play("linha", 1.0 + 0.04 * ok, 0.0)
+	_lines_ok = ok
+	_was_wrong = wrong
 
 
 # ---------- introdução / regras ----------
@@ -126,7 +153,8 @@ func _intro() -> void:
 	for a in st.animals:
 		if not Game.has_seen(a.type):
 			queue.append({"title": Game.animal_text(a.type, "MEET"),
-				"body": Game.animal_text(a.type, "DETAIL"), "image": Game.texture(a.type)})
+				"body": Game.animal_text(a.type, "DETAIL"), "image": Game.texture(a.type),
+				"sound": "animal_" + a.type})
 			Game.mark_seen(a.type)
 	_show_queue(queue)
 
@@ -135,6 +163,8 @@ func _show_queue(queue: Array) -> void:
 	if queue.is_empty():
 		return
 	var s: Dictionary = queue.pop_front()
+	if s.has("sound"):
+		Sfx.play(s.sound, 1.0, 0.0)
 	var label := tr("GOT_IT") if queue.is_empty() else tr("NEXT")
 	%Sheet.open(s.title, s.body, s.image, [{"text": label, "primary": true, "action": _show_queue.bind(queue)}],
 		{"dismissable": false})
@@ -151,6 +181,8 @@ func _show_rules() -> void:
 
 func _on_hint() -> void:
 	var h := st.hint()
+	if h.kind != "none":
+		Sfx.play("dica")
 	match h.kind:
 		"fix":
 			board.flash(h.cell)
@@ -176,6 +208,7 @@ func _on_solved() -> void:
 	var record := Game.mark_done(index, elapsed, got)
 	Game.vibrate(60)
 	await board.play_win().finished
+	Sfx.play("vitoria", 1.0, 0.0)
 	var body := tr("WIN_TIME") % Game.format_time(elapsed)
 	if record:
 		body += "  ·  " + tr("WIN_RECORD")

@@ -31,7 +31,10 @@ var _flash_t := 0.0
 var win_anim := -1.0:
 	set(v):
 		win_anim = v
+		_win_sounds()
 		queue_redraw()
+var _win_total := 0
+var _win_played := 0
 
 
 func setup(state: PuzzleState) -> void:
@@ -139,10 +142,17 @@ func _on_drag(pos: Vector2) -> void:
 		var r := st.drag(c)
 		if r == "":
 			continue
-		if r == "complete":
-			_bounce[t] = 1.0
-			set_process(true)
-			path_completed.emit(t)
+		match r:
+			"step":
+				Sfx.step(t, st.paths[t].size())
+			"back":
+				Sfx.play("passo_voltar")
+			"complete":
+				Sfx.step(t, st.paths[t].size())
+				Sfx.play("chegou")
+				_bounce[t] = 1.0
+				set_process(true)
+				path_completed.emit(t)
 		changed.emit()
 		queue_redraw()
 	_last_pos = pos
@@ -151,6 +161,7 @@ func _on_drag(pos: Vector2) -> void:
 func _on_release() -> void:
 	if _press_action == "mark" and not _moved:
 		st.toggle_mark(_press_cell)
+		Sfx.play("marca", 1.0 if st.marks.has(_press_cell) else 0.85)
 		changed.emit()
 	st.release()
 	_press_action = ""
@@ -162,6 +173,19 @@ func _on_release() -> void:
 
 # ---------- animações ----------
 
+## Na animação de vitória, cada pegada que salta toca uma nota a subir
+## (no máximo umas 10, para não ficar uma metralhadora de sons).
+func _win_sounds() -> void:
+	if win_anim < 0.0 or _win_total == 0:
+		return
+	var reached := mini(int(win_anim * (_win_total + 4)), _win_total)
+	var every := maxi(1, ceili(_win_total / 10.0))
+	while _win_played < reached:
+		if _win_played % every == 0:
+			Sfx.note(int(8.0 * _win_played / _win_total))
+		_win_played += 1
+
+
 func flash(c: Vector2i) -> void:
 	_flash_cell = c
 	_flash_t = 1.0
@@ -169,6 +193,10 @@ func flash(c: Vector2i) -> void:
 
 
 func play_win() -> Tween:
+	_win_total = 0
+	_win_played = 0
+	for a in st.animals:
+		_win_total += maxi(0, st.paths[a.type].size() - 2)
 	win_anim = 0.0
 	var tw := create_tween()
 	tw.tween_property(self, "win_anim", 1.0, 1.3).set_trans(Tween.TRANS_SINE)

@@ -12,12 +12,20 @@ var _t := 0.0
 func play(n: int) -> void:
 	filled = n
 	_t = 0.0
+	_rung = 0
 	set_process(true)
 	queue_redraw()
 
 
+var _rung := 0  # estrelas que já tocaram o som
+
+
 func _process(dt: float) -> void:
 	_t += dt
+	# o som de cada estrela sai quando ela começa a aparecer (ver _draw)
+	while _rung < filled and _t >= 0.25 + _rung * 0.28:
+		Sfx.play("estrela", pow(2.0, Sfx.PENTA[_rung * 2] / 12.0), 0.0)
+		_rung += 1
 	queue_redraw()
 	if _t > 1.6:
 		set_process(false)

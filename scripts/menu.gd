@@ -128,6 +128,12 @@ func _show_settings() -> void:
 	var vib := tr("VIBRATION_ON") if Game.progress.vibrate else tr("VIBRATION_OFF")
 	%Sheet.open(tr("SETTINGS"), tr("SETTINGS_STARS") % [Game.total_stars(), Game.levels.size() * 3], null, [
 		{"text": tr("LANGUAGE_BTN") % Game.LANGS[Game.language()], "action": _show_languages},
+		{"text": tr("SOUNDS_ON") if Game.progress.sfx else tr("SOUNDS_OFF"), "action": func():
+			Game.set_sfx(not Game.progress.sfx)
+			_show_settings()},
+		{"text": tr("MUSIC_ON") if Game.progress.music else tr("MUSIC_OFF"), "action": func():
+			Game.set_music(not Game.progress.music)
+			_show_settings()},
 		{"text": vib, "action": func():
 			Game.set_vibrate(not Game.progress.vibrate)
 			_show_settings()},

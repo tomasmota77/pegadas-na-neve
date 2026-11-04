@@ -24,6 +24,7 @@ config/icon="res://icon.png"
 [autoload]
 
 Game="*res://scripts/globals.gd"
+Sfx="*res://scripts/sfx.gd"
 
 [display]
 

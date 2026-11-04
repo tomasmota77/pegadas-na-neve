@@ -52,6 +52,7 @@ func open(title: String, body: String, image: Texture2D = null, buttons: Array =
 	_place()
 	if opts.has("stars"):
 		%Stars.play(int(opts.stars))
+	Sfx.play("painel")
 	var y: float = %Panel.position.y
 	%Panel.position.y = y + 120.0
 	_tween = create_tween().set_parallel()
