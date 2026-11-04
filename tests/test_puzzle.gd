@@ -47,5 +47,37 @@ func _init() -> void:
 	var den: Vector2i = st.animals[0].den
 	st.press(den)
 	check(st.drag(den + Vector2i(1, 0)) == "", "coelho não pode andar 1 casa")
+	st.release()
+	# tocar num caminho sem arrastar não muda nada nem enche o "desfazer"
+	st.load_level(levels[0])
+	var sol0: Array = st.solution["ourico"]
+	st.press(sol0[0])
+	for k in range(1, 4):
+		st.drag(sol0[k])
+	st.release()
+	var hist := st._history.size()
+	check(st.press(sol0[0]) == "drag", "tocar na toca pega no caminho")
+	st.release()
+	check(st.paths["ourico"].size() == 4, "toque na toca apagou o caminho")
+	check(st._history.size() == hist, "toque sem arrastar criou passo de desfazer")
+	# pegar a meio e arrastar para a frente/trás corta o caminho só nessa altura
+	st.press(sol0[1])
+	check(st.paths["ourico"].size() == 4, "pegar a meio cortou antes de mexer")
+	check(st.drag(sol0[0]) == "back", "voltar atrás a partir do meio")
+	st.release()
+	check(st.paths["ourico"].size() == 1, "caminho não ficou cortado")
+	# não se passa para lá da comida
+	st.load_level(levels[0])
+	st.press(sol0[0])
+	for k in range(1, sol0.size()):
+		st.drag(sol0[k])
+	st.release()
+	var food: Vector2i = sol0.back()
+	st.press(food)
+	for n in [food + Vector2i(1, 0), food + Vector2i(-1, 0), food + Vector2i(0, 1), food + Vector2i(0, -1)]:
+		if n != sol0[sol0.size() - 2]:  # voltar à casa anterior é permitido
+			check(st.drag(n) == "", "o caminho continuou depois da comida")
+	st.release()
+	check(st.is_complete("ourico"), "o caminho deixou de estar completo")
 	print("Níveis testados: %d | falhas: %d" % [levels.size(), fails])
 	quit(1 if fails > 0 else 0)

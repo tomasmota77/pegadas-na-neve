@@ -1,8 +1,10 @@
-[gd_scene load_steps=4 format=3]
+[gd_scene load_steps=6 format=3]
 
 [ext_resource type="Script" path="res://scripts/game_screen.gd" id="1"]
 [ext_resource type="Script" path="res://scripts/board.gd" id="2"]
 [ext_resource type="PackedScene" path="res://scenes/sheet.tscn" id="3"]
+[ext_resource type="Script" path="res://scripts/round_button.gd" id="4"]
+[ext_resource type="Script" path="res://scripts/icon_view.gd" id="5"]
 
 [node name="Game" type="Control"]
 layout_mode = 3
@@ -20,65 +22,113 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/margin_left = 36
-theme_override_constants/margin_top = 56
-theme_override_constants/margin_right = 36
-theme_override_constants/margin_bottom = 48
+theme_override_constants/margin_left = 32
+theme_override_constants/margin_top = 44
+theme_override_constants/margin_right = 32
+theme_override_constants/margin_bottom = 40
 
 [node name="VBox" type="VBoxContainer" parent="Margin"]
 layout_mode = 2
-theme_override_constants/separation = 24
+theme_override_constants/separation = 20
 
 [node name="TopBar" type="HBoxContainer" parent="Margin/VBox"]
 layout_mode = 2
-theme_override_constants/separation = 20
+theme_override_constants/separation = 16
 
-[node name="BackBtn" type="Button" parent="Margin/VBox/TopBar"]
+[node name="BackBtn" type="BaseButton" parent="Margin/VBox/TopBar"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(88, 88)
+custom_minimum_size = Vector2(96, 96)
 layout_mode = 2
 tooltip_text = "Voltar aos níveis"
-theme_type_variation = &"IconButton"
-icon_alignment = 1
+script = ExtResource("4")
+icon_name = "voltar"
 
 [node name="TitleBox" type="VBoxContainer" parent="Margin/VBox/TopBar"]
 layout_mode = 2
 size_flags_horizontal = 3
 alignment = 1
-theme_override_constants/separation = -10
+theme_override_constants/separation = -14
 
 [node name="LevelLabel" type="Label" parent="Margin/VBox/TopBar/TitleBox"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_type_variation = &"H2"
 text = "Nível 1"
+horizontal_alignment = 1
 
 [node name="NameLabel" type="Label" parent="Margin/VBox/TopBar/TitleBox"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_type_variation = &"Small"
 text = "Primeiros passos"
+horizontal_alignment = 1
 
-[node name="TimerLabel" type="Label" parent="Margin/VBox/TopBar"]
+[node name="HelpBtn" type="BaseButton" parent="Margin/VBox/TopBar"]
 unique_name_in_owner = true
-layout_mode = 2
-theme_type_variation = &"Muted"
-text = "0:00"
-
-[node name="HelpBtn" type="Button" parent="Margin/VBox/TopBar"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(88, 88)
+custom_minimum_size = Vector2(96, 96)
 layout_mode = 2
 tooltip_text = "Regras"
-theme_type_variation = &"IconButton"
-icon_alignment = 1
+script = ExtResource("4")
+icon_name = "ajuda"
 
-[node name="Chips" type="HFlowContainer" parent="Margin/VBox"]
-unique_name_in_owner = true
+[node name="Stats" type="HBoxContainer" parent="Margin/VBox"]
 layout_mode = 2
 alignment = 1
-theme_override_constants/h_separation = 12
-theme_override_constants/v_separation = 12
+theme_override_constants/separation = 16
+
+[node name="TimePill" type="PanelContainer" parent="Margin/VBox/Stats"]
+layout_mode = 2
+theme_type_variation = &"Pill"
+
+[node name="Row" type="HBoxContainer" parent="Margin/VBox/Stats/TimePill"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Icon" type="Control" parent="Margin/VBox/Stats/TimePill/Row"]
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+size_flags_vertical = 4
+script = ExtResource("5")
+icon_name = "relogio"
+color = Color(0.364706, 0.435294, 0.537255, 1)
+
+[node name="TimerLabel" type="Label" parent="Margin/VBox/Stats/TimePill/Row"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(72, 0)
+layout_mode = 2
+theme_type_variation = &"PillLabel"
+text = "0:00"
+
+[node name="ProgressPill" type="PanelContainer" parent="Margin/VBox/Stats"]
+layout_mode = 2
+theme_type_variation = &"Pill"
+
+[node name="Row" type="HBoxContainer" parent="Margin/VBox/Stats/ProgressPill"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="PawIcon" type="TextureRect" parent="Margin/VBox/Stats/ProgressPill/Row"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+size_flags_vertical = 4
+expand_mode = 1
+stretch_mode = 5
+
+[node name="ProgressLabel" type="Label" parent="Margin/VBox/Stats/ProgressPill/Row"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"PillLabel"
+text = "0/1"
+
+[node name="RulesCard" type="PanelContainer" parent="Margin/VBox"]
+layout_mode = 2
+theme_type_variation = &"RulesCard"
+
+[node name="Chips" type="HBoxContainer" parent="Margin/VBox/RulesCard"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 12
 
 [node name="Board" type="Control" parent="Margin/VBox"]
 unique_name_in_owner = true
@@ -88,36 +138,76 @@ script = ExtResource("2")
 
 [node name="Status" type="Label" parent="Margin/VBox"]
 unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 48)
 layout_mode = 2
 theme_type_variation = &"Muted"
 horizontal_alignment = 1
+vertical_alignment = 1
 autowrap_mode = 3
 
 [node name="BottomBar" type="HBoxContainer" parent="Margin/VBox"]
 layout_mode = 2
-theme_override_constants/separation = 16
+alignment = 1
+theme_override_constants/separation = 56
 
-[node name="UndoBtn" type="Button" parent="Margin/VBox/BottomBar"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 104)
+[node name="Undo" type="VBoxContainer" parent="Margin/VBox/BottomBar"]
 layout_mode = 2
-size_flags_horizontal = 3
+theme_override_constants/separation = 2
+
+[node name="UndoBtn" type="BaseButton" parent="Margin/VBox/BottomBar/Undo"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(116, 116)
+layout_mode = 2
+size_flags_horizontal = 4
+tooltip_text = "Desfazer"
+script = ExtResource("4")
+icon_name = "desfazer"
+
+[node name="Label" type="Label" parent="Margin/VBox/BottomBar/Undo"]
+layout_mode = 2
+theme_type_variation = &"Small"
 text = "Desfazer"
+horizontal_alignment = 1
 
-[node name="ClearBtn" type="Button" parent="Margin/VBox/BottomBar"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 104)
+[node name="Clear" type="VBoxContainer" parent="Margin/VBox/BottomBar"]
 layout_mode = 2
-size_flags_horizontal = 3
+theme_override_constants/separation = 2
+
+[node name="ClearBtn" type="BaseButton" parent="Margin/VBox/BottomBar/Clear"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(116, 116)
+layout_mode = 2
+size_flags_horizontal = 4
+tooltip_text = "Limpar tudo"
+script = ExtResource("4")
+icon_name = "limpar"
+
+[node name="Label" type="Label" parent="Margin/VBox/BottomBar/Clear"]
+layout_mode = 2
+theme_type_variation = &"Small"
 text = "Limpar"
+horizontal_alignment = 1
 
-[node name="HintBtn" type="Button" parent="Margin/VBox/BottomBar"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 104)
+[node name="Hint" type="VBoxContainer" parent="Margin/VBox/BottomBar"]
 layout_mode = 2
-size_flags_horizontal = 3
-theme_type_variation = &"PrimaryButton"
-text = "Dica 3"
+theme_override_constants/separation = 2
+
+[node name="HintBtn" type="BaseButton" parent="Margin/VBox/BottomBar/Hint"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(116, 116)
+layout_mode = 2
+size_flags_horizontal = 4
+tooltip_text = "Pedir uma dica"
+script = ExtResource("4")
+icon_name = "dica"
+primary = true
+badge = 3
+
+[node name="Label" type="Label" parent="Margin/VBox/BottomBar/Hint"]
+layout_mode = 2
+theme_type_variation = &"Small"
+text = "Dica"
+horizontal_alignment = 1
 
 [node name="Sheet" parent="." instance=ExtResource("3")]
 unique_name_in_owner = true

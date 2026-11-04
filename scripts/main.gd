@@ -9,7 +9,6 @@ var _current: Control
 
 func _ready() -> void:
 	theme = UITheme.build()
-	$Bg.color = Game.COLORS.sky
 	_make_snow()
 	show_menu()
 	if "--shots" in OS.get_cmdline_user_args():
@@ -42,10 +41,10 @@ func _swap(node: Control) -> void:
 
 func _notification(what: int) -> void:
 	# botão "voltar" do Android
-	if what == NOTIFICATION_WM_GO_BACK_REQUEST:
-		if _current and _current.has_signal("back_requested"):
-			show_menu()
-		else:
+	if what == NOTIFICATION_WM_GO_BACK_REQUEST and _current:
+		if _current.has_signal("back_requested"):
+			_current.handle_back()
+		elif not _current.handle_back():
 			get_tree().quit()
 
 

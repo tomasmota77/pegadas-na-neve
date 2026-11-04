@@ -24,6 +24,7 @@ var marks := {}            # Vector2i -> true (casas marcadas com X pelo jogador
 var active := ""           # animal a ser arrastado agora
 var hints_used := 0
 var _history: Array = []
+var _grab := -1            # índice do caminho onde o dedo pegou (corte adiado até mexer)
 
 
 static func _cell(a: Array) -> Vector2i:
@@ -56,6 +57,7 @@ func reset() -> void:
 		paths[a.type] = [a.den]
 	marks.clear()
 	active = ""
+	_grab = -1
 	hints_used = 0
 	_history.clear()
 
@@ -144,22 +146,32 @@ func is_solved() -> bool:
 ## Casas para onde o animal `t` pode ir a partir do fim do seu caminho.
 func valid_targets(t: String) -> Array:
 	var out := []
-	var p: Array = paths[t]
-	if is_complete(t):
+	var tip := tip_of(t)
+	if tip == animal(t).food:
 		return out
 	for m in MOVES[t]:
-		var n: Vector2i = p.back() + m
-		if can_step(t, p.back(), n):
+		var n: Vector2i = tip + m
+		if can_step(t, tip, n):
 			out.append(n)
 	return out
+
+
+## Ponta atual do caminho (onde o dedo pegou, se ainda não mexeu).
+func tip_of(t: String) -> Vector2i:
+	if t == active and _grab >= 0:
+		return paths[t][_grab]
+	return paths[t].back()
 
 
 func can_step(t: String, from: Vector2i, to: Vector2i) -> bool:
 	if not in_bounds(to) or rocks.has(to):
 		return false
+	if from == animal(t).food:
+		return false
 	if not (to - from in MOVES[t]):
 		return false
-	if occupant(to) != "":
+	var o := occupant(to)
+	if o != "" and not (o == t and t == active and _grab >= 0 and paths[t].find(to) > _grab):
 		return false
 	var s := special(to)
 	if not s.is_empty() and (s.type != t or s.role != "food"):
@@ -177,7 +189,10 @@ func _crosses(from: Vector2i, to: Vector2i) -> bool:
 	var b := Vector2i(to.x, from.y)
 	for t in paths:
 		var p: Array = paths[t]
-		for i in range(p.size() - 1):
+		var last := p.size() - 1
+		if t == active and _grab >= 0:
+			last = _grab
+		for i in range(last):
 			if (p[i] == a and p[i + 1] == b) or (p[i] == b and p[i + 1] == a):
 				return true
 	return false
@@ -185,22 +200,18 @@ func _crosses(from: Vector2i, to: Vector2i) -> bool:
 
 # ---------- ações do jogador ----------
 
-## Toque numa casa. Devolve "drag" (começou a arrastar), "mark" (casa vazia) ou "".
+## Toque numa casa. Devolve "drag" (pegou num caminho), "mark" (casa vazia) ou "".
+## O caminho só é cortado quando o dedo se mexe: um toque sem arrastar não muda nada.
 func press(c: Vector2i) -> String:
 	if not in_bounds(c):
 		return ""
 	var s := special(c)
-	if not s.is_empty() and s.role == "den":
-		_snapshot()
-		paths[s.type] = [c]
-		active = s.type
-		return "drag"
 	var t := occupant(c)
+	if t == "" and not s.is_empty() and s.role == "den":
+		t = s.type
 	if t != "":
-		var p: Array = paths[t]
-		_snapshot()
-		paths[t] = p.slice(0, p.find(c) + 1)
 		active = t
+		_grab = paths[t].find(c)
 		return "drag"
 	if s.is_empty() and not rocks.has(c):
 		return "mark"
@@ -212,6 +223,18 @@ func drag(c: Vector2i) -> String:
 	if active == "":
 		return ""
 	var p: Array = paths[active]
+	if _grab >= 0:
+		if c == p[_grab]:
+			return ""
+		# primeiro movimento: guarda o estado e corta o caminho onde o dedo pegou
+		var prev := p.slice(0, _grab + 1)
+		var to_old_back: bool = _grab >= 1 and c == p[_grab - 1]
+		if not to_old_back and not can_step(active, p[_grab], c):
+			return ""
+		_snapshot()
+		paths[active] = prev
+		p = prev
+		_grab = -1
 	if c == p.back():
 		return ""
 	if p.size() >= 2 and c == p[p.size() - 2]:
@@ -226,6 +249,7 @@ func drag(c: Vector2i) -> String:
 
 func release() -> void:
 	active = ""
+	_grab = -1
 
 
 func toggle_mark(c: Vector2i) -> void:
@@ -237,6 +261,8 @@ func toggle_mark(c: Vector2i) -> void:
 
 
 func clear_all() -> void:
+	if marks.is_empty() and paths.values().all(func(p): return p.size() == 1):
+		return
 	_snapshot()
 	for a in animals:
 		paths[a.type] = [a.den]
@@ -253,6 +279,9 @@ func undo() -> void:
 	var s: Dictionary = _history.pop_back()
 	paths = s.paths
 	marks = s.marks
+	# pistas reveladas por dicas ficam: tira-as dos caminhos de outros animais
+	for g in givens:
+		_clear_others_at(g, givens[g])
 
 
 func _snapshot() -> void:
@@ -299,12 +328,31 @@ func _clear_others_at(c: Vector2i, t: String) -> void:
 		paths[o] = p.slice(0, p.find(c))
 
 
+func complete_count() -> int:
+	var n := 0
+	for a in animals:
+		if is_complete(a.type):
+			n += 1
+	return n
+
+
+## Pistas por onde o caminho do respetivo animal ainda não passa.
+func missing_givens() -> Array:
+	var out := []
+	for g in givens:
+		if not (g in paths[givens[g]]):
+			out.append(g)
+	return out
+
+
 ## Mensagem curta sobre o estado atual (para a linha de estado).
 func status_text() -> String:
 	if is_solved():
 		return "Encontraste todos os caminhos!"
 	if all_complete():
 		if not counts_ok():
-			return "Os números das bordas ainda não batem certo."
+			return "Os números a vermelho ainda não batem certo."
 		return "Falta passar por uma das pegadas marcadas."
-	return "Arrasta a partir da toca de cada animal."
+	if complete_count() == 0 and _history.is_empty():
+		return "Arrasta cada animal até à sua comida."
+	return "Toca numa casa vazia para a marcar com um X."

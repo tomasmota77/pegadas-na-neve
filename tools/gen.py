@@ -172,7 +172,6 @@ def make_level(spec, rng):
             if not path:
                 fail = True
                 break
-            # comida não pode estar à distância de um só movimento da toca (fica trivial)
             paths[t] = path
             occupied |= set(path)
             if t == "raposa":

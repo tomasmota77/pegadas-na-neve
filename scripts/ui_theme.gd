@@ -1,8 +1,8 @@
 class_name UITheme
 extends RefCounted
 ## Constrói o tema da interface (cores, fontes, botões, painéis).
-## Variações de tipo: PrimaryButton, LevelButton, LevelButtonDone, IconButton,
-## Card, Chip, Sheet, Title, H2, Muted, Small.
+## Variações de tipo: PrimaryButton, SoftButton, Card, RulesCard, Pill, Sheet,
+## Title, H2, Muted, Small, PillLabel, ChipTitle.
 
 const FONT_MEDIUM := preload("res://assets/fonts/Baloo2-Medium.ttf")
 const FONT_BOLD := preload("res://assets/fonts/Baloo2-Bold.ttf")
@@ -22,8 +22,9 @@ static func build() -> Theme:
 
 	# Texto
 	th.set_color("font_color", "Label", C.ink)
-	for v in [["Title", FONT_XBOLD, SIZE_TITLE, C.ink], ["H2", FONT_BOLD, SIZE_H2, C.ink],
-			["Muted", FONT_MEDIUM, SIZE_BODY, C.ink_soft], ["Small", FONT_MEDIUM, SIZE_SMALL, C.ink_soft]]:
+	for v in [["Title", FONT_XBOLD, SIZE_TITLE, C.ink], ["H2", FONT_XBOLD, SIZE_H2, C.ink],
+			["Muted", FONT_MEDIUM, SIZE_BODY, C.ink_soft], ["Small", FONT_MEDIUM, SIZE_SMALL, C.ink_soft],
+			["PillLabel", FONT_XBOLD, SIZE_BODY, C.ink], ["ChipTitle", FONT_XBOLD, SIZE_SMALL + 2, C.ink]]:
 		th.set_type_variation(v[0], "Label")
 		th.set_font("font", v[0], v[1])
 		th.set_font_size("font_size", v[0], v[2])
@@ -36,35 +37,43 @@ static func build() -> Theme:
 	th.set_font_size("bold_font_size", "RichTextLabel", SIZE_BODY)
 
 	# Botões
-	_button(th, "Button", C.snow, C.ink, 28, C.frost_dark)
+	_button(th, "Button", C.snow, C.ink, 32, C.frost_dark)
 	th.set_type_variation("PrimaryButton", "Button")
-	_button(th, "PrimaryButton", C.ink, C.snow, 32, Color(C.ink, 0.35))
-	th.set_type_variation("LevelButton", "Button")
-	_button(th, "LevelButton", C.snow, C.ink, 48, C.frost_dark)
-	th.set_type_variation("LevelButtonDone", "Button")
-	_button(th, "LevelButtonDone", C.ink, C.snow, 48, Color(C.ink, 0.35))
-	th.set_type_variation("IconButton", "Button")
-	_button(th, "IconButton", C.snow, C.ink, 40, C.frost_dark)
-	for v in ["Button", "PrimaryButton", "LevelButton", "LevelButtonDone", "IconButton"]:
-		th.set_font("font", v, FONT_BOLD)
-		th.set_font_size("font_size", v, SIZE_BODY)
-	th.set_font_size("font_size", "LevelButton", SIZE_H2)
-	th.set_font_size("font_size", "LevelButtonDone", SIZE_H2)
+	_button(th, "PrimaryButton", C.ink, C.snow, 32, C.ink.darkened(0.45))
+	th.set_type_variation("SoftButton", "Button")
+	_button(th, "SoftButton", C.sky, C.ink, 32, Color(0, 0, 0, 0))
+	for v in ["Button", "PrimaryButton", "SoftButton"]:
+		th.set_font("font", v, FONT_XBOLD)
+		th.set_font_size("font_size", v, SIZE_BODY + 2)
 	th.set_constant("h_separation", "Button", 12)
 	th.set_constant("icon_max_width", "Button", 44)
-	th.set_constant("icon_max_width", "IconButton", 48)
 
 	# Painéis
 	th.set_stylebox("panel", "PanelContainer", _box(C.snow, 40, 32, 28, C.frost_dark))
 	th.set_type_variation("Card", "PanelContainer")
-	th.set_stylebox("panel", "Card", _box(Color(C.snow, 0.72), 40, 32, 28, Color(C.frost_dark, 0.5)))
-	th.set_type_variation("Chip", "PanelContainer")
-	th.set_stylebox("panel", "Chip", _box(C.snow, 40, 20, 8, Color(C.frost_dark, 0.6)))
+	th.set_stylebox("panel", "Card", _box(C.snow, 40, 28, 24, C.frost_dark))
+	th.set_type_variation("RulesCard", "PanelContainer")
+	th.set_stylebox("panel", "RulesCard", _box(C.snow, 32, 12, 12, C.frost_dark))
+	th.set_type_variation("Pill", "PanelContainer")
+	th.set_stylebox("panel", "Pill", _box(C.snow, 40, 22, 6, C.frost_dark))
 	th.set_type_variation("Sheet", "PanelContainer")
-	var sheet := _box(C.snow, 48, 48, 40, Color(0, 0, 0, 0))
+	var sheet := _box(C.snow, 48, 48, 28, Color(C.ink, 0.25))
 	sheet.corner_radius_bottom_left = 0
 	sheet.corner_radius_bottom_right = 0
+	sheet.content_margin_bottom = 48
+	sheet.shadow_offset = Vector2(0, -4)
+	sheet.shadow_size = 16
 	th.set_stylebox("panel", "Sheet", sheet)
+
+	# Barra de progresso
+	var track := StyleBoxFlat.new()
+	track.bg_color = C.frost
+	track.set_corner_radius_all(8)
+	var fill := StyleBoxFlat.new()
+	fill.bg_color = C.ok
+	fill.set_corner_radius_all(8)
+	th.set_stylebox("background", "ProgressBar", track)
+	th.set_stylebox("fill", "ProgressBar", fill)
 
 	# Barra de scroll discreta
 	var empty := StyleBoxEmpty.new()

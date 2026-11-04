@@ -18,6 +18,7 @@ var _snow_box: StyleBoxFlat
 var _rock_box: StyleBoxFlat
 var _card_box: StyleBoxFlat
 var _pill_box: StyleBoxFlat
+var _bad_box: StyleBoxFlat
 
 var _press_cell := Vector2i(-1, -1)
 var _press_action := ""
@@ -68,6 +69,7 @@ func _layout() -> void:
 	_rock_box = _box(Color(C.frost, 0.55), cell * 0.2, Color(0, 0, 0, 0), 0)
 	_card_box = _box(Color(C.snow, 0.5), cell * 0.32, Color(C.frost_dark, 0.35), cell * 0.06)
 	_pill_box = _box(Color(C.ok, 0.14), hdr * 0.4, Color(0, 0, 0, 0), 0)
+	_bad_box = _box(Color(C.bad, 0.12), hdr * 0.4, Color(0, 0, 0, 0), 0)
 
 
 func _box(bg: Color, radius: float, shadow: Color, off: float) -> StyleBoxFlat:
@@ -152,6 +154,7 @@ func _on_release() -> void:
 		changed.emit()
 	st.release()
 	_press_action = ""
+	changed.emit()
 	queue_redraw()
 	if st.is_solved():
 		solved.emit()
@@ -229,6 +232,7 @@ func _draw() -> void:
 
 	if st.active != "":
 		var col: Color = Game.ANIMALS[st.active].color
+		draw_arc(center_of(st.tip_of(st.active)), cell * 0.44, 0.0, TAU, 40, Color(col, 0.7), cell * 0.05, true)
 		for c in st.valid_targets(st.active):
 			draw_circle(center_of(c), cell * 0.09, Color(col, 0.55), true, -1.0, true)
 
@@ -236,22 +240,26 @@ func _draw() -> void:
 func _draw_counters() -> void:
 	var C: Dictionary = Game.COLORS
 	var fs := int(clampf(cell * 0.42, 22.0, 44.0))
+	var strict := st.all_complete()
 	for x in st.width:
 		var r := Rect2(origin.x + x * cell, origin.y - hdr - cell * 0.1, cell, hdr)
-		_counter(r, st.col_count(x), st.col_targets[x], fs, C)
+		_counter(r, st.col_count(x), st.col_targets[x], fs, C, strict)
 	for y in st.height:
 		var r := Rect2(origin.x - hdr - cell * 0.1, origin.y + y * cell, hdr, cell)
-		_counter(r, st.row_count(y), st.row_targets[y], fs, C)
+		_counter(r, st.row_count(y), st.row_targets[y], fs, C, strict)
 
 
-func _counter(r: Rect2, cur: int, target: int, fs: int, C: Dictionary) -> void:
+## strict: todos os animais chegaram à comida, por isso qualquer diferença é erro.
+func _counter(r: Rect2, cur: int, target: int, fs: int, C: Dictionary, strict: bool) -> void:
 	var col: Color = C.ink
+	var s := minf(r.size.x, r.size.y) * 0.86
+	var pill := Rect2(r.get_center() - Vector2(s, s) * 0.5, Vector2(s, s))
 	if cur == target:
 		col = C.ok
-		var s := minf(r.size.x, r.size.y) * 0.86
-		_pill_box.draw(get_canvas_item(), Rect2(r.get_center() - Vector2(s, s) * 0.5, Vector2(s, s)))
-	elif cur > target:
+		_pill_box.draw(get_canvas_item(), pill)
+	elif cur > target or strict:
 		col = C.bad
+		_bad_box.draw(get_canvas_item(), pill)
 	var base := r.get_center().y + (FONT.get_ascent(fs) - FONT.get_descent(fs)) * 0.5
 	draw_string(FONT, Vector2(r.position.x, base), str(target), HORIZONTAL_ALIGNMENT_CENTER, r.size.x, fs, col)
 
@@ -289,19 +297,19 @@ func _draw_givens_and_paws() -> void:
 	var total := 0
 	for a in st.animals:
 		total += maxi(0, st.paths[a.type].size() - 2)
+	var warn := st.all_complete()
 	for g in st.givens:
 		var t: String = st.givens[g]
 		if not (g in st.paths[t]):
 			var col: Color = Game.ANIMALS[t].color
-			draw_arc(center_of(g), cell * 0.36, 0.0, TAU, 40, Color(col, 0.5), cell * 0.045, true)
+			var ring: Color = Game.COLORS.bad if warn else Color(col, 0.5)
+			draw_arc(center_of(g), cell * 0.36, 0.0, TAU, 40, ring, cell * 0.045, true)
 			_draw_tex(_tex["pegada_" + t], center_of(g), cell * 0.5, 0.0, Color(col, 0.55))
 	for a in st.animals:
 		var t: String = a.type
 		var p: Array = st.paths[t]
 		var col: Color = Game.ANIMALS[t].color
 		for i in range(1, p.size() - 1):
-			if i == p.size() - 1:
-				break
 			var d := Vector2(p[i] - p[i - 1]).normalized()
 			var ang := atan2(d.x, -d.y)
 			var s := cell * 0.5

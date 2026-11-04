@@ -13,19 +13,20 @@ const COLORS := {
 	"frost_dark": Color("a9bccf"),
 	"ok": Color("3e9a5e"),
 	"bad": Color("d9534f"),
+	"star": Color("f5b82e"),
 }
 
 const ANIMALS := {
 	"ourico": {
-		"name": "Ouriço", "rule": "Anda 1 casa", "color": Color("2e8c7e"),
+		"name": "Ouriço", "rule": "Anda 1 casa", "color": Color("2e8c7e"), "food": "cogumelo",
 		"detail": "Anda 1 casa de cada vez: para cima, para baixo ou para os lados.",
 	},
 	"coelho": {
-		"name": "Coelho", "rule": "Salta 2 casas", "color": Color("c2477a"),
+		"name": "Coelho", "rule": "Salta 2 casas", "color": Color("c2477a"), "food": "cenoura",
 		"detail": "Salta sempre 2 casas em linha reta, por cima do que estiver no meio, até de rochas.",
 	},
 	"raposa": {
-		"name": "Raposa", "rule": "Anda na diagonal", "color": Color("e3801f"),
+		"name": "Raposa", "rule": "Anda na diagonal", "color": Color("e3801f"), "food": "mirtilos",
 		"detail": "Anda 1 casa na diagonal. O caminho dela não se pode cruzar em X.",
 	},
 }
@@ -36,7 +37,8 @@ const WORLDS := [
 ]
 
 var levels: Array = []
-var progress := {"done": {}, "seen": []}  # done: índice -> melhor tempo (s)
+## done: índice (texto) -> {"t": melhor tempo em s, "s": melhores estrelas}
+var progress := {"done": {}, "seen": [], "vibrate": true}
 var current := 0
 
 
@@ -55,8 +57,29 @@ func is_done(i: int) -> bool:
 	return progress.done.has(str(i))
 
 
+## Um nível está aberto se for o primeiro ou se o anterior estiver resolvido.
+func is_unlocked(i: int) -> bool:
+	return i == 0 or is_done(i - 1) or is_done(i)
+
+
 func best_time(i: int) -> float:
-	return float(progress.done.get(str(i), 0.0))
+	return float(progress.done.get(str(i), {}).get("t", 0.0))
+
+
+func stars(i: int) -> int:
+	return int(progress.done.get(str(i), {}).get("s", 0))
+
+
+## Estrelas por nível: 3 sem dicas, 2 com uma, 1 com mais.
+static func stars_for(hints_used: int) -> int:
+	return clampi(3 - hints_used, 1, 3)
+
+
+func total_stars() -> int:
+	var n := 0
+	for k in progress.done:
+		n += int(progress.done[k].get("s", 0))
+	return n
 
 
 func first_unsolved() -> int:
@@ -73,11 +96,17 @@ func world_of(i: int) -> int:
 	return 0
 
 
-func mark_done(i: int, seconds: float) -> void:
+## Guarda o resultado. Devolve true se for um novo recorde de tempo.
+func mark_done(i: int, seconds: float, got_stars: int) -> bool:
 	var k := str(i)
-	if not progress.done.has(k) or seconds < float(progress.done[k]):
-		progress.done[k] = seconds
+	var prev: Dictionary = progress.done.get(k, {})
+	var record := prev.is_empty() or seconds < float(prev.get("t", INF))
+	progress.done[k] = {
+		"t": seconds if record else float(prev.t),
+		"s": maxi(got_stars, int(prev.get("s", 0))),
+	}
 	_save()
+	return record and not prev.is_empty()
 
 
 func has_seen(animal_type: String) -> bool:
@@ -90,13 +119,38 @@ func mark_seen(animal_type: String) -> void:
 		_save()
 
 
+func set_vibrate(on: bool) -> void:
+	progress.vibrate = on
+	_save()
+
+
+func vibrate(ms: int) -> void:
+	if progress.vibrate:
+		Input.vibrate_handheld(ms)
+
+
+func reset_progress() -> void:
+	progress.done = {}
+	progress.seen = []
+	_save()
+
+
 func _load() -> void:
 	if not FileAccess.file_exists(SAVE_PATH):
 		return
 	var data = JSON.parse_string(FileAccess.get_file_as_string(SAVE_PATH))
-	if data is Dictionary:
-		progress.done = data.get("done", {})
-		progress.seen = data.get("seen", [])
+	if not (data is Dictionary):
+		return
+	var done = data.get("done", {})
+	if done is Dictionary:
+		for k in done:
+			# formato antigo: só o tempo
+			var v = done[k]
+			progress.done[k] = v if v is Dictionary else {"t": float(v), "s": 3}
+	var seen = data.get("seen", [])
+	if seen is Array:
+		progress.seen = seen
+	progress.vibrate = bool(data.get("vibrate", true))
 
 
 func _save() -> void:

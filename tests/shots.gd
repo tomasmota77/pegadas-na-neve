@@ -67,4 +67,7 @@ func _run() -> void:
 	main.show_menu()
 	await _wait(30)
 	await _shot("09_menu_depois")
+	main._current._show_settings()
+	await _wait(30)
+	await _shot("10_definicoes")
 	get_tree().quit()
