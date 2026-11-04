@@ -93,11 +93,19 @@ O menu mostra `logo_<língua>.png`. Se não existir para a língua escolhida, mo
 | `logo_fr.png` | Traces dans la Neige |
 | `logo_de.png` | Spuren im Schnee |
 
-Usa o `logo_en.png` como imagem de referência e troca só o texto:
+Gera cada um com o `logo_en.png` como imagem de referência, para o estilo ficar igual. Os modelos de imagem às vezes trocam ou esquecem letras: confirma o texto antes de usar.
 
-> Game logo with the exact text "TEXTO" and no other words. Same style as the reference image: chunky rounded bold letters, dark navy (#20304A), soft fluffy white snow on top of the letters, small animal paw prints next to the text. Centered, transparent background.
+**`logo_pt.png`**
+> Game logo, same style as the reference image. The exact text "Pegadas na Neve" in two lines: "Pegadas" on the first line and "na Neve" on the second line, both lines centered. Spelled P-E-G-A-D-A-S, N-A, N-E-V-E. No other words or letters. Very chunky, soft, rounded bubble letters in solid dark navy (#20304A), each letter with a thick fluffy white snow cap on top with soft light blue shading. Two small dark navy animal paw prints on the left and two on the right. Cute cozy winter mobile game style, flat colors, no outline around the letters, no background, transparent background.
 
-Os modelos de imagem às vezes trocam ou esquecem letras e acentos (é, ü): confirma o texto antes de usar.
+**`logo_es.png`**
+> Game logo, same style as the reference image. The exact text "Huellas en la Nieve" in two lines: "Huellas en" on the first line and "la Nieve" on the second line, both lines centered. Spelled H-U-E-L-L-A-S, E-N, L-A, N-I-E-V-E. No other words or letters. Very chunky, soft, rounded bubble letters in solid dark navy (#20304A), each letter with a thick fluffy white snow cap on top with soft light blue shading. Two small dark navy animal paw prints on the left and two on the right. Cute cozy winter mobile game style, flat colors, no outline around the letters, no background, transparent background.
+
+**`logo_fr.png`**
+> Game logo, same style as the reference image. The exact text "Traces dans la Neige" in two lines: "Traces dans" on the first line and "la Neige" on the second line, both lines centered. Spelled T-R-A-C-E-S, D-A-N-S, L-A, N-E-I-G-E. No other words or letters. Very chunky, soft, rounded bubble letters in solid dark navy (#20304A), each letter with a thick fluffy white snow cap on top with soft light blue shading. Two small dark navy animal paw prints on the left and two on the right. Cute cozy winter mobile game style, flat colors, no outline around the letters, no background, transparent background.
+
+**`logo_de.png`**
+> Game logo, same style as the reference image. The exact text "Spuren im Schnee" in two lines: "Spuren" on the first line and "im Schnee" on the second line, both lines centered. Spelled S-P-U-R-E-N, I-M, S-C-H-N-E-E. No other words or letters. Very chunky, soft, rounded bubble letters in solid dark navy (#20304A), each letter with a thick fluffy white snow cap on top with soft light blue shading. Two small dark navy animal paw prints on the left and two on the right. Cute cozy winter mobile game style, flat colors, no outline around the letters, no background, transparent background.
 
 ## Botões e caixas (opcional)
 
