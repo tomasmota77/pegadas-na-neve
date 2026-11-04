@@ -1,7 +1,7 @@
 class_name StarRow
 extends Control
 ## Três estrelas (assets/images/estrela.png); as ganhas aparecem uma a uma com um salto.
-## Sem a imagem, mostra o texto "2/3 estrelas".
+## Sem a imagem, mostra o texto "2/3" (chave STARS_OF_3).
 
 const FONT := preload("res://assets/fonts/Baloo2-ExtraBold.ttf")
 
@@ -28,7 +28,7 @@ func _draw() -> void:
 	if tex == null:
 		var fs := int(size.y * 0.42)
 		var base := size.y * 0.5 + (FONT.get_ascent(fs) - FONT.get_descent(fs)) * 0.5
-		draw_string(FONT, Vector2(0, base), "%d/3 estrelas" % filled, HORIZONTAL_ALIGNMENT_CENTER, size.x, fs, Game.COLORS.star.darkened(0.15))
+		draw_string(FONT, Vector2(0, base), tr("STARS_OF_3") % filled, HORIZONTAL_ALIGNMENT_CENTER, size.x, fs, Game.COLORS.star.darkened(0.15))
 		return
 	var s := minf(size.y, size.x / 3.6)
 	for i in 3:

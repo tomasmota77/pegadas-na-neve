@@ -79,5 +79,14 @@ func _init() -> void:
 			check(st.drag(n) == "", "o caminho continuou depois da comida")
 	st.release()
 	check(st.is_complete("ourico"), "o caminho deixou de estar completo")
+	# traduções: todas as línguas carregadas e com os textos principais
+	for lang in ["pt", "en", "es", "fr", "de"]:
+		TranslationServer.set_locale(lang)
+		for key in ["LEVEL_N", "RULES_BODY", "NAME_RAPOSA", "LEVEL_NAME_12", "STATUS_START"]:
+			check(tr(key) != key, "tradução em falta: %s em %s" % [key, lang])
+	TranslationServer.set_locale("pt")
+	check(tr("LEVEL_N") % 3 == "Nível 3", "português errado")
+	TranslationServer.set_locale("en")
+	check(tr("LEVEL_N") % 3 == "Level 3", "inglês errado")
 	print("Níveis testados: %d | falhas: %d" % [levels.size(), fails])
 	quit(1 if fails > 0 else 0)

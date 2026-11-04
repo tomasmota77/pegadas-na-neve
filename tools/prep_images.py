@@ -25,15 +25,22 @@ SQUARE = {
 }
 MARGIN = 0.04  # espaço livre à volta, em fração do lado
 
+# Fundos da interface (opcionais). Os botões, cartões e pílulas esticam no meio
+# (9-slice), por isso só se corta a margem vazia e se acerta a altura/lado menor.
+UI_HEIGHT = {"ui_botao": 128, "ui_botao_claro": 128, "ui_pilula": 64}
+UI_MIN_SIDE = {"ui_cartao": 160}
+UI_SQUARE = {"ui_redondo": 256, "ui_redondo_escuro": 256,
+             "ui_nivel": 128, "ui_nivel_feito": 128, "ui_nivel_fechado": 128}
+
 
 def trim(im):
     box = im.getchannel("A").point(lambda a: 255 if a > 8 else 0).getbbox()
     return im.crop(box) if box else im
 
 
-def square(im, side):
+def square(im, side, margin=MARGIN):
     im = trim(im.convert("RGBA"))
-    inner = side * (1 - 2 * MARGIN)
+    inner = side * (1 - 2 * margin)
     k = inner / max(im.size)
     im = im.resize((max(1, round(im.width * k)), max(1, round(im.height * k))), Image.LANCZOS)
     out = Image.new("RGBA", (side, side), (0, 0, 0, 0))
@@ -56,12 +63,31 @@ def main():
             print("ok", name)
         else:
             print("FALTA", name)
-    p = os.path.join(IMG, "logo.png")
-    if os.path.exists(p):
-        im = trim(Image.open(p).convert("RGBA"))
-        im.thumbnail((1024, 1024), Image.LANCZOS)
-        im.save(p, optimize=True)
-        print("ok logo", im.size)
+    for f in sorted(os.listdir(IMG)):
+        if f.startswith("logo") and f.endswith(".png"):
+            p = os.path.join(IMG, f)
+            im = trim(Image.open(p).convert("RGBA"))
+            im.thumbnail((1024, 1024), Image.LANCZOS)
+            im.save(p, optimize=True)
+            print("ok", f, im.size)
+    for name, h in UI_HEIGHT.items():
+        p = os.path.join(IMG, name + ".png")
+        if os.path.exists(p):
+            im = trim(Image.open(p).convert("RGBA"))
+            im.resize((round(im.width * h / im.height), h), Image.LANCZOS).save(p, optimize=True)
+            print("ok", name)
+    for name, side in UI_MIN_SIDE.items():
+        p = os.path.join(IMG, name + ".png")
+        if os.path.exists(p):
+            im = trim(Image.open(p).convert("RGBA"))
+            k = side / min(im.size)
+            im.resize((round(im.width * k), round(im.height * k)), Image.LANCZOS).save(p, optimize=True)
+            print("ok", name)
+    for name, side in UI_SQUARE.items():
+        p = os.path.join(IMG, name + ".png")
+        if os.path.exists(p):
+            square(Image.open(p), side, 0.0).save(p, optimize=True)
+            print("ok", name)
     p = os.path.join(IMG, "fundo.png")
     if os.path.exists(p):
         cover(Image.open(p).convert("RGB"), 1080, 1920).save(p, optimize=True)

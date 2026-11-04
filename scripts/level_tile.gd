@@ -47,9 +47,16 @@ func _draw() -> void:
 		"done":
 			bg = C.ink
 			fg = C.snow
-	if lift > 0.0:
-		_box(Color(C.frost_dark if state != "done" else C.ink.darkened(0.45), 0.6), rad).draw(get_canvas_item(), Rect2(r.position + Vector2(0, lift), r.size))
-	_box(bg, rad).draw(get_canvas_item(), r)
+	# base: imagem ui_nivel / ui_nivel_feito / ui_nivel_fechado.png se existir
+	var tex_name: String = {"locked": "ui_nivel_fechado", "done": "ui_nivel_feito"}.get(state, "ui_nivel")
+	var tex_box := UITheme.tex_box(tex_name, 40, 0, 0)
+	if tex_box:
+		tex_box.modulate_color = Color(0.9, 0.9, 0.9) if down else Color.WHITE
+		tex_box.draw(get_canvas_item(), Rect2(r.position, r.size + Vector2(0, 6)))
+	else:
+		if lift > 0.0:
+			_box(Color(C.frost_dark if state != "done" else C.ink.darkened(0.45), 0.6), rad).draw(get_canvas_item(), Rect2(r.position + Vector2(0, lift), r.size))
+		_box(bg, rad).draw(get_canvas_item(), r)
 	if state == "current":
 		var k := 0.5 + 0.5 * sin(_pulse)
 		var ring := _box(Color(0, 0, 0, 0), rad + 6)

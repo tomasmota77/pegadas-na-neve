@@ -29,7 +29,7 @@ func open(title: String, body: String, image: Texture2D = null, buttons: Array =
 	for c in %Buttons.get_children():
 		c.queue_free()
 	if buttons.is_empty():
-		buttons = [{"text": "Percebi", "primary": true}]
+		buttons = [{"text": tr("GOT_IT"), "primary": true}]
 	_buttons = buttons
 	for b in buttons:
 		var btn := Button.new()

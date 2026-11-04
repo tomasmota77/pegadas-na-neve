@@ -39,7 +39,7 @@ theme_override_constants/separation = 16
 unique_name_in_owner = true
 custom_minimum_size = Vector2(96, 96)
 layout_mode = 2
-tooltip_text = "Voltar aos níveis"
+tooltip_text = "TT_BACK"
 script = ExtResource("4")
 icon_name = "voltar"
 
@@ -53,21 +53,21 @@ theme_override_constants/separation = -14
 unique_name_in_owner = true
 layout_mode = 2
 theme_type_variation = &"H2"
-text = "Nível 1"
+text = ""
 horizontal_alignment = 1
 
 [node name="NameLabel" type="Label" parent="Margin/VBox/TopBar/TitleBox"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_type_variation = &"Small"
-text = "Primeiros passos"
+text = ""
 horizontal_alignment = 1
 
 [node name="HelpBtn" type="BaseButton" parent="Margin/VBox/TopBar"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(96, 96)
 layout_mode = 2
-tooltip_text = "Regras"
+tooltip_text = "RULES_TITLE"
 script = ExtResource("4")
 icon_name = "ajuda"
 
@@ -159,14 +159,14 @@ unique_name_in_owner = true
 custom_minimum_size = Vector2(116, 116)
 layout_mode = 2
 size_flags_horizontal = 4
-tooltip_text = "Desfazer"
+tooltip_text = "UNDO"
 script = ExtResource("4")
 icon_name = "desfazer"
 
 [node name="Label" type="Label" parent="Margin/VBox/BottomBar/Undo"]
 layout_mode = 2
 theme_type_variation = &"Small"
-text = "Desfazer"
+text = "UNDO"
 horizontal_alignment = 1
 
 [node name="Clear" type="VBoxContainer" parent="Margin/VBox/BottomBar"]
@@ -178,14 +178,14 @@ unique_name_in_owner = true
 custom_minimum_size = Vector2(116, 116)
 layout_mode = 2
 size_flags_horizontal = 4
-tooltip_text = "Limpar tudo"
+tooltip_text = "TT_CLEAR"
 script = ExtResource("4")
 icon_name = "limpar"
 
 [node name="Label" type="Label" parent="Margin/VBox/BottomBar/Clear"]
 layout_mode = 2
 theme_type_variation = &"Small"
-text = "Limpar"
+text = "CLEAR"
 horizontal_alignment = 1
 
 [node name="Hint" type="VBoxContainer" parent="Margin/VBox/BottomBar"]
@@ -197,7 +197,7 @@ unique_name_in_owner = true
 custom_minimum_size = Vector2(116, 116)
 layout_mode = 2
 size_flags_horizontal = 4
-tooltip_text = "Pedir uma dica"
+tooltip_text = "TT_HINT"
 script = ExtResource("4")
 icon_name = "dica"
 primary = true
@@ -206,7 +206,7 @@ badge = 3
 [node name="Label" type="Label" parent="Margin/VBox/BottomBar/Hint"]
 layout_mode = 2
 theme_type_variation = &"Small"
-text = "Dica"
+text = "HINT"
 horizontal_alignment = 1
 
 [node name="Sheet" parent="." instance=ExtResource("3")]

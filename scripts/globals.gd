@@ -16,29 +16,28 @@ const COLORS := {
 	"star": Color("f5b82e"),
 }
 
+## Os textos (nome, regra, detalhe...) estão em data/traducoes.csv,
+## com as chaves NAME_<TIPO>, RULE_<TIPO>, DETAIL_<TIPO>, MEET_<TIPO> e LEAD_<TIPO>.
 const ANIMALS := {
-	"ourico": {
-		"name": "Ouriço", "rule": "Anda 1 casa", "color": Color("2e8c7e"), "food": "cogumelo",
-		"detail": "Anda 1 casa de cada vez: para cima, para baixo ou para os lados.",
-	},
-	"coelho": {
-		"name": "Coelho", "rule": "Salta 2 casas", "color": Color("c2477a"), "food": "cenoura",
-		"detail": "Salta sempre 2 casas em linha reta, por cima do que estiver no meio, até de rochas.",
-	},
-	"raposa": {
-		"name": "Raposa", "rule": "Anda na diagonal", "color": Color("e3801f"), "food": "mirtilos",
-		"detail": "Anda 1 casa na diagonal. O caminho dela não se pode cruzar em X.",
-	},
+	"ourico": {"color": Color("2e8c7e")},
+	"coelho": {"color": Color("c2477a")},
+	"raposa": {"color": Color("e3801f")},
 }
 
+## Nome de cada mundo: chave WORLD_<n> em data/traducoes.csv.
 const WORLDS := [
-	{"name": "Clareira", "levels": [0, 1, 2, 3, 4, 5]},
-	{"name": "Bosque", "levels": [6, 7, 8, 9, 10, 11]},
+	{"levels": [0, 1, 2, 3, 4, 5]},
+	{"levels": [6, 7, 8, 9, 10, 11]},
 ]
+
+## Línguas do jogo (código -> nome na própria língua). Para juntar uma,
+## acrescenta a coluna em data/traducoes.csv e o ficheiro em project.godot.
+const LANGS := {"pt": "Português", "en": "English", "es": "Español", "fr": "Français", "de": "Deutsch"}
 
 var levels: Array = []
 ## done: índice (texto) -> {"t": melhor tempo em s, "s": melhores estrelas}
-var progress := {"done": {}, "seen": [], "vibrate": true}
+## lang: "" segue a língua do telemóvel
+var progress := {"done": {}, "seen": [], "vibrate": true, "lang": ""}
 var current := 0
 
 
@@ -46,6 +45,45 @@ func _ready() -> void:
 	var f := FileAccess.open("res://data/levels.json", FileAccess.READ)
 	levels = JSON.parse_string(f.get_as_text())
 	_load()
+	_apply_language()
+
+
+# ---------- línguas ----------
+
+## Língua em uso ("pt", "en", ...).
+func language() -> String:
+	if progress.lang in LANGS:
+		return progress.lang
+	var os_lang := OS.get_locale_language()
+	return os_lang if os_lang in LANGS else "en"
+
+
+func set_language(code: String) -> void:
+	progress.lang = code
+	_save()
+	_apply_language()
+
+
+func _apply_language() -> void:
+	TranslationServer.set_locale(language())
+
+
+## Texto de um animal: field é "NAME", "RULE", "DETAIL", "MEET" ou "LEAD".
+func animal_text(t: String, field: String) -> String:
+	return tr("%s_%s" % [field, t.to_upper()])
+
+
+func level_name(i: int) -> String:
+	return tr("LEVEL_NAME_%d" % (i + 1))
+
+
+func world_name(w: int) -> String:
+	return tr("WORLD_%d" % (w + 1))
+
+
+## Imagem com texto na língua atual: procura <name>_<língua>.png (ex.: logo_pt).
+func texture_localized(name: String) -> Texture2D:
+	return texture("%s_%s" % [name, TranslationServer.get_locale().left(2)])
 
 
 var _textures := {}  # nome -> Texture2D ou null
@@ -159,6 +197,7 @@ func _load() -> void:
 	if seen is Array:
 		progress.seen = seen
 	progress.vibrate = bool(data.get("vibrate", true))
+	progress.lang = str(data.get("lang", ""))
 
 
 func _save() -> void:

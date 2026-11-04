@@ -1,0 +1,117 @@
+keys,pt,en,es,fr,de
+GAME_TITLE,"Pegadas
+na Neve","Snow
+Tracks","Huellas en
+la Nieve","Traces dans
+la Neige","Spuren
+im Schnee"
+SUBTITLE,Descobre por onde passou cada animal.,Find out where each animal went.,Descubre por dónde pasó cada animal.,Découvre par où est passé chaque animal.,"Finde heraus, wo jedes Tier entlanggelaufen ist."
+PLAY_LEVEL,Jogar nível %d,Play level %d,Jugar nivel %d,Jouer niveau %d,Level %d spielen
+PLAY_AGAIN,Jogar outra vez,Play again,Jugar otra vez,Rejouer,Nochmal spielen
+STARS_N,%d/%d estrelas,%d/%d stars,%d/%d estrellas,%d/%d étoiles,%d/%d Sterne
+STARS_OF_3,%d/3 estrelas,%d/3 stars,%d/3 estrellas,%d/3 étoiles,%d/3 Sterne
+WORLD_N,Mundo %d,World %d,Mundo %d,Monde %d,Welt %d
+WORLD_1,Clareira,Clearing,Claro del bosque,Clairière,Lichtung
+WORLD_2,Bosque,Forest,Bosque,Forêt,Wald
+TT_LOCKED,Resolve o nível %d primeiro,Solve level %d first,Resuelve primero el nivel %d,Résous d'abord le niveau %d,Löse zuerst Level %d
+WORLD_LOCKED,Resolve o nível %d para abrir este mundo.,Solve level %d to unlock this world.,Resuelve el nivel %d para abrir este mundo.,Résous le niveau %d pour ouvrir ce monde.,"Löse Level %d, um diese Welt freizuschalten."
+SETTINGS,Definições,Settings,Ajustes,Réglages,Einstellungen
+SETTINGS_STARS,Estrelas: [b]%d[/b] de %d,Stars: [b]%d[/b] of %d,Estrellas: [b]%d[/b] de %d,Étoiles : [b]%d[/b] sur %d,Sterne: [b]%d[/b] von %d
+VIBRATION_ON,Vibração: ligada,Vibration: on,Vibración: activada,Vibration : activée,Vibration: an
+VIBRATION_OFF,Vibração: desligada,Vibration: off,Vibración: desactivada,Vibration : désactivée,Vibration: aus
+LANGUAGE_BTN,Língua: %s,Language: %s,Idioma: %s,Langue : %s,Sprache: %s
+LANGUAGE,Língua,Language,Idioma,Langue,Sprache
+RESET,Apagar progresso,Reset progress,Borrar progreso,Effacer la progression,Fortschritt löschen
+RESET_TITLE,Apagar progresso?,Reset progress?,¿Borrar progreso?,Effacer la progression ?,Fortschritt löschen?
+RESET_BODY,"Os níveis resolvidos, as estrelas e os recordes vão ser apagados. Não dá para voltar atrás.","Solved levels, stars and best times will be deleted. This can't be undone.","Se borrarán los niveles resueltos, las estrellas y los récords. No se puede deshacer.","Les niveaux résolus, les étoiles et les records seront effacés. C'est définitif.","Gelöste Level, Sterne und Bestzeiten werden gelöscht. Das lässt sich nicht rückgängig machen."
+RESET_CONFIRM,Apagar tudo,Delete everything,Borrar todo,Tout effacer,Alles löschen
+CANCEL,Cancelar,Cancel,Cancelar,Annuler,Abbrechen
+CLOSE,Fechar,Close,Cerrar,Fermer,Schließen
+LEVEL_N,Nível %d,Level %d,Nivel %d,Niveau %d,Level %d
+UNDO,Desfazer,Undo,Deshacer,Annuler,Zurück
+CLEAR,Limpar,Clear,Borrar,Effacer,Leeren
+HINT,Dica,Hint,Pista,Indice,Tipp
+TT_BACK,Voltar aos níveis,Back to levels,Volver a los niveles,Retour aux niveaux,Zurück zu den Leveln
+TT_CLEAR,Limpar tudo,Clear everything,Borrar todo,Tout effacer,Alles leeren
+TT_HINT,Pedir uma dica,Get a hint,Pedir una pista,Demander un indice,Tipp holen
+RULES_TITLE,Regras,Rules,Reglas,Règles,Regeln
+HOW_TO_PLAY,Como se joga,How to play,Cómo se juega,Comment jouer,So wird gespielt
+RULES_BODY,"[b]Leva cada animal da toca até à sua comida.[/b] Arrasta o dedo a partir do animal.
+
+Os [b]números[/b] nas bordas dizem quantas casas são pisadas em cada linha e coluna.
+
+Ninguém pisa a mesma casa duas vezes. As [b]pegadas já marcadas[/b] fazem parte do caminho daquele animal.
+
+Toca numa casa vazia para a marcar com um X.","[b]Take each animal from its den to its food.[/b] Drag your finger starting from the animal.
+
+The [b]numbers[/b] on the edges show how many squares are stepped on in each row and column.
+
+No square is stepped on twice. The [b]footprints already shown[/b] are part of that animal's trail.
+
+Tap an empty square to mark it with an X.","[b]Lleva cada animal desde su madriguera hasta su comida.[/b] Arrastra el dedo desde el animal.
+
+Los [b]números[/b] de los bordes indican cuántas casillas se pisan en cada fila y columna.
+
+Nadie pisa la misma casilla dos veces. Las [b]huellas ya marcadas[/b] forman parte del camino de ese animal.
+
+Toca una casilla vacía para marcarla con una X.","[b]Emmène chaque animal de son terrier jusqu'à sa nourriture.[/b] Fais glisser ton doigt depuis l'animal.
+
+Les [b]nombres[/b] sur les bords indiquent combien de cases sont foulées dans chaque ligne et colonne.
+
+Personne ne passe deux fois sur la même case. Les [b]empreintes déjà affichées[/b] font partie du chemin de cet animal.
+
+Touche une case vide pour la marquer d'un X.","[b]Bring jedes Tier von seinem Bau zu seinem Futter.[/b] Zieh den Finger vom Tier aus.
+
+Die [b]Zahlen[/b] am Rand zeigen, wie viele Felder in jeder Zeile und Spalte betreten werden.
+
+Kein Feld wird zweimal betreten. Die [b]bereits gezeigten Spuren[/b] gehören zum Weg dieses Tieres.
+
+Tippe auf ein leeres Feld, um es mit einem X zu markieren."
+GOT_IT,Percebi,Got it,Entendido,Compris,Verstanden
+NEXT,Seguinte,Next,Siguiente,Suivant,Weiter
+BACK_TO_LEVEL,Voltar ao nível,Back to the level,Volver al nivel,Retour au niveau,Zurück zum Level
+STATUS_SOLVED,Encontraste todos os caminhos!,You found every trail!,¡Has encontrado todos los caminos!,Tu as trouvé tous les chemins !,Du hast alle Wege gefunden!
+STATUS_COUNTS,Os números a vermelho ainda não batem certo.,The numbers in red don't match yet.,Los números en rojo aún no cuadran.,Les nombres en rouge ne correspondent pas encore.,Die roten Zahlen passen noch nicht.
+STATUS_GIVENS,Falta passar por uma das pegadas marcadas.,A trail still misses one of the footprints shown.,Falta pasar por una de las huellas marcadas.,Il manque le passage par une des empreintes affichées.,Ein Weg führt noch nicht über eine der gezeigten Spuren.
+STATUS_START,Arrasta cada animal até à sua comida.,Drag each animal to its food.,Arrastra cada animal hasta su comida.,Fais glisser chaque animal jusqu'à sa nourriture.,Zieh jedes Tier zu seinem Futter.
+STATUS_MARK,Toca numa casa vazia para a marcar com um X.,Tap an empty square to mark it with an X.,Toca una casilla vacía para marcarla con una X.,Touche une case vide pour la marquer d'un X.,"Tippe auf ein leeres Feld, um es mit X zu markieren."
+HINT_FIX,Este passo estava errado. Continua a partir daqui.,That step was wrong. Carry on from here.,Ese paso estaba mal. Sigue desde aquí.,Ce pas était faux. Continue à partir d'ici.,Dieser Schritt war falsch. Mach hier weiter.
+HINT_REVEAL,Revelei mais uma pegada.,One more footprint revealed.,He revelado otra huella.,Une empreinte de plus est révélée.,Eine weitere Spur ist aufgedeckt.
+HINT_NONE,Os caminhos estão certos. Leva-os até à comida.,The trails are right. Take them to the food.,Los caminos están bien. Llévalos hasta la comida.,Les chemins sont bons. Mène-les jusqu'à la nourriture.,Die Wege stimmen. Führe sie bis zum Futter.
+WIN_TITLE,Caminhos descobertos!,Trails found!,¡Caminos descubiertos!,Chemins trouvés !,Wege gefunden!
+WIN_TIME,Tempo: [b]%s[/b],Time: [b]%s[/b],Tiempo: [b]%s[/b],Temps : [b]%s[/b],Zeit: [b]%s[/b]
+WIN_RECORD,novo recorde!,new best!,¡nuevo récord!,nouveau record !,neue Bestzeit!
+WIN_BEST,recorde %s,best %s,récord %s,record %s,Bestzeit %s
+WIN_HINTS_1,Usaste 1 dica,You used 1 hint,Has usado 1 pista,Tu as utilisé 1 indice,Du hast 1 Tipp benutzt
+WIN_HINTS_N,Usaste %d dicas,You used %d hints,Has usado %d pistas,Tu as utilisé %d indices,Du hast %d Tipps benutzt
+WIN_NO_HINTS,Sem dicas!,No hints!,¡Sin pistas!,Sans indice !,Ohne Tipps!
+WIN_ALL,Resolveste todos os níveis.,You solved every level.,Has resuelto todos los niveles.,Tu as résolu tous les niveaux.,Du hast alle Level gelöst.
+NEXT_LEVEL,Próximo nível,Next level,Siguiente nivel,Niveau suivant,Nächstes Level
+SEE_LEVELS,Ver níveis,See levels,Ver niveles,Voir les niveaux,Level ansehen
+NAME_OURICO,Ouriço,Hedgehog,Erizo,Hérisson,Igel
+NAME_COELHO,Coelho,Rabbit,Conejo,Lapin,Hase
+NAME_RAPOSA,Raposa,Fox,Zorro,Renard,Fuchs
+RULE_OURICO,Anda 1 casa,Moves 1 square,Avanza 1 casilla,Avance d'1 case,Geht 1 Feld
+RULE_COELHO,Salta 2 casas,Jumps 2 squares,Salta 2 casillas,Saute 2 cases,Springt 2 Felder
+RULE_RAPOSA,Anda na diagonal,Moves diagonally,Va en diagonal,Va en diagonale,Geht diagonal
+DETAIL_OURICO,"Anda 1 casa de cada vez: para cima, para baixo ou para os lados.","Moves 1 square at a time: up, down, left or right.","Avanza 1 casilla cada vez: arriba, abajo o a los lados.","Avance d'une case à la fois : en haut, en bas ou sur les côtés.","Geht immer 1 Feld: nach oben, unten, links oder rechts."
+DETAIL_COELHO,"Salta sempre 2 casas em linha reta, por cima do que estiver no meio, até de rochas.","Always jumps exactly 2 squares in a straight line, over whatever is in between, even rocks.","Salta siempre 2 casillas en línea recta, por encima de lo que haya en medio, incluso rocas.","Saute toujours 2 cases en ligne droite, par-dessus ce qui se trouve au milieu, même les rochers.","Springt immer genau 2 Felder geradeaus, über alles dazwischen, sogar über Felsen."
+DETAIL_RAPOSA,Anda 1 casa na diagonal. O caminho dela não se pode cruzar em X.,Moves 1 square diagonally. Its trail can't cross in an X.,Avanza 1 casilla en diagonal. Su camino no puede cruzarse en X.,Avance d'une case en diagonale. Son chemin ne peut pas se croiser en X.,Geht 1 Feld diagonal. Sein Weg darf sich nicht zu einem X kreuzen.
+MEET_OURICO,Conhece o Ouriço,Meet the Hedgehog,Conoce al Erizo,Voici le Hérisson,Das ist der Igel
+MEET_COELHO,Conhece o Coelho,Meet the Rabbit,Conoce al Conejo,Voici le Lapin,Das ist der Hase
+MEET_RAPOSA,Conhece a Raposa,Meet the Fox,Conoce al Zorro,Voici le Renard,Das ist der Fuchs
+LEAD_OURICO,Leva o Ouriço até ao cogumelo.,Take the hedgehog to the mushroom.,Lleva al erizo hasta la seta.,Emmène le hérisson jusqu'au champignon.,Bring den Igel zum Pilz.
+LEAD_COELHO,Leva o Coelho até à cenoura.,Take the rabbit to the carrot.,Lleva al conejo hasta la zanahoria.,Emmène le lapin jusqu'à la carotte.,Bring den Hasen zur Karotte.
+LEAD_RAPOSA,Leva a Raposa até aos mirtilos.,Take the fox to the blueberries.,Lleva al zorro hasta los arándanos.,Emmène le renard jusqu'aux myrtilles.,Bring den Fuchs zu den Heidelbeeren.
+LEVEL_NAME_1,Primeiros passos,First Steps,Primeros pasos,Premiers pas,Erste Schritte
+LEVEL_NAME_2,Caracol,Snail,Caracol,Escargot,Schnecke
+LEVEL_NAME_3,Salto a salto,Hop by Hop,Salto a salto,Bond après bond,Sprung für Sprung
+LEVEL_NAME_4,Vizinhos,Neighbours,Vecinos,Voisins,Nachbarn
+LEVEL_NAME_5,Trilhos cruzados,Crossing Trails,Senderos cruzados,Sentiers croisés,Gekreuzte Pfade
+LEVEL_NAME_6,Neve funda,Deep Snow,Nieve profunda,Neige profonde,Tiefer Schnee
+LEVEL_NAME_7,Passo de raposa,Fox Steps,Paso de zorro,Pas de renard,Fuchsschritte
+LEVEL_NAME_8,Entre rochas,Between Rocks,Entre rocas,Entre les rochers,Zwischen Felsen
+LEVEL_NAME_9,Por cima das pedras,Over the Stones,Sobre las piedras,Par-dessus les pierres,Über die Steine
+LEVEL_NAME_10,Três trilhos,Three Trails,Tres senderos,Trois sentiers,Drei Pfade
+LEVEL_NAME_11,Bosque cerrado,Thick Forest,Bosque espeso,Forêt dense,Dichter Wald
+LEVEL_NAME_12,Tempestade,Snowstorm,Tormenta,Tempête,Schneesturm

@@ -59,11 +59,18 @@ Depois de juntar ou trocar imagens, corre `python tools/prep_images.py`: corta a
 | `estrela.png` | 256×256 | Estrela dourada (níveis, vitória, contador do menu) |
 | `floco.png` | 512×512 | Ilustração para o ecrã "Como se joga" |
 | `vitoria.png` | 512×512 | Ilustração para o ecrã de vitória |
-| `logo.png` | 1024×512 | Título "Pegadas na Neve" (substitui o texto do menu) |
+| `logo_<língua>.png` | 1024×512 | Título do menu nessa língua (`logo_pt`, `logo_en`, ...); sem ele, o jogo escreve o título |
+| `ui_*.png` | ver `docs/imagens.md` | Fundos opcionais de botões, cartões, pílulas e níveis (sem texto) |
 | `fundo.png` | 1080×1920 | Fundo de todos os ecrãs, **sem** transparência |
 | `icon.png` (raiz) | 1024×1024 | Ícone da app, **sem** transparência |
 
 Paleta: fundo `#E7EFF6`, texto `#20304A`, ouriço `#2E8C7E`, coelho `#C2477A`, raposa `#E3801F`.
+
+## Línguas
+
+O jogo está em português, inglês, espanhol, francês e alemão. Escolhe a língua do telemóvel (ou inglês, se não for nenhuma destas), e pode mudar-se nas Definições.
+
+Todos os textos estão em `data/traducoes.csv`: uma linha por texto e uma coluna por língua. Para juntar uma língua, acrescenta a coluna, junta o ficheiro `data/traducoes.<código>.translation` em `project.godot` e o nome em `Game.LANGS` (`scripts/globals.gd`).
 
 ## Gerar níveis
 

@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://c8qme788memwb"
-path="res://.godot/imported/logo.png-9164f87f81119ac7320e78ed71593bc1.ctex"
+uid="uid://1bad8jlieu7u"
+path="res://.godot/imported/comida_coelho.png-d41fb50562562ff704164e46e05a55c3.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/images/logo.png"
-dest_files=["res://.godot/imported/logo.png-9164f87f81119ac7320e78ed71593bc1.ctex"]
+source_file="res://assets/images/comida_coelho.png"
+dest_files=["res://.godot/imported/comida_coelho.png-d41fb50562562ff704164e46e05a55c3.ctex"]
 
 [params]
 

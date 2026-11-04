@@ -71,7 +71,7 @@ size_flags_horizontal = 3
 unique_name_in_owner = true
 custom_minimum_size = Vector2(96, 96)
 layout_mode = 2
-tooltip_text = "Definições"
+tooltip_text = "SETTINGS"
 script = ExtResource("2")
 icon_name = "definicoes"
 
@@ -91,14 +91,13 @@ stretch_mode = 5
 unique_name_in_owner = true
 layout_mode = 2
 theme_type_variation = &"Title"
-text = "Pegadas
-na Neve"
+text = "GAME_TITLE"
 horizontal_alignment = 1
 
 [node name="Subtitle" type="Label" parent="Scroll/Margin/VBox/Header"]
 layout_mode = 2
 theme_type_variation = &"Muted"
-text = "Descobre por onde passou cada animal."
+text = "SUBTITLE"
 horizontal_alignment = 1
 autowrap_mode = 3
 
@@ -107,7 +106,7 @@ unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 120)
 layout_mode = 2
 theme_type_variation = &"PrimaryButton"
-text = "Jogar nível 1"
+text = ""
 
 [node name="Worlds" type="VBoxContainer" parent="Scroll/Margin/VBox"]
 unique_name_in_owner = true

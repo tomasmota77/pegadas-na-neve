@@ -81,10 +81,47 @@ Estilo dos ícones:
 **`vitoria.png`** (512×512, ecrã de vitória)
 > (estilo comum) A happy hedgehog, rabbit and fox sitting together in the snow, cheering, each holding their food (mushroom, carrot, blueberries), little sparkles and snowflakes around them.
 
-**`logo.png`** (1024×512, título do menu)
-> Logótipo de jogo com o texto exato "Pegadas na Neve", em português, sem nenhuma outra palavra. Letras grossas e arredondadas, azul-marinho escuro (#20304A), com um pouco de neve branca e fofa por cima das letras. Pequenas pegadas de animais ao lado do texto. Estilo fofo e acolhedor de jogo de inverno para telemóvel, centrado, fundo transparente.
+## Logótipos, um por língua (1024×512, título do menu)
 
-Os modelos de imagem às vezes trocam letras: confirma que diz exatamente "Pegadas na Neve".
+O menu mostra `logo_<língua>.png`. Se não existir para a língua escolhida, mostra o título escrito pelo jogo.
+
+| Ficheiro | Texto exato |
+|---|---|
+| `logo_en.png` | Snow Tracks (já existe) |
+| `logo_pt.png` | Pegadas na Neve |
+| `logo_es.png` | Huellas en la Nieve |
+| `logo_fr.png` | Traces dans la Neige |
+| `logo_de.png` | Spuren im Schnee |
+
+Usa o `logo_en.png` como imagem de referência e troca só o texto:
+
+> Game logo with the exact text "TEXTO" and no other words. Same style as the reference image: chunky rounded bold letters, dark navy (#20304A), soft fluffy white snow on top of the letters, small animal paw prints next to the text. Centered, transparent background.
+
+Os modelos de imagem às vezes trocam ou esquecem letras e acentos (é, ü): confirma o texto antes de usar.
+
+## Botões e caixas (opcional)
+
+O jogo desenha os botões e as caixas sozinho. Se puseres estas imagens, passa a usá-las. **Não podem ter texto:** o texto é escrito pelo jogo, na língua escolhida.
+
+Os botões, cartões e pílulas são esticados no meio e os cantos ficam iguais. Por isso o desenho tem de ser **liso no meio**, sem padrões, brilhos nem desenhos que se notem esticados, e com os cantos arredondados iguais nos quatro lados.
+
+Estilo das caixas:
+
+> Mobile game UI element, cute cozy winter style matching the reference image, soft rounded corners, gentle top highlight, subtle darker bottom edge for a slight 3D look, flat and plain in the middle, no text, no icons, no pattern, centered, transparent background.
+
+| Ficheiro | Usado em | Prompt (depois do estilo) |
+|---|---|---|
+| `ui_botao.png` | Botão principal ("Jogar", "Próximo nível") | `A wide pill-shaped button, about 3 times wider than tall, dark navy blue (#20304A) with a slightly lighter top.` |
+| `ui_botao_claro.png` | Botões secundários | `A wide pill-shaped button, about 3 times wider than tall, very light icy blue (#E7EFF6) with a white top highlight.` |
+| `ui_cartao.png` | Cartões do menu e das regras | `A square card panel with large rounded corners, white with a very soft light blue bottom edge.` |
+| `ui_pilula.png` | Tempo, progresso, estrelas | `A small pill-shaped label background, about 3 times wider than tall, white with a soft light blue bottom edge.` |
+| `ui_redondo.png` | Botões redondos claros | `A perfectly round button, white with a soft light blue bottom edge.` |
+| `ui_redondo_escuro.png` | Botão da dica | `A perfectly round button, dark navy blue (#20304A) with a slightly lighter top.` |
+| `ui_nivel.png` | Nível disponível | `A rounded square tile, white with a soft light blue bottom edge.` |
+| `ui_nivel_feito.png` | Nível resolvido | `A rounded square tile, dark navy blue (#20304A) with a slightly lighter top.` |
+| `ui_nivel_fechado.png` | Nível fechado | `A rounded square tile, pale grey-blue (#CFDCE8), flat, no highlight.` |
+
+Depois de pores qualquer imagem nova, corre `python tools/prep_images.py`.
 
 **`fundo.png`** (1080×1920, vertical, sem transparência)
 > Soft calm winter landscape background for a vertical mobile puzzle game, very light pale blue sky (#E7EFF6) fading to white, gentle snowy hills only along the bottom 20% of the image, a few small pine trees on the hills, falling snowflakes, flat pastel colors, low contrast, lots of empty calm space in the middle so UI can sit on top, no characters, no text.

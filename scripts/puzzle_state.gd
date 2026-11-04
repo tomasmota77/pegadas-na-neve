@@ -345,14 +345,14 @@ func missing_givens() -> Array:
 	return out
 
 
-## Mensagem curta sobre o estado atual (para a linha de estado).
-func status_text() -> String:
+## Chave (em data/traducoes.csv) da mensagem curta sobre o estado atual.
+func status_key() -> String:
 	if is_solved():
-		return "Encontraste todos os caminhos!"
+		return "STATUS_SOLVED"
 	if all_complete():
 		if not counts_ok():
-			return "Os números a vermelho ainda não batem certo."
-		return "Falta passar por uma das pegadas marcadas."
+			return "STATUS_COUNTS"
+		return "STATUS_GIVENS"
 	if complete_count() == 0 and _history.is_empty():
-		return "Arrasta cada animal até à sua comida."
-	return "Toca numa casa vazia para a marcar com um X."
+		return "STATUS_START"
+	return "STATUS_MARK"

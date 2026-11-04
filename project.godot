@@ -4,7 +4,16 @@ config_version=5
 
 [application]
 
-config/name="Pegadas na Neve"
+config/name="Snow Tracks"
+config/use_custom_user_dir=true
+config/custom_user_dir_name="Pegadas na Neve"
+config/name_localized={
+"de": "Spuren im Schnee",
+"en": "Snow Tracks",
+"es": "Huellas en la Nieve",
+"fr": "Traces dans la Neige",
+"pt": "Pegadas na Neve"
+}
 config/description="Puzzle de lógica: descobre o caminho de cada animal na neve."
 run/main_scene="res://scenes/main.tscn"
 config/features=PackedStringArray("4.7", "GL Compatibility")
@@ -29,6 +38,11 @@ window/handheld/orientation=1
 [gui]
 
 common/drop_mouse_on_gui_input_disabled=true
+
+[internationalization]
+
+locale/translations=PackedStringArray("res://data/traducoes.pt.translation", "res://data/traducoes.en.translation", "res://data/traducoes.es.translation", "res://data/traducoes.fr.translation", "res://data/traducoes.de.translation")
+locale/fallback="en"
 
 [rendering]
 

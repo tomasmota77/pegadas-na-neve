@@ -4,7 +4,7 @@ extends Control
 signal back_requested
 signal next_requested(index: int)
 
-const RULES := "[b]Leva cada animal da toca até à sua comida.[/b] Arrasta o dedo a partir do animal.\n\nOs [b]números[/b] nas bordas dizem quantas casas são pisadas em cada linha e coluna.\n\nNinguém pisa a mesma casa duas vezes. As [b]pegadas já marcadas[/b] fazem parte do caminho daquele animal.\n\nToca numa casa vazia para a marcar com um X."
+## Todos os textos vêm de data/traducoes.csv (tr("CHAVE")).
 
 var index := 0
 var st := PuzzleState.new()
@@ -31,11 +31,10 @@ func _ready() -> void:
 
 func start(i: int) -> void:
 	index = i
-	var data: Dictionary = Game.levels[i]
-	st.load_level(data)
+	st.load_level(Game.levels[i])
 	board.setup(st)
-	%LevelLabel.text = "Nível %d" % (i + 1)
-	%NameLabel.text = data.name
+	%LevelLabel.text = tr("LEVEL_N") % (i + 1)
+	%NameLabel.text = Game.level_name(i)
 	elapsed = 0.0
 	running = true
 	_build_chips()
@@ -83,12 +82,12 @@ func _build_chips() -> void:
 		icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 		var name_lbl := Label.new()
-		name_lbl.text = info.name
+		name_lbl.text = Game.animal_text(a.type, "NAME")
 		name_lbl.theme_type_variation = &"ChipTitle"
 		name_lbl.add_theme_color_override("font_color", col.darkened(0.2))
 		name_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		var rule := Label.new()
-		rule.text = info.rule
+		rule.text = Game.animal_text(a.type, "RULE")
 		rule.theme_type_variation = &"Small"
 		rule.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		col_box.add_child(icon)
@@ -106,11 +105,9 @@ func _after_change() -> void:
 
 
 func _refresh() -> void:
-	%Status.text = st.status_text()
+	%Status.text = tr(st.status_key())
 	if st.active != "":
-		var info: Dictionary = Game.ANIMALS[st.active]
-		var who: String = ("a " if st.active == "raposa" else "o ") + info.name
-		%Status.text = "Leva %s até %s." % [who, _food_article(info.food)]
+		%Status.text = Game.animal_text(st.active, "LEAD")
 	%UndoBtn.disabled = not st.can_undo()
 	%ClearBtn.disabled = not st.can_undo() and st.marks.is_empty()
 	var left := Game.HINTS_PER_LEVEL - st.hints_used
@@ -120,21 +117,16 @@ func _refresh() -> void:
 	%ProgressLabel.add_theme_color_override("font_color", Game.COLORS.ok if st.all_complete() else Game.COLORS.ink)
 
 
-static func _food_article(food: String) -> String:
-	return {"cogumelo": "ao cogumelo", "cenoura": "à cenoura", "mirtilos": "aos mirtilos"}.get(food, "à comida")
-
-
 # ---------- introdução / regras ----------
 
 func _intro() -> void:
 	var queue := []
 	if Game.progress.seen.is_empty():
-		queue.append({"title": "Como se joga", "body": RULES, "image": Game.texture("floco")})
+		queue.append({"title": tr("HOW_TO_PLAY"), "body": tr("RULES_BODY"), "image": Game.texture("floco")})
 	for a in st.animals:
 		if not Game.has_seen(a.type):
-			var info: Dictionary = Game.ANIMALS[a.type]
-			queue.append({"title": "Conhece o %s" % info.name if a.type != "raposa" else "Conhece a Raposa",
-				"body": info.detail, "image": Game.texture(a.type)})
+			queue.append({"title": Game.animal_text(a.type, "MEET"),
+				"body": Game.animal_text(a.type, "DETAIL"), "image": Game.texture(a.type)})
 			Game.mark_seen(a.type)
 	_show_queue(queue)
 
@@ -143,17 +135,16 @@ func _show_queue(queue: Array) -> void:
 	if queue.is_empty():
 		return
 	var s: Dictionary = queue.pop_front()
-	var label := "Percebi" if queue.is_empty() else "Seguinte"
+	var label := tr("GOT_IT") if queue.is_empty() else tr("NEXT")
 	%Sheet.open(s.title, s.body, s.image, [{"text": label, "primary": true, "action": _show_queue.bind(queue)}],
 		{"dismissable": false})
 
 
 func _show_rules() -> void:
-	var body := RULES + "\n"
+	var body := tr("RULES_BODY") + "\n"
 	for a in st.animals:
-		var info: Dictionary = Game.ANIMALS[a.type]
-		body += "\n[b]%s:[/b] %s" % [info.name, info.detail]
-	%Sheet.open("Regras", body, null, [{"text": "Voltar ao nível", "primary": true}])
+		body += "\n[b]%s:[/b] %s" % [Game.animal_text(a.type, "NAME"), Game.animal_text(a.type, "DETAIL")]
+	%Sheet.open(tr("RULES_TITLE"), body, null, [{"text": tr("BACK_TO_LEVEL"), "primary": true}])
 
 
 # ---------- dicas e vitória ----------
@@ -164,14 +155,14 @@ func _on_hint() -> void:
 		"fix":
 			board.flash(h.cell)
 			_refresh()
-			%Status.text = "Este passo estava errado. Continua a partir daqui."
+			%Status.text = tr("HINT_FIX")
 		"reveal":
 			board.flash(h.cell)
 			_refresh()
-			%Status.text = "Revelei mais uma pegada."
+			%Status.text = tr("HINT_REVEAL")
 		_:
 			_refresh()
-			%Status.text = "Os caminhos estão certos. Leva-os até à comida."
+			%Status.text = tr("HINT_NONE")
 	board.queue_redraw()
 
 
@@ -185,21 +176,23 @@ func _on_solved() -> void:
 	var record := Game.mark_done(index, elapsed, got)
 	Game.vibrate(60)
 	await board.play_win().finished
-	var body := "Tempo: [b]%s[/b]" % Game.format_time(elapsed)
+	var body := tr("WIN_TIME") % Game.format_time(elapsed)
 	if record:
-		body += "  ·  novo recorde!"
+		body += "  ·  " + tr("WIN_RECORD")
 	elif had_best:
-		body += "  ·  recorde %s" % Game.format_time(Game.best_time(index))
-	if st.hints_used > 0:
-		body += "\nUsaste %d %s" % [st.hints_used, "dica" if st.hints_used == 1 else "dicas"]
+		body += "  ·  " + tr("WIN_BEST") % Game.format_time(Game.best_time(index))
+	if st.hints_used == 1:
+		body += "\n" + tr("WIN_HINTS_1")
+	elif st.hints_used > 1:
+		body += "\n" + tr("WIN_HINTS_N") % st.hints_used
 	else:
-		body += "\nSem dicas!"
+		body += "\n" + tr("WIN_NO_HINTS")
 	var last := index >= Game.levels.size() - 1
 	var buttons := []
 	if last:
-		body += "\n\nResolveste todos os níveis do protótipo."
+		body += "\n\n" + tr("WIN_ALL")
 	else:
-		buttons.append({"text": "Próximo nível", "primary": true, "action": func(): next_requested.emit(index + 1)})
-	buttons.append({"text": "Ver níveis", "primary": last, "action": func(): back_requested.emit()})
-	%Sheet.open("Caminhos descobertos!", body, Game.texture("vitoria"), buttons,
+		buttons.append({"text": tr("NEXT_LEVEL"), "primary": true, "action": func(): next_requested.emit(index + 1)})
+	buttons.append({"text": tr("SEE_LEVELS"), "primary": last, "action": func(): back_requested.emit()})
+	%Sheet.open(tr("WIN_TITLE"), body, Game.texture("vitoria"), buttons,
 		{"stars": got, "dismissable": false})

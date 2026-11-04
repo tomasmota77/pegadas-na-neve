@@ -5,20 +5,20 @@ signal level_chosen(index: int)
 
 
 func _ready() -> void:
-	var logo := Game.texture("logo")
+	# logótipo na língua atual (logo_pt.png, logo_en.png...); sem ele, o título em texto
+	var logo := Game.texture_localized("logo")
 	if logo:
 		%Logo.texture = logo
 		%Logo.visible = true
 		%Title.visible = false
 	var next := Game.first_unsolved()
-	%PlayBtn.text = "Jogar nível %d" % (next + 1)
+	%PlayBtn.text = tr("PLAY_LEVEL") % (next + 1)
 	if Game.is_done(next):
-		%PlayBtn.text = "Jogar outra vez"
+		%PlayBtn.text = tr("PLAY_AGAIN")
 	%PlayBtn.pressed.connect(func(): level_chosen.emit(next))
 	%SettingsBtn.pressed.connect(_show_settings)
-	%StarsLabel.text = "%d/%d" % [Game.total_stars(), Game.levels.size() * 3]
-	if not Icons.has("estrela"):
-		%StarsLabel.text += " estrelas"
+	var stars := [Game.total_stars(), Game.levels.size() * 3]
+	%StarsLabel.text = "%d/%d" % stars if Icons.has("estrela") else tr("STARS_N") % stars
 	for w in Game.WORLDS.size():
 		%Worlds.add_child(_world_card(w, next))
 
@@ -49,10 +49,10 @@ func _world_card(w: int, next: int) -> Control:
 	names.add_theme_constant_override("separation", -10)
 	names.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	var small := Label.new()
-	small.text = "Mundo %d" % (w + 1)
+	small.text = tr("WORLD_N") % (w + 1)
 	small.theme_type_variation = &"Small"
 	var big := Label.new()
-	big.text = world.name
+	big.text = Game.world_name(w)
 	big.theme_type_variation = &"H2"
 	names.add_child(small)
 	names.add_child(big)
@@ -109,13 +109,13 @@ func _world_card(w: int, next: int) -> Control:
 		tile.setup(i + 1, state, Game.stars(i))
 		tile.custom_minimum_size = Vector2(0, 96)
 		tile.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		tile.tooltip_text = Game.levels[i].name if state != "locked" else "Resolve o nível %d primeiro" % i
+		tile.tooltip_text = Game.level_name(i) if state != "locked" else tr("TT_LOCKED") % i
 		tile.pressed.connect(func(): level_chosen.emit(i))
 		grid.add_child(tile)
 	box.add_child(grid)
 	if not open:
 		var hint := Label.new()
-		hint.text = "Resolve o nível %d para abrir este mundo." % levels[0]
+		hint.text = tr("WORLD_LOCKED") % levels[0]
 		hint.theme_type_variation = &"Small"
 		hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		box.add_child(hint)
@@ -125,20 +125,30 @@ func _world_card(w: int, next: int) -> Control:
 # ---------- definições ----------
 
 func _show_settings() -> void:
-	var vib := "Vibração: ligada" if Game.progress.vibrate else "Vibração: desligada"
-	%Sheet.open("Definições", "Estrelas: [b]%d[/b] de %d" % [Game.total_stars(), Game.levels.size() * 3], null, [
+	var vib := tr("VIBRATION_ON") if Game.progress.vibrate else tr("VIBRATION_OFF")
+	%Sheet.open(tr("SETTINGS"), tr("SETTINGS_STARS") % [Game.total_stars(), Game.levels.size() * 3], null, [
+		{"text": tr("LANGUAGE_BTN") % Game.LANGS[Game.language()], "action": _show_languages},
 		{"text": vib, "action": func():
 			Game.set_vibrate(not Game.progress.vibrate)
 			_show_settings()},
-		{"text": "Apagar progresso", "action": _confirm_reset},
-		{"text": "Fechar", "primary": true},
+		{"text": tr("RESET"), "action": _confirm_reset},
+		{"text": tr("CLOSE"), "primary": true},
 	])
 
 
+func _show_languages() -> void:
+	var buttons := []
+	for code in Game.LANGS:
+		buttons.append({"text": Game.LANGS[code], "primary": code == Game.language(), "action": func():
+			Game.set_language(code)
+			get_tree().reload_current_scene()})
+	%Sheet.open(tr("LANGUAGE"), "", null, buttons)
+
+
 func _confirm_reset() -> void:
-	%Sheet.open("Apagar progresso?", "Os níveis resolvidos, as estrelas e os recordes vão ser apagados. Não dá para voltar atrás.", null, [
-		{"text": "Apagar tudo", "primary": true, "action": func():
+	%Sheet.open(tr("RESET_TITLE"), tr("RESET_BODY"), null, [
+		{"text": tr("RESET_CONFIRM"), "primary": true, "action": func():
 			Game.reset_progress()
 			get_tree().reload_current_scene()},
-		{"text": "Cancelar", "action": _show_settings},
+		{"text": tr("CANCEL"), "action": _show_settings},
 	])

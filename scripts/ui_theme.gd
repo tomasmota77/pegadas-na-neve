@@ -47,6 +47,10 @@ static func build() -> Theme:
 		th.set_font_size("font_size", v, SIZE_BODY + 2)
 	th.set_constant("h_separation", "Button", 12)
 	th.set_constant("icon_max_width", "Button", 44)
+	# imagens opcionais (assets/images/ui_*.png) por cima do estilo desenhado
+	_button_tex(th, "PrimaryButton", "ui_botao")
+	_button_tex(th, "Button", "ui_botao_claro")
+	_button_tex(th, "SoftButton", "ui_botao_claro")
 
 	# Painéis
 	th.set_stylebox("panel", "PanelContainer", _box(C.snow, 40, 32, 28, C.frost_dark))
@@ -56,6 +60,13 @@ static func build() -> Theme:
 	th.set_stylebox("panel", "RulesCard", _box(C.snow, 32, 12, 12, C.frost_dark))
 	th.set_type_variation("Pill", "PanelContainer")
 	th.set_stylebox("panel", "Pill", _box(C.snow, 40, 22, 6, C.frost_dark))
+	for v in [["Card", 28, 24], ["RulesCard", 12, 12]]:
+		var t := tex_box("ui_cartao", 52, v[1], v[2])
+		if t:
+			th.set_stylebox("panel", v[0], t)
+	var pill := tex_box("ui_pilula", 30, 22, 6)
+	if pill:
+		th.set_stylebox("panel", "Pill", pill)
 	th.set_type_variation("Sheet", "PanelContainer")
 	var sheet := _box(C.snow, 48, 48, 28, Color(C.ink, 0.25))
 	sheet.corner_radius_bottom_left = 0
@@ -82,6 +93,43 @@ static func build() -> Theme:
 	th.set_stylebox("grabber_highlight", "VScrollBar", empty)
 	th.set_stylebox("grabber_pressed", "VScrollBar", empty)
 	return th
+
+
+## Caixa esticável feita a partir de assets/images/<name>.png (9-slice): os cantos
+## (margin px) ficam iguais e o meio estica. null se a imagem não existir.
+static func tex_box(name: String, margin: int, mx: int, my: int) -> StyleBoxTexture:
+	var tex := Game.texture(name)
+	if tex == null:
+		return null
+	var s := StyleBoxTexture.new()
+	s.texture = tex
+	var m := mini(margin, int(minf(tex.get_width(), tex.get_height()) * 0.45))
+	s.texture_margin_left = m
+	s.texture_margin_right = m
+	s.texture_margin_top = m
+	s.texture_margin_bottom = m
+	s.content_margin_left = mx
+	s.content_margin_right = mx
+	s.content_margin_top = my
+	s.content_margin_bottom = my
+	return s
+
+
+static func _button_tex(th: Theme, type: String, name: String) -> void:
+	var normal := tex_box(name, 48, 28, 16)
+	if normal == null:
+		return
+	var hover: StyleBoxTexture = normal.duplicate()
+	hover.modulate_color = Color(1.06, 1.06, 1.06)
+	var pressed: StyleBoxTexture = normal.duplicate()
+	pressed.modulate_color = Color(0.88, 0.88, 0.88)
+	var disabled: StyleBoxTexture = normal.duplicate()
+	disabled.modulate_color = Color(1, 1, 1, 0.5)
+	th.set_stylebox("normal", type, normal)
+	th.set_stylebox("hover", type, hover)
+	th.set_stylebox("pressed", type, pressed)
+	th.set_stylebox("hover_pressed", type, pressed)
+	th.set_stylebox("disabled", type, disabled)
 
 
 static func _box(bg: Color, radius: int, mx: int, my: int, shadow: Color) -> StyleBoxFlat:
