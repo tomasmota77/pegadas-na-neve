@@ -82,7 +82,7 @@ Estilo dos ícones:
 > (estilo comum) A happy hedgehog, rabbit and fox sitting together in the snow, cheering, each holding their food (mushroom, carrot, blueberries), little sparkles and snowflakes around them.
 
 **`logo.png`** (1024×512, título do menu)
-> Game logo text "Pegadas na Neve" in a chunky rounded bold font, dark navy (#20304A) letters with a soft white snow cap on top of the letters, small animal paw prints next to the text, cute cozy winter mobile game style, centered, transparent background.
+> Logótipo de jogo com o texto exato "Pegadas na Neve", em português, sem nenhuma outra palavra. Letras grossas e arredondadas, azul-marinho escuro (#20304A), com um pouco de neve branca e fofa por cima das letras. Pequenas pegadas de animais ao lado do texto. Estilo fofo e acolhedor de jogo de inverno para telemóvel, centrado, fundo transparente.
 
 Os modelos de imagem às vezes trocam letras: confirma que diz exatamente "Pegadas na Neve".
 
