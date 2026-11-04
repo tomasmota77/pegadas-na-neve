@@ -80,6 +80,17 @@ python tools/gen.py 7        # semente 7 → data/levels.json
 python tools/verify.py       # confirma por força bruta que cada nível tem 1 solução
 ```
 
+## Versão web
+
+Precisa dos modelos de exportação do Godot 4.7.1 (no editor: Editor > Gerir modelos de exportação).
+
+```
+godot --headless --path . --export-release "Web" build/web/index.html
+python tools/patch_web.py
+```
+
+O `patch_web.py` comprime o motor (`engine-gz.wasm`), muda o nome do `.pck` para `pck.wasm` (para caberem nos limites de publicação como artifact do Claude) e põe o título "Pegadas na Neve".
+
 ## Testes
 
 ```
