@@ -27,7 +27,7 @@ MARGIN = 0.04  # espaço livre à volta, em fração do lado
 
 # Fundos da interface (opcionais). Os botões, cartões e pílulas esticam no meio
 # (9-slice), por isso só se corta a margem vazia e se acerta a altura/lado menor.
-UI_HEIGHT = {"ui_botao": 128, "ui_botao_claro": 128, "ui_pilula": 64}
+UI_HEIGHT = {"ui_botao": 100, "ui_botao_claro": 100, "ui_pilula": 56}
 UI_MIN_SIDE = {"ui_cartao": 160}
 UI_SQUARE = {"ui_redondo": 256, "ui_redondo_escuro": 256,
              "ui_nivel": 128, "ui_nivel_feito": 128, "ui_nivel_fechado": 128}

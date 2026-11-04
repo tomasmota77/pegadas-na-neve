@@ -64,7 +64,7 @@ static func build() -> Theme:
 		var t := tex_box("ui_cartao", 52, v[1], v[2])
 		if t:
 			th.set_stylebox("panel", v[0], t)
-	var pill := tex_box("ui_pilula", 30, 22, 6)
+	var pill := tex_box("ui_pilula", 0, 22, 6, true)
 	if pill:
 		th.set_stylebox("panel", "Pill", pill)
 	th.set_type_variation("Sheet", "PanelContainer")
@@ -97,17 +97,20 @@ static func build() -> Theme:
 
 ## Caixa esticável feita a partir de assets/images/<name>.png (9-slice): os cantos
 ## (margin px) ficam iguais e o meio estica. null se a imagem não existir.
-static func tex_box(name: String, margin: int, mx: int, my: int) -> StyleBoxTexture:
+## Para as pílulas (botões), os lados são meia altura, para a curva não esticar.
+static func tex_box(name: String, margin: int, mx: int, my: int, pill := false) -> StyleBoxTexture:
 	var tex := Game.texture(name)
 	if tex == null:
 		return null
 	var s := StyleBoxTexture.new()
 	s.texture = tex
-	var m := mini(margin, int(minf(tex.get_width(), tex.get_height()) * 0.45))
-	s.texture_margin_left = m
-	s.texture_margin_right = m
-	s.texture_margin_top = m
-	s.texture_margin_bottom = m
+	var h := tex.get_height()
+	var side := int(h * 0.5) if pill else mini(margin, int(minf(tex.get_width(), h) * 0.45))
+	var vert := int(h * 0.3) if pill else side
+	s.texture_margin_left = side
+	s.texture_margin_right = side
+	s.texture_margin_top = vert
+	s.texture_margin_bottom = vert
 	s.content_margin_left = mx
 	s.content_margin_right = mx
 	s.content_margin_top = my
@@ -116,7 +119,7 @@ static func tex_box(name: String, margin: int, mx: int, my: int) -> StyleBoxText
 
 
 static func _button_tex(th: Theme, type: String, name: String) -> void:
-	var normal := tex_box(name, 48, 28, 16)
+	var normal := tex_box(name, 0, 36, 16, true)
 	if normal == null:
 		return
 	var hover: StyleBoxTexture = normal.duplicate()
