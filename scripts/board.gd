@@ -298,26 +298,46 @@ func _trail_points(t: String) -> PackedVector2Array:
 	for i in p.size():
 		var b := center_of(p[i])
 		if i > 0 and t == "coelho":
+			# salto: um arco baixo, sempre para cima (ou para a esquerda), dentro das casas
 			var a := center_of(p[i - 1])
 			var d := (b - a).normalized()
-			var ctrl := (a + b) * 0.5 + Vector2(-d.y, d.x) * cell * 0.3
-			for k in range(1, 10):
-				var u := k / 10.0
+			var n := Vector2(-d.y, d.x)
+			if n.y > 0.0 or (is_zero_approx(n.y) and n.x > 0.0):
+				n = -n
+			var ctrl := (a + b) * 0.5 + n * cell * 0.36
+			for k in range(1, 12):
+				var u := k / 12.0
 				pts.append(a.lerp(ctrl, u).lerp(ctrl.lerp(b, u), u))
 		pts.append(b)
 	return pts
 
 
+## Rasto: uma faixa suave da cor do animal e, por cima, pontinhos espaçados,
+## como um trilho na neve. As pegadas são desenhadas depois, por cima.
 func _draw_trail(t: String) -> void:
 	var p: Array = st.paths[t]
 	if p.size() < 2:
 		return
-	var col: Color = Game.ANIMALS[t].color.lerp(Color.WHITE, 0.62)
-	var w := cell * 0.32
+	var col: Color = Game.ANIMALS[t].color
 	var pts := _trail_points(t)
-	draw_polyline(pts, col, w, true)
-	for q in pts:
-		draw_circle(q, w * 0.5, col, true, -1.0, true)
+	var w := cell * 0.2
+	var soft := Color(col.lerp(Color.WHITE, 0.55), 0.55)
+	draw_polyline(pts, soft, w, true)
+	for q in [pts[0], pts[pts.size() - 1]]:
+		draw_circle(q, w * 0.5, soft, true, -1.0, true)
+	# pontinhos a cada ~0,2 casa ao longo do rasto
+	var step := cell * 0.2
+	var carry := step * 0.5
+	var dot := Color(col, 0.5)
+	for i in range(pts.size() - 1):
+		var a := pts[i]
+		var b := pts[i + 1]
+		var seg := a.distance_to(b)
+		var pos := carry
+		while pos < seg:
+			draw_circle(a.lerp(b, pos / seg), cell * 0.03, dot, true, -1.0, true)
+			pos += step
+		carry = pos - seg
 
 
 func _draw_givens_and_paws() -> void:
@@ -355,25 +375,35 @@ func _draw_animal(a: Dictionary) -> void:
 	var p: Array = st.paths[t]
 	var col: Color = Game.ANIMALS[t].color
 	var done := st.is_complete(t)
-	# toca
-	var den := center_of(a.den)
-	draw_set_transform(den + Vector2(0, cell * 0.2), 0.0, Vector2(1.0, 0.42))
-	draw_circle(Vector2.ZERO, cell * 0.34, Color(col.darkened(0.35), 0.28), true, -1.0, true)
-	draw_set_transform(Vector2.ZERO)
-	# comida
+	# toca: só se vê depois de o animal sair dela (buraco escuro com borda de neve)
+	if p.size() > 1:
+		var den := center_of(a.den) + Vector2(0, cell * 0.08)
+		_ellipse(den, cell * 0.3, 0.62, Color(col, 0.22))
+		_ellipse(den + Vector2(0, cell * 0.03), cell * 0.2, 0.55, Color(col.darkened(0.6), 0.6))
+		draw_arc(den, cell * 0.3, PI * 1.1, PI * 1.9, 16, Color(col, 0.6), cell * 0.04, true)
+	# comida: num círculo da cor do animal, para se ver de quem é
 	var food := center_of(a.food)
+	draw_circle(food, cell * 0.42, Color(col, 0.14), true, -1.0, true)
+	draw_arc(food, cell * 0.42, 0.0, TAU, 40, Color(col, 0.75 if not done else 0.35), cell * 0.04, true)
 	if done:
-		_draw_tex(_tex["comida_" + t], food + Vector2(cell * 0.24, cell * 0.22), cell * 0.4)
+		_draw_tex(_tex["comida_" + t], food + Vector2(cell * 0.22, cell * 0.2), cell * 0.42)
 	else:
-		_draw_tex(_tex["comida_" + t], food, cell * 0.62)
-	# animal: segue a ponta do caminho
+		_draw_tex(_tex["comida_" + t], food, cell * 0.64)
+	# animal: segue a ponta do caminho, com uma sombra suave por baixo
 	var tip := center_of(p.back())
 	var b: float = _bounce.get(t, 0.0)
 	var lift := -sin(b * PI) * cell * 0.22
-	var size_k := 0.84 if p.size() == 1 else 0.72
 	if win_anim >= 0.0:
 		lift -= sin(clampf(win_anim * 2.0 - 1.0, 0.0, 1.0) * PI * 2.0) * cell * 0.12
-	_draw_tex(_tex[t], tip + Vector2(0, lift), cell * size_k)
+	var shrink := 1.0 + lift / (cell * 0.5)
+	_ellipse(tip + Vector2(0, cell * 0.33), cell * 0.27 * shrink, 0.3, Color(Game.COLORS.ink, 0.16 * shrink))
+	_draw_tex(_tex[t], tip + Vector2(0, lift - cell * 0.02), cell * 0.86)
+
+
+func _ellipse(c: Vector2, r: float, squash: float, col: Color) -> void:
+	draw_set_transform(c, 0.0, Vector2(1.0, squash))
+	draw_circle(Vector2.ZERO, r, col, true, -1.0, true)
+	draw_set_transform(Vector2.ZERO)
 
 
 func _draw_tex(tex: Texture2D, center: Vector2, s: float, ang := 0.0, mod := Color.WHITE) -> void:

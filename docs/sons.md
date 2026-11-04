@@ -2,6 +2,8 @@
 
 O jogo já está preparado: põe cada som em `assets/sounds/` com o nome da tabela e passa a tocar. Um som que não exista simplesmente não toca.
 
+Os sons atuais foram gerados no ElevenLabs com os prompts abaixo, cortados no início e no fim, igualados em volume e convertidos para `.ogg`. As outras versões que o ElevenLabs gerou estão em `assets/sounds/alternativas/` (o Godot ignora essa pasta): para trocar, copia a que preferires para `assets/sounds/` com o nome da tabela.
+
 - **Formato:** `.ogg`, `.mp3` ou `.wav`. Para a música e o ambiente, prefere `.ogg` ou `.mp3`, que ocupam menos.
 - **Variações:** para os sons que se repetem muito (os passos), gera 2 ou 3 versões e grava-as como `passo_ourico.mp3`, `passo_ourico_2.mp3`, `passo_ourico_3.mp3`. O jogo escolhe uma ao acaso.
 - **Silêncio no início:** corta-o. Um passo que começa 0,2 s depois do dedo parece atrasado.

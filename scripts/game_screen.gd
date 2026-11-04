@@ -82,11 +82,20 @@ func _build_chips() -> void:
 		var col_box := VBoxContainer.new()
 		col_box.add_theme_constant_override("separation", -6)
 		col_box.alignment = BoxContainer.ALIGNMENT_CENTER
-		var icon := TextureRect.new()
-		icon.texture = Game.texture(a.type)
-		icon.custom_minimum_size = Vector2(0, 60)
-		icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		# animal -> comida, para ficar claro de quem é cada comida
+		var icon := HBoxContainer.new()
+		icon.alignment = BoxContainer.ALIGNMENT_CENTER
+		icon.add_theme_constant_override("separation", 2)
+		for part in [[a.type, 60], ["voltar", 26], ["comida_" + a.type, 48]]:
+			var tr_ := TextureRect.new()
+			tr_.texture = Game.texture(part[0])
+			tr_.custom_minimum_size = Vector2(part[1], 60)
+			tr_.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+			tr_.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+			if part[0] == "voltar":
+				tr_.flip_h = true
+				tr_.modulate = Color(1, 1, 1, 0.45)
+			icon.add_child(tr_)
 		var name_lbl := Label.new()
 		name_lbl.text = Game.animal_text(a.type, "NAME")
 		name_lbl.theme_type_variation = &"ChipTitle"
@@ -153,7 +162,8 @@ func _intro() -> void:
 	for a in st.animals:
 		if not Game.has_seen(a.type):
 			queue.append({"title": Game.animal_text(a.type, "MEET"),
-				"body": Game.animal_text(a.type, "DETAIL"), "image": Game.texture(a.type),
+				"body": Game.animal_text(a.type, "DETAIL") + "\n\n[b]" + Game.animal_text(a.type, "LEAD") + "[/b]",
+				"image": Game.texture(a.type),
 				"sound": "animal_" + a.type})
 			Game.mark_seen(a.type)
 	_show_queue(queue)
@@ -173,7 +183,8 @@ func _show_queue(queue: Array) -> void:
 func _show_rules() -> void:
 	var body := tr("RULES_BODY") + "\n"
 	for a in st.animals:
-		body += "\n[b]%s:[/b] %s" % [Game.animal_text(a.type, "NAME"), Game.animal_text(a.type, "DETAIL")]
+		body += "\n[b]%s:[/b] %s %s" % [Game.animal_text(a.type, "NAME"), Game.animal_text(a.type, "DETAIL"),
+			Game.animal_text(a.type, "LEAD")]
 	%Sheet.open(tr("RULES_TITLE"), body, null, [{"text": tr("BACK_TO_LEVEL"), "primary": true}])
 
 
