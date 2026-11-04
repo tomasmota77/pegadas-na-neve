@@ -26,11 +26,13 @@ const ANIMALS := {
 	"raposa": {"color": Color("e3801f")},
 }
 
-## Nome de cada mundo: chave WORLD_<n> em data/traducoes.csv.
-const WORLDS := [
-	{"levels": [0, 1, 2, 3, 4, 5]},
-	{"levels": [6, 7, 8, 9, 10, 11]},
-]
+## Mundos, montados a partir do campo "world" de cada nível em data/levels.json:
+## [{"levels": [índices]}, ...]. Nome de cada mundo: chave WORLD_<n> em data/traducoes.csv.
+var WORLDS: Array = []
+
+## Versão do ficheiro de gravação. 2: os níveis do Bosque passaram de 6-11 para 12-17
+## (quando a Clareira ganhou mais 6 níveis).
+const SAVE_VERSION := 2
 
 ## Línguas do jogo (código -> nome na própria língua). Para juntar uma,
 ## acrescenta a coluna em data/traducoes.csv e o ficheiro em project.godot.
@@ -46,6 +48,12 @@ var current := 0
 func _ready() -> void:
 	var f := FileAccess.open("res://data/levels.json", FileAccess.READ)
 	levels = JSON.parse_string(f.get_as_text())
+	WORLDS.clear()
+	for i in levels.size():
+		var w := int(levels[i].get("world", 1)) - 1
+		while WORLDS.size() <= w:
+			WORLDS.append({"levels": []})
+		WORLDS[w].levels.append(i)
 	_load()
 	_apply_language()
 
@@ -75,8 +83,9 @@ func animal_text(t: String, field: String) -> String:
 	return tr("%s_%s" % [field, t.to_upper()])
 
 
+## Nome mostrado por baixo de "Nível N": o nome do mundo.
 func level_name(i: int) -> String:
-	return tr("LEVEL_NAME_%d" % (i + 1))
+	return world_name(world_of(i))
 
 
 func world_name(w: int) -> String:
@@ -201,11 +210,16 @@ func _load() -> void:
 	if not (data is Dictionary):
 		return
 	var done = data.get("done", {})
+	var version := int(data.get("version", 1))
 	if done is Dictionary:
 		for k in done:
 			# formato antigo: só o tempo
 			var v = done[k]
-			progress.done[k] = v if v is Dictionary else {"t": float(v), "s": 3}
+			var key: String = k
+			# versão 1: o Bosque eram os níveis 6-11; agora são 12-17
+			if version < 2 and int(k) >= 6:
+				key = str(int(k) + 6)
+			progress.done[key] = v if v is Dictionary else {"t": float(v), "s": 3}
 	var seen = data.get("seen", [])
 	if seen is Array:
 		progress.seen = seen
@@ -218,7 +232,9 @@ func _load() -> void:
 func _save() -> void:
 	var f := FileAccess.open(SAVE_PATH, FileAccess.WRITE)
 	if f:
-		f.store_string(JSON.stringify(progress))
+		var data := progress.duplicate()
+		data.version = SAVE_VERSION
+		f.store_string(JSON.stringify(data))
 
 
 static func format_time(s: float) -> String:

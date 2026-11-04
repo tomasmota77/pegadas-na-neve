@@ -103,19 +103,10 @@ MEET_RAPOSA,Conhece a Raposa,Meet the Fox,Conoce al Zorro,Voici le Renard,Das is
 LEAD_OURICO,Leva o Ouriço até ao cogumelo.,Take the hedgehog to the mushroom.,Lleva al erizo hasta la seta.,Emmène le hérisson jusqu'au champignon.,Bring den Igel zum Pilz.
 LEAD_COELHO,Leva o Coelho até à cenoura.,Take the rabbit to the carrot.,Lleva al conejo hasta la zanahoria.,Emmène le lapin jusqu'à la carotte.,Bring den Hasen zur Karotte.
 LEAD_RAPOSA,Leva a Raposa até aos mirtilos.,Take the fox to the blueberries.,Lleva al zorro hasta los arándanos.,Emmène le renard jusqu'aux myrtilles.,Bring den Fuchs zu den Heidelbeeren.
-LEVEL_NAME_1,Primeiros passos,First Steps,Primeros pasos,Premiers pas,Erste Schritte
-LEVEL_NAME_2,Caracol,Snail,Caracol,Escargot,Schnecke
-LEVEL_NAME_3,Salto a salto,Hop by Hop,Salto a salto,Bond après bond,Sprung für Sprung
-LEVEL_NAME_4,Vizinhos,Neighbours,Vecinos,Voisins,Nachbarn
-LEVEL_NAME_5,Trilhos cruzados,Crossing Trails,Senderos cruzados,Sentiers croisés,Gekreuzte Pfade
-LEVEL_NAME_6,Neve funda,Deep Snow,Nieve profunda,Neige profonde,Tiefer Schnee
-LEVEL_NAME_7,Passo de raposa,Fox Steps,Paso de zorro,Pas de renard,Fuchsschritte
-LEVEL_NAME_8,Entre rochas,Between Rocks,Entre rocas,Entre les rochers,Zwischen Felsen
-LEVEL_NAME_9,Por cima das pedras,Over the Stones,Sobre las piedras,Par-dessus les pierres,Über die Steine
-LEVEL_NAME_10,Três trilhos,Three Trails,Tres senderos,Trois sentiers,Drei Pfade
-LEVEL_NAME_11,Bosque cerrado,Thick Forest,Bosque espeso,Forêt dense,Dichter Wald
-LEVEL_NAME_12,Tempestade,Snowstorm,Tormenta,Tempête,Schneesturm
 SOUNDS_ON,Sons: ligados,Sounds: on,Sonidos: activados,Sons : activés,Töne: an
 SOUNDS_OFF,Sons: desligados,Sounds: off,Sonidos: desactivados,Sons : désactivés,Töne: aus
 MUSIC_ON,Música: ligada,Music: on,Música: activada,Musique : activée,Musik: an
 MUSIC_OFF,Música: desligada,Music: off,Música: desactivada,Musique : désactivée,Musik: aus
+WORLD_3,Lago gelado,Frozen Lake,Lago helado,Lac gelé,Zugefrorener See
+WORLD_4,Montanha,Mountain,Montaña,Montagne,Berg
+WORLD_5,Nevão,Blizzard,Ventisca,Tempête de neige,Schneesturm

@@ -9,7 +9,7 @@ Regras:
 - Números nas bordas = casas pisadas (inclui toca e comida) em cada linha/coluna.
 - Pegadas visíveis (pistas) indicam uma casa por onde passa aquela espécie.
 """
-import json, random, sys
+import json, os, random, sys
 from ortools.sat.python import cp_model
 
 MOVES = {
@@ -239,31 +239,77 @@ def make_level(spec, rng):
     raise RuntimeError(f"falhou {spec}")
 
 
-SPECS = [
-    # Mundo 1 — Clareira
-    {"name": "Primeiros passos", "size": (4, 4), "animals": [("ourico", (7, 9))], "extra": 2},
-    {"name": "Caracol", "size": (5, 5), "animals": [("ourico", (10, 13))], "extra": 1},
-    {"name": "Salto a salto", "size": (5, 5), "animals": [("coelho", (5, 6))], "extra": 1},
-    {"name": "Vizinhos", "size": (5, 5), "animals": [("ourico", (7, 9)), ("coelho", (4, 5))], "extra": 1},
-    {"name": "Trilhos cruzados", "size": (6, 6), "animals": [("ourico", (10, 13)), ("coelho", (5, 6))]},
-    {"name": "Neve funda", "size": (6, 6), "animals": [("ourico", (12, 15)), ("coelho", (6, 7))], "givens_range": (0, 2)},
-    # Mundo 2 — Bosque
-    {"name": "Passo de raposa", "size": (5, 5), "animals": [("raposa", (6, 8))], "rocks": 3, "extra": 1},
-    {"name": "Entre rochas", "size": (5, 5), "animals": [("ourico", (7, 9)), ("raposa", (5, 6))], "rocks": 3, "extra": 1},
-    {"name": "Por cima das pedras", "size": (6, 6), "animals": [("coelho", (5, 7)), ("raposa", (6, 8))], "rocks": 4},
-    {"name": "Três trilhos", "size": (6, 6), "animals": [("ourico", (8, 11)), ("coelho", (4, 6)), ("raposa", (5, 7))], "rocks": 3},
-    {"name": "Bosque cerrado", "size": (7, 7), "animals": [("ourico", (11, 15)), ("coelho", (5, 7)), ("raposa", (7, 9))], "rocks": 5},
-    {"name": "Tempestade", "size": (7, 7), "animals": [("ourico", (13, 17)), ("coelho", (6, 8)), ("raposa", (7, 10))], "rocks": 4, "givens_range": (0, 3)},
+# Mundos e níveis. Cada nível tem um "id" fixo: ao correr outra vez, os níveis
+# que já existem em data/levels.json são mantidos tal e qual (o progresso dos
+# jogadores aponta para eles); só os ids novos são gerados.
+WORLDS = [
+    ("Clareira", [
+        {"id": "Primeiros passos", "size": (4, 4), "animals": [("ourico", (7, 9))], "extra": 2},
+        {"id": "Caracol", "size": (5, 5), "animals": [("ourico", (10, 13))], "extra": 1},
+        {"id": "Salto a salto", "size": (5, 5), "animals": [("coelho", (5, 6))], "extra": 1},
+        {"id": "Vizinhos", "size": (5, 5), "animals": [("ourico", (7, 9)), ("coelho", (4, 5))], "extra": 1},
+        {"id": "Trilhos cruzados", "size": (6, 6), "animals": [("ourico", (10, 13)), ("coelho", (5, 6))]},
+        {"id": "Neve funda", "size": (6, 6), "animals": [("ourico", (12, 15)), ("coelho", (6, 7))], "givens_range": (0, 2)},
+        {"id": "c07", "size": (5, 5), "animals": [("coelho", (6, 7))], "extra": 1},
+        {"id": "c08", "size": (6, 6), "animals": [("ourico", (14, 17))]},
+        {"id": "c09", "size": (6, 6), "animals": [("coelho", (6, 8)), ("ourico", (8, 10))]},
+        {"id": "c10", "size": (6, 6), "animals": [("ourico", (13, 16)), ("coelho", (6, 8))], "givens_range": (0, 2)},
+        {"id": "c11", "size": (7, 7), "animals": [("ourico", (15, 19)), ("coelho", (5, 7))], "extra": 1},
+        {"id": "c12", "size": (7, 7), "animals": [("ourico", (16, 20)), ("coelho", (7, 9))], "givens_range": (0, 2)},
+    ]),
+    ("Bosque", [
+        {"id": "Passo de raposa", "size": (5, 5), "animals": [("raposa", (6, 8))], "rocks": 3, "extra": 1},
+        {"id": "Entre rochas", "size": (5, 5), "animals": [("ourico", (7, 9)), ("raposa", (5, 6))], "rocks": 3, "extra": 1},
+        {"id": "Por cima das pedras", "size": (6, 6), "animals": [("coelho", (5, 7)), ("raposa", (6, 8))], "rocks": 4},
+        {"id": "Três trilhos", "size": (6, 6), "animals": [("ourico", (8, 11)), ("coelho", (4, 6)), ("raposa", (5, 7))], "rocks": 3},
+        {"id": "Bosque cerrado", "size": (7, 7), "animals": [("ourico", (11, 15)), ("coelho", (5, 7)), ("raposa", (7, 9))], "rocks": 5},
+        {"id": "Tempestade", "size": (7, 7), "animals": [("ourico", (13, 17)), ("coelho", (6, 8)), ("raposa", (7, 10))], "rocks": 4, "givens_range": (0, 3)},
+        {"id": "b07", "size": (6, 6), "animals": [("raposa", (8, 10))], "rocks": 4, "extra": 1},
+        {"id": "b08", "size": (6, 6), "animals": [("raposa", (7, 9)), ("ourico", (8, 10))], "rocks": 3},
+        {"id": "b09", "size": (6, 6), "animals": [("raposa", (7, 9)), ("coelho", (5, 7))], "rocks": 4},
+        {"id": "b10", "size": (7, 7), "animals": [("raposa", (8, 11)), ("ourico", (10, 13))], "rocks": 5},
+        {"id": "b11", "size": (7, 7), "animals": [("ourico", (12, 15)), ("coelho", (6, 8)), ("raposa", (7, 9))], "rocks": 5},
+        {"id": "b12", "size": (7, 7), "animals": [("ourico", (13, 17)), ("coelho", (6, 8)), ("raposa", (8, 10))], "rocks": 6, "givens_range": (0, 2)},
+    ]),
+    ("Lago gelado", [
+        {"id": "l%02d" % i, "size": (7, 7),
+         "animals": [("ourico", (9 + i // 2, 12 + i // 2)), ("coelho", (5, 7)), ("raposa", (6, 8 + i // 4))],
+         "rocks": 3 + i % 3, **({"extra": 1} if i <= 3 else {}), **({"givens_range": (0, 2)} if i >= 9 else {})}
+        for i in range(1, 13)
+    ]),
+    ("Montanha", [
+        {"id": "m%02d" % i, "size": (8, 8) if i > 4 else (7, 7),
+         "animals": [("ourico", (12 + i // 2, 16 + i // 2)), ("coelho", (6, 8)), ("raposa", (8, 10 + i // 4))],
+         "rocks": 5 + i % 3, **({"givens_range": (0, 2)} if i >= 7 else {})}
+        for i in range(1, 13)
+    ]),
+    ("Nevão", [
+        {"id": "n%02d" % i, "size": (8, 8),
+         "animals": [("ourico", (16 + i // 2, 20 + i // 2)), ("coelho", (7, 9)), ("raposa", (9, 12))],
+         "rocks": 6 + i % 3, "givens_range": (0, 1 if i >= 6 else 2)}
+        for i in range(1, 13)
+    ]),
 ]
 
 if __name__ == "__main__":
     seed = int(sys.argv[1]) if len(sys.argv) > 1 else 7
     rng = random.Random(seed)
+    try:
+        old = {lv.get("id", lv.get("name")): lv for lv in json.load(open("data/levels.json"))}
+    except FileNotFoundError:
+        old = {}
     out = []
-    for i, spec in enumerate(SPECS):
-        lv = make_level(spec, rng)
-        lv["name"] = spec["name"]
-        lv["world"] = 1 if i < 6 else 2
-        out.append(lv)
-        print(i + 1, spec["name"], f'{lv["w"]}x{lv["h"]}', "pistas:", len(lv["givens"]), file=sys.stderr)
-    json.dump(out, open("data/levels.json", "w"))
+    for w, (world, specs) in enumerate(WORLDS):
+        for spec in specs:
+            if spec["id"] in old:
+                lv = old[spec["id"]]
+            else:
+                lv = make_level(spec, rng)
+                print(len(out) + 1, spec["id"], f'{lv["w"]}x{lv["h"]}', "pistas:", len(lv["givens"]), file=sys.stderr, flush=True)
+            lv["id"] = spec["id"]
+            lv["world"] = w + 1
+            lv.pop("name", None)
+            out.append(lv)
+            json.dump(out, open("data/levels.json.tmp", "w"))  # guarda o progresso
+    os.replace("data/levels.json.tmp", "data/levels.json")
+    print("níveis:", len(out), file=sys.stderr)

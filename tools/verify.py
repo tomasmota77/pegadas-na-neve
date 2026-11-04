@@ -82,8 +82,8 @@ def draw(lv):
         print(f"{lv['rows'][r]:2} " + " ".join(g[r]))
 
 if __name__ == "__main__":
-    levels = json.load(open("data/levels.json"))
+    levels = json.load(open(sys.argv[1] if len(sys.argv) > 1 else "data/levels.json"))
     for i, lv in enumerate(levels):
         n = count(lv)
-        print(f"--- {i+1} {lv['name']} soluções={n} pistas={len(lv['givens'])}")
+        print(f"--- {i+1} {lv.get('id', lv.get('name'))} soluções={n} pistas={len(lv['givens'])}")
         draw(lv)

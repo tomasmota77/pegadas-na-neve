@@ -82,7 +82,7 @@ func _init() -> void:
 	# traduções: todas as línguas carregadas e com os textos principais
 	for lang in ["pt", "en", "es", "fr", "de"]:
 		TranslationServer.set_locale(lang)
-		for key in ["LEVEL_N", "RULES_BODY", "NAME_RAPOSA", "LEVEL_NAME_12", "STATUS_START"]:
+		for key in ["LEVEL_N", "RULES_BODY", "NAME_RAPOSA", "WORLD_5", "STATUS_START"]:
 			check(tr(key) != key, "tradução em falta: %s em %s" % [key, lang])
 	TranslationServer.set_locale("pt")
 	check(tr("LEVEL_N") % 3 == "Nível 3", "português errado")

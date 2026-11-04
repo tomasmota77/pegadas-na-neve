@@ -79,9 +79,11 @@ Todos os textos estão em `data/traducoes.csv`: uma linha por texto e uma coluna
 
 ## Gerar níveis
 
+Há 60 níveis em 5 mundos (Clareira, Bosque, Lago gelado, Montanha, Nevão), 12 por mundo, definidos em `WORLDS` no fim de `tools/gen.py`. Cada nível tem um `id` fixo: ao correr o gerador, os que já existem em `data/levels.json` ficam iguais e só os novos são gerados. Para juntar níveis, acrescenta entradas com ids novos e corre outra vez. O nome de cada mundo está em `data/traducoes.csv` (`WORLD_<n>`).
+
 ```
 pip install ortools
-python tools/gen.py 7        # semente 7 → data/levels.json
+python tools/gen.py 11       # gera só os níveis novos → data/levels.json
 python tools/verify.py       # confirma por força bruta que cada nível tem 1 solução
 ```
 
@@ -99,6 +101,6 @@ O `patch_web.py` comprime o motor (`engine-gz.wasm`), muda o nome do `.pck` para
 ## Testes
 
 ```
-godot --headless --path . -s tests/test_puzzle.gd     # lógica dos 12 níveis e dos toques
+godot --headless --path . -s tests/test_puzzle.gd     # lógica dos 60 níveis e dos toques
 godot --path . -- --shots                             # capturas para user://shots/
 ```
