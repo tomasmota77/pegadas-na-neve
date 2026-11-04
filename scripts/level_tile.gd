@@ -33,7 +33,7 @@ func _process(dt: float) -> void:
 
 func _draw() -> void:
 	var C: Dictionary = Game.COLORS
-	var accent: Color = Game.ANIMALS.coelho.color
+	var accent: Color = C.accent
 	var down := is_pressed() and not disabled
 	var lift := 0.0 if down or state == "locked" else 6.0
 	var r := Rect2(Vector2(0, 0 if not down else 4), size - Vector2(0, 6))
@@ -45,7 +45,7 @@ func _draw() -> void:
 			bg = Color(C.frost, 0.7)
 			fg = C.frost_dark
 		"done":
-			bg = C.ink
+			bg = C.accent2
 			fg = C.snow
 	# base: imagem ui_nivel / ui_nivel_feito / ui_nivel_fechado.png se existir
 	var tex_name: String = {"locked": "ui_nivel_fechado", "done": "ui_nivel_feito"}.get(state, "ui_nivel")
@@ -62,7 +62,7 @@ func _draw() -> void:
 		tex_box.draw(get_canvas_item(), full)
 	else:
 		if lift > 0.0:
-			_box(Color(C.frost_dark if state != "done" else C.ink.darkened(0.45), 0.6), rad).draw(get_canvas_item(), Rect2(r.position + Vector2(0, lift), r.size))
+			_box(Color(C.frost_dark if state != "done" else C.accent2.darkened(0.3), 0.6), rad).draw(get_canvas_item(), Rect2(r.position + Vector2(0, lift), r.size))
 		_box(bg, rad).draw(get_canvas_item(), r)
 		if state == "current":
 			var ring := _box(Color(0, 0, 0, 0), rad + 6)

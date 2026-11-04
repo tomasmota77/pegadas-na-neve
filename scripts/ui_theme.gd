@@ -12,6 +12,11 @@ const SIZE_TITLE := 76
 const SIZE_H2 := 42
 const SIZE_BODY := 30
 const SIZE_SMALL := 24
+const SIZE_BUTTON := 38
+
+## As imagens ui_*.png (botões, cartões, níveis com brilho) ficam guardadas mas
+## desligadas: o estilo liso, desenhado aqui, é mais simples e lê-se melhor.
+const USE_UI_IMAGES := false
 
 
 static func build() -> Theme:
@@ -36,15 +41,15 @@ static func build() -> Theme:
 	th.set_font_size("normal_font_size", "RichTextLabel", SIZE_BODY)
 	th.set_font_size("bold_font_size", "RichTextLabel", SIZE_BODY)
 
-	# Botões
-	_button(th, "Button", C.snow, C.ink, 32, C.frost_dark)
+	# Botões: pílulas lisas, cor forte, letra grande e branca, sombra suave da mesma cor
+	_button(th, "Button", C.snow, C.ink, C.frost_dark)
 	th.set_type_variation("PrimaryButton", "Button")
-	_button(th, "PrimaryButton", C.ink, C.snow, 32, C.ink.darkened(0.45))
+	_button(th, "PrimaryButton", C.accent, C.snow, C.accent)
 	th.set_type_variation("SoftButton", "Button")
-	_button(th, "SoftButton", C.sky, C.ink, 32, Color(0, 0, 0, 0))
+	_button(th, "SoftButton", C.accent2, C.snow, C.accent2)
 	for v in ["Button", "PrimaryButton", "SoftButton"]:
 		th.set_font("font", v, FONT_XBOLD)
-		th.set_font_size("font_size", v, SIZE_BODY + 2)
+		th.set_font_size("font_size", v, SIZE_BUTTON)
 	th.set_constant("h_separation", "Button", 12)
 	th.set_constant("icon_max_width", "Button", 44)
 	# imagens opcionais (assets/images/ui_*.png) por cima do estilo desenhado
@@ -99,7 +104,7 @@ static func build() -> Theme:
 ## (margin px) ficam iguais e o meio estica. null se a imagem não existir.
 ## Para as pílulas (botões), os lados são meia altura, para a curva não esticar.
 static func tex_box(name: String, margin: int, mx: int, my: int, pill := false) -> StyleBoxTexture:
-	var tex := Game.texture(name)
+	var tex := ui_texture(name)
 	if tex == null:
 		return null
 	var s := StyleBoxTexture.new()
@@ -116,6 +121,11 @@ static func tex_box(name: String, margin: int, mx: int, my: int, pill := false) 
 	s.content_margin_top = my
 	s.content_margin_bottom = my
 	return s
+
+
+## Imagem da interface (ui_*.png), ou null se estiverem desligadas ou não existirem.
+static func ui_texture(name: String) -> Texture2D:
+	return Game.texture(name) if USE_UI_IMAGES else null
 
 
 static func _button_tex(th: Theme, type: String, name: String) -> void:
@@ -150,19 +160,24 @@ static func _box(bg: Color, radius: int, mx: int, my: int, shadow: Color) -> Sty
 	return s
 
 
-static func _button(th: Theme, type: String, bg: Color, fg: Color, radius: int, shadow: Color) -> void:
-	var normal := _box(bg, radius, 28, 16, shadow)
-	var hover := normal.duplicate()
-	hover.bg_color = bg.lightened(0.06) if bg.v < 0.5 else bg.darkened(0.02)
-	var pressed := normal.duplicate()
+static func _button(th: Theme, type: String, bg: Color, fg: Color, glow: Color) -> void:
+	var radius := 999  # pílula: cantos sempre meia altura
+	var normal := _box(bg, radius, 36, 14, Color(0, 0, 0, 0))
+	normal.shadow_color = Color(glow, 0.35)
+	normal.shadow_size = 14
+	normal.shadow_offset = Vector2(0, 8)
+	var hover: StyleBoxFlat = normal.duplicate()
+	hover.bg_color = bg.lightened(0.06) if bg.v < 0.9 else bg.darkened(0.03)
+	var pressed: StyleBoxFlat = normal.duplicate()
 	pressed.bg_color = bg.darkened(0.08)
-	pressed.shadow_offset = Vector2(0, 2)
-	var disabled := normal.duplicate()
-	disabled.bg_color = Color(bg, 0.5)
-	disabled.shadow_offset = Vector2.ZERO
+	pressed.shadow_size = 6
+	pressed.shadow_offset = Vector2(0, 3)
+	var disabled: StyleBoxFlat = normal.duplicate()
+	disabled.bg_color = Color(bg, 0.45)
+	disabled.shadow_size = 0
 	var focus := StyleBoxFlat.new()
 	focus.draw_center = false
-	focus.set_corner_radius_all(radius + 4)
+	focus.set_corner_radius_all(radius)
 	focus.set_border_width_all(4)
 	focus.border_color = Color(Game.COLORS.ink, 0.35)
 	focus.expand_margin_left = 6

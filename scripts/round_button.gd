@@ -40,19 +40,19 @@ func _draw() -> void:
 	var r := d * 0.5 - 4.0
 	var down := is_pressed() and not disabled
 	var lift := 0.0 if down else d * 0.05
-	var bg: Color = C.ink if primary else C.snow
+	var bg: Color = C.accent if primary else C.snow
 	var fg: Color = C.snow if primary else C.ink
 	var a := 0.45 if disabled else 1.0
 	if is_hovered() and not disabled and not down:
 		bg = bg.lightened(0.08) if primary else bg.darkened(0.02)
 	var top := c + Vector2(0, d * 0.03 if down else 0.0)
 	# base: imagem ui_redondo(_escuro).png se existir; senão círculo com sombra
-	var base_tex := Game.texture("ui_redondo_escuro" if primary else "ui_redondo")
+	var base_tex := UITheme.ui_texture("ui_redondo_escuro" if primary else "ui_redondo")
 	if base_tex:
 		var k := 0.9 if down else (1.06 if is_hovered() and not disabled else 1.0)
 		Icons.draw_tex(self, base_tex, top, d, Color(k, k, k, a))
 	else:
-		draw_circle(c + Vector2(0, lift), r, Color(C.frost_dark if not primary else C.ink.darkened(0.4), 0.55 * a), true, -1.0, true)
+		draw_circle(c + Vector2(0, lift), r, Color(C.frost_dark if not primary else C.accent.darkened(0.25), 0.5 * a), true, -1.0, true)
 		draw_circle(top, r, Color(bg, a), true, -1.0, true)
 	Icons.draw_icon(self, icon_name, top, d * 0.5, Color(fg, a))
 	if badge >= 0:

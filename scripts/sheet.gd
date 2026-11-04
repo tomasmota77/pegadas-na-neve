@@ -17,7 +17,7 @@ func _ready() -> void:
 	resized.connect(_place)
 
 
-## buttons: Array de {text, primary (bool), action (Callable, opcional)}
+## buttons: Array de {text, primary (bool), plain (bool), action (Callable, opcional)}
 ## opts: {stars: int (mostra 3 estrelas), dismissable: bool (fecha ao tocar fora; por omissão true)}
 func open(title: String, body: String, image: Texture2D = null, buttons: Array = [], opts := {}) -> void:
 	%Title.text = title
@@ -35,7 +35,8 @@ func open(title: String, body: String, image: Texture2D = null, buttons: Array =
 		var btn := Button.new()
 		btn.text = b.text
 		btn.custom_minimum_size.y = 100
-		btn.theme_type_variation = &"PrimaryButton" if b.get("primary", false) else &"SoftButton"
+		# primary: laranja; plain: branco (listas de opções); senão: azul suave
+		btn.theme_type_variation = &"PrimaryButton" if b.get("primary", false) else (&"Button" if b.get("plain", false) else &"SoftButton")
 		btn.pressed.connect(_on_button.bind(b))
 		%Buttons.add_child(btn)
 	show()

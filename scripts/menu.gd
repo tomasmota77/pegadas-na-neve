@@ -127,17 +127,17 @@ func _world_card(w: int, next: int) -> Control:
 func _show_settings() -> void:
 	var vib := tr("VIBRATION_ON") if Game.progress.vibrate else tr("VIBRATION_OFF")
 	%Sheet.open(tr("SETTINGS"), tr("SETTINGS_STARS") % [Game.total_stars(), Game.levels.size() * 3], null, [
-		{"text": tr("LANGUAGE_BTN") % Game.LANGS[Game.language()], "action": _show_languages},
-		{"text": tr("SOUNDS_ON") if Game.progress.sfx else tr("SOUNDS_OFF"), "action": func():
+		{"text": tr("LANGUAGE_BTN") % Game.LANGS[Game.language()], "plain": true, "action": _show_languages},
+		{"text": tr("SOUNDS_ON") if Game.progress.sfx else tr("SOUNDS_OFF"), "plain": true, "action": func():
 			Game.set_sfx(not Game.progress.sfx)
 			_show_settings()},
-		{"text": tr("MUSIC_ON") if Game.progress.music else tr("MUSIC_OFF"), "action": func():
+		{"text": tr("MUSIC_ON") if Game.progress.music else tr("MUSIC_OFF"), "plain": true, "action": func():
 			Game.set_music(not Game.progress.music)
 			_show_settings()},
-		{"text": vib, "action": func():
+		{"text": vib, "plain": true, "action": func():
 			Game.set_vibrate(not Game.progress.vibrate)
 			_show_settings()},
-		{"text": tr("RESET"), "action": _confirm_reset},
+		{"text": tr("RESET"), "plain": true, "action": _confirm_reset},
 		{"text": tr("CLOSE"), "primary": true},
 	])
 
@@ -145,7 +145,7 @@ func _show_settings() -> void:
 func _show_languages() -> void:
 	var buttons := []
 	for code in Game.LANGS:
-		buttons.append({"text": Game.LANGS[code], "primary": code == Game.language(), "action": func():
+		buttons.append({"text": Game.LANGS[code], "primary": code == Game.language(), "plain": true, "action": func():
 			Game.set_language(code)
 			get_tree().reload_current_scene()})
 	%Sheet.open(tr("LANGUAGE"), "", null, buttons)

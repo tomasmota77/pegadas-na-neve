@@ -14,6 +14,8 @@ const COLORS := {
 	"ok": Color("3e9a5e"),
 	"bad": Color("d9534f"),
 	"star": Color("f5b82e"),
+	"accent": Color("f2962c"),   # botão principal (laranja quente)
+	"accent2": Color("8ea8ea"),  # botão secundário (azul suave)
 }
 
 ## Os textos (nome, regra, detalhe...) estão em data/traducoes.csv,
