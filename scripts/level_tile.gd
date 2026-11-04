@@ -7,13 +7,15 @@ const FONT := preload("res://assets/fonts/Baloo2-ExtraBold.ttf")
 var number := 1
 var state := "open"   # "locked", "open", "current", "done"
 var stars := 0
+var tag := ""          # "", "hard" ou "super"
 var _pulse := 0.0
 
 
-func setup(n: int, st: String, st_stars: int) -> void:
+func setup(n: int, st: String, st_stars: int, st_tag := "") -> void:
 	number = n
 	state = st
 	stars = st_stars
+	tag = st_tag
 	disabled = st == "locked"
 	mouse_default_cursor_shape = Control.CURSOR_ARROW if disabled else Control.CURSOR_POINTING_HAND
 	set_process(st == "current")
@@ -73,6 +75,7 @@ func _draw() -> void:
 	if state == "current":
 		fg = accent
 	var c := r.get_center()
+	_draw_tag_badge(r)
 	if state == "locked" and Icons.has("cadeado"):
 		Icons.draw_icon(self, "cadeado", c, minf(r.size.x, r.size.y) * 0.5, fg)
 		return
@@ -91,6 +94,26 @@ func _draw() -> void:
 			var p := Vector2(c.x + (i - 1) * ss * 1.05, r.end.y - ss * 0.8)
 			var tint := Color.WHITE if i < stars else Color(1, 1, 1, 0.22)
 			Icons.draw_tex(self, star, p, ss, tint)
+
+
+## Marca dos níveis Difícil / Super difícil: imagem assets/images/chama.png (pintada
+## com a cor do tipo) ou, sem ela, um círculo com "!" ou "!!", no canto de cima.
+func _draw_tag_badge(r: Rect2) -> void:
+	if tag == "":
+		return
+	var col: Color = Game.TAG_COLORS[tag]
+	var s := minf(r.size.x, r.size.y)
+	var bc := Vector2(r.end.x - s * 0.12, r.position.y + s * 0.12)
+	var flame := Game.texture("chama")
+	if flame:
+		Icons.draw_tex(self, flame, bc, s * 0.42, Color.WHITE if tag == "super" else Color(1, 1, 1, 0.9))
+		return
+	var br := s * 0.17
+	draw_circle(bc, br + 3.0, Game.COLORS.snow, true, -1.0, true)
+	draw_circle(bc, br, col, true, -1.0, true)
+	var fs := int(br * 1.5)
+	var base := bc.y + (FONT.get_ascent(fs) - FONT.get_descent(fs)) * 0.5
+	draw_string(FONT, Vector2(bc.x - br, base), "!!" if tag == "super" else "!", HORIZONTAL_ALIGNMENT_CENTER, br * 2, fs, Color.WHITE)
 
 
 func _box(col: Color, rad: int) -> StyleBoxFlat:

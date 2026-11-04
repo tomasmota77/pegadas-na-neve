@@ -106,7 +106,7 @@ func _world_card(w: int, next: int) -> Control:
 			state = "current"
 		elif Game.is_unlocked(i):
 			state = "open"
-		tile.setup(i + 1, state, Game.stars(i))
+		tile.setup(i + 1, state, Game.stars(i), Game.level_tag(i))
 		tile.custom_minimum_size = Vector2(0, 96)
 		tile.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		tile.tooltip_text = Game.level_name(i) if state != "locked" else tr("TT_LOCKED") % i

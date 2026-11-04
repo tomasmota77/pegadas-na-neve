@@ -42,14 +42,23 @@ func _init() -> void:
 		st.undo()
 		check(st.paths[t].size() == 1, "nível %d: desfazer falhou" % i)
 	# regras de movimento
+	# níveis só com um animal (procurados, porque a ordem dos níveis pode mudar)
+	var only := func(t: String) -> Dictionary:
+		for lv in levels:
+			if lv.animals.size() == 1 and lv.animals[0].type == t and lv.solution[t].size() >= 5:
+				return lv
+		return {}
+	var lv_coelho: Dictionary = only.call("coelho")
+	var lv_ourico: Dictionary = only.call("ourico")
+	check(not lv_coelho.is_empty() and not lv_ourico.is_empty(), "faltam níveis só de coelho/ouriço")
 	var st := PuzzleState.new()
-	st.load_level(levels[2])  # só coelho
+	st.load_level(lv_coelho)
 	var den: Vector2i = st.animals[0].den
 	st.press(den)
 	check(st.drag(den + Vector2i(1, 0)) == "", "coelho não pode andar 1 casa")
 	st.release()
 	# tocar num caminho sem arrastar não muda nada nem enche o "desfazer"
-	st.load_level(levels[0])
+	st.load_level(lv_ourico)
 	var sol0: Array = st.solution["ourico"]
 	st.press(sol0[0])
 	for k in range(1, 4):
@@ -67,7 +76,7 @@ func _init() -> void:
 	st.release()
 	check(st.paths["ourico"].size() == 1, "caminho não ficou cortado")
 	# não se passa para lá da comida
-	st.load_level(levels[0])
+	st.load_level(lv_ourico)
 	st.press(sol0[0])
 	for k in range(1, sol0.size()):
 		st.drag(sol0[k])

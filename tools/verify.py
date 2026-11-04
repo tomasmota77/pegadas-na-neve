@@ -2,7 +2,13 @@
 import json, sys
 import os, sys; sys.path.insert(0, os.path.dirname(__file__)); from gen import MOVES
 
-def count(level, cap=2):
+def effort(level):
+    """Esforço de um resolvedor ingénuo: quantas casas experimenta até ter a certeza
+    de que a solução é única. Serve para ordenar os níveis por dificuldade."""
+    return count(level, 2, stats=True)[1]
+
+
+def count(level, cap=2, stats=False):
     W, H = level["w"], level["h"]
     rocks = set(map(tuple, level["rocks"]))
     animals = level["animals"]
@@ -25,7 +31,11 @@ def count(level, cap=2):
         if rc[r] + 1 > rows[r] or cc[c] + 1 > cols[c]: return False
         return True
 
+    nodes = [0]
+
     def put(cell, d):
+        if d > 0:
+            nodes[0] += 1
         used.add(cell) if d > 0 else used.discard(cell)
         rc[cell[0]] += d; cc[cell[1]] += d
 
@@ -64,7 +74,7 @@ def count(level, cap=2):
 
     d = tuple(animals[0]["den"])
     put(d, 1); go(0, [d])
-    return len(found)
+    return (len(found), nodes[0]) if stats else len(found)
 
 def draw(lv):
     H, W = lv["h"], lv["w"]
@@ -85,5 +95,5 @@ if __name__ == "__main__":
     levels = json.load(open(sys.argv[1] if len(sys.argv) > 1 else "data/levels.json"))
     for i, lv in enumerate(levels):
         n = count(lv)
-        print(f"--- {i+1} {lv.get('id', lv.get('name'))} soluções={n} pistas={len(lv['givens'])}")
+        print(f"--- {i+1} {lv.get('id', lv.get('name'))} soluções={n} pistas={len(lv['givens'])} esforço={effort(lv)}")
         draw(lv)

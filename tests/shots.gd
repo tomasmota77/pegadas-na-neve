@@ -31,7 +31,7 @@ func _run() -> void:
 	var main = get_parent()
 	await _wait(40)
 	await _shot("01_menu")
-	main.start_level(3)
+	main.start_level(Game.levels.map(func(l): return l.id).find("Vizinhos"))
 	await _wait(30)
 	await _shot("02_tutorial")
 	main._current.get_node("%Sheet").hide()

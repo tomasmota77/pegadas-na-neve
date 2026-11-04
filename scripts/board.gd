@@ -16,6 +16,7 @@ var origin := Vector2.ZERO
 var _tex := {}
 var _snow_box: StyleBoxFlat
 var _rock_box: StyleBoxFlat
+var _closed_box: StyleBoxFlat
 var _card_box: StyleBoxFlat
 var _pill_box: StyleBoxFlat
 var _bad_box: StyleBoxFlat
@@ -71,6 +72,7 @@ func _layout() -> void:
 	var C: Dictionary = Game.COLORS
 	_snow_box = _box(C.snow, cell * 0.2, Color(C.frost_dark, 0.55), cell * 0.05)
 	_rock_box = _box(Color(C.frost, 0.55), cell * 0.2, Color(0, 0, 0, 0), 0)
+	_closed_box = _box(Color(C.frost, 0.4), cell * 0.2, Color(0, 0, 0, 0), 0)
 	_card_box = _box(Color(C.snow, 0.5), cell * 0.32, Color(C.frost_dark, 0.35), cell * 0.06)
 	_pill_box = _box(Color(C.ok, 0.14), hdr * 0.4, Color(0, 0, 0, 0), 0)
 	_bad_box = _box(Color(C.bad, 0.12), hdr * 0.4, Color(0, 0, 0, 0), 0)
@@ -232,6 +234,13 @@ func _draw() -> void:
 	_draw_counters()
 
 	var gap := maxf(2.0, cell * 0.05)
+	# ajuda: linhas e colunas que já têm as casas todas
+	var full_row := []
+	for y in st.height:
+		full_row.append(st.row_count(y) >= st.row_targets[y])
+	var full_col := []
+	for x in st.width:
+		full_col.append(st.col_count(x) >= st.col_targets[x])
 	for y in st.height:
 		for x in st.width:
 			var c := Vector2i(x, y)
@@ -239,6 +248,10 @@ func _draw() -> void:
 			if st.rocks.has(c):
 				_rock_box.draw(get_canvas_item(), r)
 				_draw_tex(_tex.rocha, center_of(c), cell * 0.78)
+			elif (full_row[y] or full_col[x]) and st.occupant(c) == "" and st.special(c).is_empty() \
+					and not st.givens.has(c):
+				# casa vazia numa linha ou coluna já cheia: ninguém pode passar aqui
+				_closed_box.draw(get_canvas_item(), r)
 			else:
 				_snow_box.draw(get_canvas_item(), r)
 			if st.marks.has(c):

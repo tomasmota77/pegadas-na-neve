@@ -243,33 +243,34 @@ def make_level(spec, rng):
 # que já existem em data/levels.json são mantidos tal e qual (o progresso dos
 # jogadores aponta para eles); só os ids novos são gerados.
 WORLDS = [
+    # Os primeiros níveis de cada mundo ensinam: caminhos curtos e quase tudo marcado.
     ("Clareira", [
+        {"id": "e01", "intro": True, "size": (4, 4), "animals": [("ourico", (4, 5))], "extra": 2},
+        {"id": "e02", "intro": True, "size": (4, 4), "animals": [("ourico", (6, 7))], "extra": 2},
+        {"id": "e03", "intro": True, "size": (5, 5), "animals": [("ourico", (7, 8))], "extra": 2},
+        {"id": "e04", "intro": True, "size": (4, 4), "animals": [("coelho", (3, 4))], "extra": 1},
+        {"id": "Salto a salto", "size": (5, 5), "animals": [("coelho", (5, 6))], "extra": 1},
+        {"id": "c07", "size": (5, 5), "animals": [("coelho", (6, 7))], "extra": 1},
         {"id": "Primeiros passos", "size": (4, 4), "animals": [("ourico", (7, 9))], "extra": 2},
         {"id": "Caracol", "size": (5, 5), "animals": [("ourico", (10, 13))], "extra": 1},
-        {"id": "Salto a salto", "size": (5, 5), "animals": [("coelho", (5, 6))], "extra": 1},
         {"id": "Vizinhos", "size": (5, 5), "animals": [("ourico", (7, 9)), ("coelho", (4, 5))], "extra": 1},
         {"id": "Trilhos cruzados", "size": (6, 6), "animals": [("ourico", (10, 13)), ("coelho", (5, 6))]},
-        {"id": "Neve funda", "size": (6, 6), "animals": [("ourico", (12, 15)), ("coelho", (6, 7))], "givens_range": (0, 2)},
-        {"id": "c07", "size": (5, 5), "animals": [("coelho", (6, 7))], "extra": 1},
-        {"id": "c08", "size": (6, 6), "animals": [("ourico", (14, 17))]},
         {"id": "c09", "size": (6, 6), "animals": [("coelho", (6, 8)), ("ourico", (8, 10))]},
         {"id": "c10", "size": (6, 6), "animals": [("ourico", (13, 16)), ("coelho", (6, 8))], "givens_range": (0, 2)},
-        {"id": "c11", "size": (7, 7), "animals": [("ourico", (15, 19)), ("coelho", (5, 7))], "extra": 1},
-        {"id": "c12", "size": (7, 7), "animals": [("ourico", (16, 20)), ("coelho", (7, 9))], "givens_range": (0, 2)},
     ]),
     ("Bosque", [
+        {"id": "r01", "intro": True, "size": (4, 4), "animals": [("raposa", (4, 5))], "rocks": 1, "extra": 2},
+        {"id": "r02", "intro": True, "size": (5, 5), "animals": [("raposa", (5, 6))], "rocks": 2, "extra": 2},
         {"id": "Passo de raposa", "size": (5, 5), "animals": [("raposa", (6, 8))], "rocks": 3, "extra": 1},
-        {"id": "Entre rochas", "size": (5, 5), "animals": [("ourico", (7, 9)), ("raposa", (5, 6))], "rocks": 3, "extra": 1},
-        {"id": "Por cima das pedras", "size": (6, 6), "animals": [("coelho", (5, 7)), ("raposa", (6, 8))], "rocks": 4},
-        {"id": "Três trilhos", "size": (6, 6), "animals": [("ourico", (8, 11)), ("coelho", (4, 6)), ("raposa", (5, 7))], "rocks": 3},
-        {"id": "Bosque cerrado", "size": (7, 7), "animals": [("ourico", (11, 15)), ("coelho", (5, 7)), ("raposa", (7, 9))], "rocks": 5},
-        {"id": "Tempestade", "size": (7, 7), "animals": [("ourico", (13, 17)), ("coelho", (6, 8)), ("raposa", (7, 10))], "rocks": 4, "givens_range": (0, 3)},
         {"id": "b07", "size": (6, 6), "animals": [("raposa", (8, 10))], "rocks": 4, "extra": 1},
+        {"id": "Por cima das pedras", "size": (6, 6), "animals": [("coelho", (5, 7)), ("raposa", (6, 8))], "rocks": 4},
         {"id": "b08", "size": (6, 6), "animals": [("raposa", (7, 9)), ("ourico", (8, 10))], "rocks": 3},
+        {"id": "Entre rochas", "size": (5, 5), "animals": [("ourico", (7, 9)), ("raposa", (5, 6))], "rocks": 3, "extra": 1},
         {"id": "b09", "size": (6, 6), "animals": [("raposa", (7, 9)), ("coelho", (5, 7))], "rocks": 4},
         {"id": "b10", "size": (7, 7), "animals": [("raposa", (8, 11)), ("ourico", (10, 13))], "rocks": 5},
-        {"id": "b11", "size": (7, 7), "animals": [("ourico", (12, 15)), ("coelho", (6, 8)), ("raposa", (7, 9))], "rocks": 5},
+        {"id": "Três trilhos", "size": (6, 6), "animals": [("ourico", (8, 11)), ("coelho", (4, 6)), ("raposa", (5, 7))], "rocks": 3},
         {"id": "b12", "size": (7, 7), "animals": [("ourico", (13, 17)), ("coelho", (6, 8)), ("raposa", (8, 10))], "rocks": 6, "givens_range": (0, 2)},
+        {"id": "Bosque cerrado", "size": (7, 7), "animals": [("ourico", (11, 15)), ("coelho", (5, 7)), ("raposa", (7, 9))], "rocks": 5},
     ]),
     ("Lago gelado", [
         {"id": "l%02d" % i, "size": (7, 7),
@@ -291,6 +292,28 @@ WORLDS = [
     ]),
 ]
 
+# Em cada mundo: os níveis "intro" primeiro, pela ordem escrita (ensinam um animal);
+# depois os outros do mais fácil para o mais difícil, com dois picos ao estilo
+# Meowdoku: um "Difícil" a meio e um "Super difícil" a fechar o mundo.
+HARD_POS = {0: 7}   # mundo -> posição (0 = primeiro) do nível Difícil; por omissão 5
+
+
+def arrange(levels, specs, w, verify):
+    intro_ids = [sp["id"] for sp in specs if sp.get("intro")]
+    for lv in levels:
+        lv.setdefault("effort", verify.effort(lv))
+        lv.pop("tag", None)
+    intro = [lv for i in intro_ids for lv in levels if lv["id"] == i]
+    rest = sorted([lv for lv in levels if lv["id"] not in intro_ids], key=lambda lv: lv["effort"])
+    super_ = rest.pop()          # o mais difícil fecha o mundo
+    hard = rest.pop()            # o segundo mais difícil é o pico a meio
+    super_["tag"] = "super"
+    hard["tag"] = "hard"
+    seq = intro + rest
+    seq.insert(min(HARD_POS.get(w, 5), len(seq)), hard)
+    return seq + [super_]
+
+
 if __name__ == "__main__":
     seed = int(sys.argv[1]) if len(sys.argv) > 1 else 7
     rng = random.Random(seed)
@@ -298,8 +321,10 @@ if __name__ == "__main__":
         old = {lv.get("id", lv.get("name")): lv for lv in json.load(open("data/levels.json"))}
     except FileNotFoundError:
         old = {}
+    import verify  # aqui para evitar import circular (verify usa MOVES deste ficheiro)
     out = []
     for w, (world, specs) in enumerate(WORLDS):
+        start = len(out)
         for spec in specs:
             if spec["id"] in old:
                 lv = old[spec["id"]]
@@ -311,5 +336,8 @@ if __name__ == "__main__":
             lv.pop("name", None)
             out.append(lv)
             json.dump(out, open("data/levels.json.tmp", "w"))  # guarda o progresso
+        out[start:] = arrange(out[start:], specs, w, verify)
+        json.dump(out, open("data/levels.json.tmp", "w"))
+        print(world, [(lv["effort"], lv.get("tag", "")) for lv in out[start:]], file=sys.stderr, flush=True)
     os.replace("data/levels.json.tmp", "data/levels.json")
     print("níveis:", len(out), file=sys.stderr)

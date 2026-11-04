@@ -30,9 +30,18 @@ const ANIMALS := {
 ## [{"levels": [índices]}, ...]. Nome de cada mundo: chave WORLD_<n> em data/traducoes.csv.
 var WORLDS: Array = []
 
-## Versão do ficheiro de gravação. 2: os níveis do Bosque passaram de 6-11 para 12-17
-## (quando a Clareira ganhou mais 6 níveis).
-const SAVE_VERSION := 2
+## Versão do ficheiro de gravação.
+## 2: os níveis do Bosque passaram de 6-11 para 12-17 (a Clareira ganhou mais 6 níveis).
+## 3: o progresso passou a ser guardado pelo id do nível em vez do número.
+const SAVE_VERSION := 3
+
+## Ordem dos níveis na versão 2 (número -> id), para converter gravações antigas.
+const LEGACY_ORDER_V2 := ["Primeiros passos", "Caracol", "Salto a salto", "Vizinhos", "Trilhos cruzados",
+	"Neve funda", "c07", "c08", "c09", "c10", "c11", "c12", "Passo de raposa", "Entre rochas",
+	"Por cima das pedras", "Três trilhos", "Bosque cerrado", "Tempestade", "b07", "b08", "b09", "b10",
+	"b11", "b12", "l01", "l02", "l03", "l04", "l05", "l06", "l07", "l08", "l09", "l10", "l11", "l12",
+	"m01", "m02", "m03", "m04", "m05", "m06", "m07", "m08", "m09", "m10", "m11", "m12",
+	"n01", "n02", "n03", "n04", "n05", "n06", "n07", "n08", "n09", "n10", "n11", "n12"]
 
 ## Línguas do jogo (código -> nome na própria língua). Para juntar uma,
 ## acrescenta a coluna em data/traducoes.csv e o ficheiro em project.godot.
@@ -83,6 +92,15 @@ func animal_text(t: String, field: String) -> String:
 	return tr("%s_%s" % [field, t.to_upper()])
 
 
+## Nível especial: "hard" (Difícil, a meio de cada mundo), "super" (Super difícil,
+## a fechar o mundo) ou "" (normal). Vem do campo "tag" de data/levels.json.
+func level_tag(i: int) -> String:
+	return str(levels[i].get("tag", ""))
+
+
+const TAG_COLORS := {"hard": Color("f08a24"), "super": Color("d9434f")}
+
+
 ## Nome mostrado por baixo de "Nível N": o nome do mundo.
 func level_name(i: int) -> String:
 	return world_name(world_of(i))
@@ -110,8 +128,14 @@ func texture(name: String) -> Texture2D:
 	return _textures[name]
 
 
+## O progresso é guardado pelo id do nível (não pelo número), para que mudar a
+## ordem ou juntar níveis não baralhe o que o jogador já resolveu.
+func level_id(i: int) -> String:
+	return str(levels[i].get("id", i))
+
+
 func is_done(i: int) -> bool:
-	return progress.done.has(str(i))
+	return progress.done.has(level_id(i))
 
 
 ## Um nível está aberto se for o primeiro ou se o anterior estiver resolvido.
@@ -120,11 +144,11 @@ func is_unlocked(i: int) -> bool:
 
 
 func best_time(i: int) -> float:
-	return float(progress.done.get(str(i), {}).get("t", 0.0))
+	return float(progress.done.get(level_id(i), {}).get("t", 0.0))
 
 
 func stars(i: int) -> int:
-	return int(progress.done.get(str(i), {}).get("s", 0))
+	return int(progress.done.get(level_id(i), {}).get("s", 0))
 
 
 ## Estrelas por nível: 3 sem dicas, 2 com uma, 1 com mais.
@@ -134,8 +158,8 @@ static func stars_for(hints_used: int) -> int:
 
 func total_stars() -> int:
 	var n := 0
-	for k in progress.done:
-		n += int(progress.done[k].get("s", 0))
+	for i in levels.size():
+		n += stars(i)
 	return n
 
 
@@ -155,7 +179,7 @@ func world_of(i: int) -> int:
 
 ## Guarda o resultado. Devolve true se for um novo recorde de tempo.
 func mark_done(i: int, seconds: float, got_stars: int) -> bool:
-	var k := str(i)
+	var k := level_id(i)
 	var prev: Dictionary = progress.done.get(k, {})
 	var record := prev.is_empty() or seconds < float(prev.get("t", INF))
 	progress.done[k] = {
@@ -216,9 +240,15 @@ func _load() -> void:
 			# formato antigo: só o tempo
 			var v = done[k]
 			var key: String = k
-			# versão 1: o Bosque eram os níveis 6-11; agora são 12-17
+			# versão 1: o Bosque eram os níveis 6-11; na versão 2 passaram a 12-17
 			if version < 2 and int(k) >= 6:
 				key = str(int(k) + 6)
+			# versões 1 e 2 guardavam o número do nível; a 3 guarda o id
+			if version < 3:
+				var idx := int(key)
+				if idx < 0 or idx >= LEGACY_ORDER_V2.size():
+					continue
+				key = LEGACY_ORDER_V2[idx]
 			progress.done[key] = v if v is Dictionary else {"t": float(v), "s": 3}
 	var seen = data.get("seen", [])
 	if seen is Array:

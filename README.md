@@ -81,6 +81,10 @@ Todos os textos estão em `data/traducoes.csv`: uma linha por texto e uma coluna
 
 Há 60 níveis em 5 mundos (Clareira, Bosque, Lago gelado, Montanha, Nevão), 12 por mundo, definidos em `WORLDS` no fim de `tools/gen.py`. Cada nível tem um `id` fixo: ao correr o gerador, os que já existem em `data/levels.json` ficam iguais e só os novos são gerados. Para juntar níveis, acrescenta entradas com ids novos e corre outra vez. O nome de cada mundo está em `data/traducoes.csv` (`WORLD_<n>`).
 
+Dentro de cada mundo, os níveis marcados `"intro"` (os que ensinam um animal) ficam primeiro, pela ordem escrita. Os outros são ordenados pela dificuldade medida (`effort`: quantas casas um resolvedor simples experimenta, ver `tools/verify.py`). O segundo mais difícil vira o nível **Difícil** a meio do mundo e o mais difícil o **Super difícil** no fim (campo `tag`).
+
+O progresso dos jogadores é guardado pelo `id` de cada nível, por isso mudar a ordem não estraga nada.
+
 ```
 pip install ortools
 python tools/gen.py 11       # gera só os níveis novos → data/levels.json

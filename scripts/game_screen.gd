@@ -38,7 +38,15 @@ func start(i: int) -> void:
 	st.load_level(Game.levels[i])
 	board.setup(st)
 	%LevelLabel.text = tr("LEVEL_N") % (i + 1)
-	%NameLabel.text = Game.level_name(i)
+	var tag := Game.level_tag(i)
+	if tag != "":
+		%NameLabel.text = tr("TAG_SUPER" if tag == "super" else "TAG_HARD")
+		%NameLabel.add_theme_color_override("font_color", Game.TAG_COLORS[tag])
+		%NameLabel.theme_type_variation = &"ChipTitle"
+	else:
+		%NameLabel.text = Game.level_name(i)
+		%NameLabel.remove_theme_color_override("font_color")
+		%NameLabel.theme_type_variation = &"Small"
 	elapsed = 0.0
 	running = true
 	_lines_ok = -1

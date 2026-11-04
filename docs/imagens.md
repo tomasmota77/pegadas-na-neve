@@ -136,3 +136,6 @@ Depois de pores qualquer imagem nova, corre `python tools/prep_images.py`.
 
 **`icon.png`** (1024×1024, ícone da app, sem transparência, fica na raiz do projeto)
 > Mobile app icon, cute hedgehog face peeking from the bottom, a trail of colorful footprints (teal, pink, orange) in white snow above it, pale blue background (#E7EFF6), thick dark navy outline, flat soft shading, square, no text.
+
+**`chama.png`** (256×256, opcional): marca dos níveis Difícil e Super difícil no menu. Sem ela, aparece um círculo com "!" ou "!!".
+> Simple rounded mobile game UI icon of a small cute flame, warm orange and red with a yellow center, thick dark navy outline (#34303C), flat colors, no text, centered, transparent background.
