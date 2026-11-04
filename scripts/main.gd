@@ -15,6 +15,7 @@ func _ready() -> void:
 		if n is BaseButton and not n.pressed.is_connected(_on_any_button):
 			n.pressed.connect(_on_any_button))
 	Sfx.refresh_music()
+	_fit_screen()
 	show_menu()
 	if "--shots" in OS.get_cmdline_user_args():
 		add_child(load("res://tests/shots.gd").new())
@@ -48,7 +49,21 @@ func _swap(node: Control) -> void:
 	create_tween().tween_property(node, "modulate:a", 1.0, 0.22)
 
 
+## Largura máxima do jogo. Num ecrã largo (browser no computador, tablet deitado)
+## o jogo fica centrado com esta largura, em vez de esticar os botões para os lados.
+const MAX_WIDTH := 760.0
+
+
+func _fit_screen() -> void:
+	var w := minf(size.x, MAX_WIDTH)
+	$Screen.set_anchors_preset(Control.PRESET_TOP_LEFT)
+	$Screen.position = Vector2((size.x - w) * 0.5, 0)
+	$Screen.size = Vector2(w, size.y)
+
+
 func _notification(what: int) -> void:
+	if what == NOTIFICATION_RESIZED and is_node_ready():
+		_fit_screen()
 	# botão "voltar" do Android
 	if what == NOTIFICATION_WM_GO_BACK_REQUEST and _current:
 		if _current.has_signal("back_requested"):

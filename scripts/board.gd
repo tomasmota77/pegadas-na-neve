@@ -48,6 +48,7 @@ func setup(state: PuzzleState) -> void:
 		_tex["comida_" + t] = Game.texture("comida_" + t)
 		_tex["pegada_" + t] = Game.texture("pegada_" + t)
 	_tex["rocha"] = Game.texture("rocha")
+	_tex["toca"] = Game.texture("toca")
 	_layout()
 	queue_redraw()
 
@@ -375,12 +376,18 @@ func _draw_animal(a: Dictionary) -> void:
 	var p: Array = st.paths[t]
 	var col: Color = Game.ANIMALS[t].color
 	var done := st.is_complete(t)
-	# toca: só se vê depois de o animal sair dela (buraco escuro com borda de neve)
+	# toca: depois de o animal sair, a casa de partida fica pintada de leve com a cor
+	# dele (ou mostra assets/images/toca.png, se existir)
 	if p.size() > 1:
-		var den := center_of(a.den) + Vector2(0, cell * 0.08)
-		_ellipse(den, cell * 0.3, 0.62, Color(col, 0.22))
-		_ellipse(den + Vector2(0, cell * 0.03), cell * 0.2, 0.55, Color(col.darkened(0.6), 0.6))
-		draw_arc(den, cell * 0.3, PI * 1.1, PI * 1.9, 16, Color(col, 0.6), cell * 0.04, true)
+		var den_c := center_of(a.den)
+		var toca: Texture2D = _tex.get("toca")
+		if toca:
+			_draw_tex(toca, den_c, cell * 0.8)
+		else:
+			var gap := maxf(2.0, cell * 0.05)
+			var cell_r := Rect2(origin + Vector2(a.den) * cell, Vector2(cell, cell)).grow(-gap)
+			_box(Color(col, 0.16), cell * 0.2, Color(0, 0, 0, 0), 0).draw(get_canvas_item(), cell_r)
+			draw_circle(den_c, cell * 0.1, Color(col, 0.7), true, -1.0, true)
 	# comida: num círculo da cor do animal, para se ver de quem é
 	var food := center_of(a.food)
 	draw_circle(food, cell * 0.42, Color(col, 0.14), true, -1.0, true)

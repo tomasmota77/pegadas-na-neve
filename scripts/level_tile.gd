@@ -50,20 +50,27 @@ func _draw() -> void:
 	# base: imagem ui_nivel / ui_nivel_feito / ui_nivel_fechado.png se existir
 	var tex_name: String = {"locked": "ui_nivel_fechado", "done": "ui_nivel_feito"}.get(state, "ui_nivel")
 	var tex_box := UITheme.tex_box(tex_name, 40, 0, 0)
+	var k := 0.5 + 0.5 * sin(_pulse)
 	if tex_box:
+		var full := Rect2(r.position, r.size + Vector2(0, 6))
+		if state == "current":
+			# brilho com a forma exata do botão: a mesma imagem, maior e pintada da cor de destaque
+			var glow: StyleBoxTexture = tex_box.duplicate()
+			glow.modulate_color = Color(accent.lightened(0.15), 0.45 + 0.4 * k)
+			glow.draw(get_canvas_item(), full.grow(3.0 + 3.0 * k))
 		tex_box.modulate_color = Color(0.9, 0.9, 0.9) if down else Color.WHITE
-		tex_box.draw(get_canvas_item(), Rect2(r.position, r.size + Vector2(0, 6)))
+		tex_box.draw(get_canvas_item(), full)
 	else:
 		if lift > 0.0:
 			_box(Color(C.frost_dark if state != "done" else C.ink.darkened(0.45), 0.6), rad).draw(get_canvas_item(), Rect2(r.position + Vector2(0, lift), r.size))
 		_box(bg, rad).draw(get_canvas_item(), r)
+		if state == "current":
+			var ring := _box(Color(0, 0, 0, 0), rad + 6)
+			ring.draw_center = false
+			ring.set_border_width_all(5)
+			ring.border_color = Color(accent, 0.55 + 0.45 * k)
+			ring.draw(get_canvas_item(), r.grow(3.0 + 2.0 * k))
 	if state == "current":
-		var k := 0.5 + 0.5 * sin(_pulse)
-		var ring := _box(Color(0, 0, 0, 0), rad + 6)
-		ring.draw_center = false
-		ring.set_border_width_all(5)
-		ring.border_color = Color(accent, 0.55 + 0.45 * k)
-		ring.draw(get_canvas_item(), r.grow(3.0 + 2.0 * k))
 		fg = accent
 	var c := r.get_center()
 	if state == "locked" and Icons.has("cadeado"):
@@ -75,7 +82,7 @@ func _draw() -> void:
 	draw_string(FONT, Vector2(r.position.x, base), str(number), HORIZONTAL_ALIGNMENT_CENTER, r.size.x, fs, fg)
 	if state == "done":
 		var star := Game.texture("estrela")
-		var ss := r.size.x * 0.2
+		var ss := minf(r.size.x * 0.2, r.size.y * 0.24)
 		if star == null:
 			var sf := int(ss * 0.95)
 			draw_string(FONT, Vector2(r.position.x, r.end.y - ss * 0.45), "%d/3" % stars, HORIZONTAL_ALIGNMENT_CENTER, r.size.x, sf, C.star)
