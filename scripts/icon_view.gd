@@ -1,6 +1,6 @@
 class_name IconView
 extends Control
-## Mostra um ícone (imagem de assets/images ou o desenho vetorial de Icons).
+## Mostra um ícone de assets/images (escondido enquanto a imagem não existir).
 
 @export var icon_name := "":
 	set(v):
