@@ -2,6 +2,8 @@
 
 O jogo já está preparado: põe cada som em `assets/sounds/` com o nome da tabela e passa a tocar. Um som que não exista simplesmente não toca.
 
+O som de ambiente (vento) foi tirado do jogo: era quase só ruído agudo e soava a chiado por baixo da música. Está em `assets/sounds/alternativas/ambiente_vento.ogg`. A música (Suno) passou por um filtro de ruído suave antes de ser ligada em ciclo.
+
 Os sons atuais foram gerados no ElevenLabs com os prompts abaixo, cortados no início e no fim, igualados em volume e convertidos para `.ogg`. As outras versões que o ElevenLabs gerou estão em `assets/sounds/alternativas/` (o Godot ignora essa pasta): para trocar, copia a que preferires para `assets/sounds/` com o nome da tabela.
 
 - **Formato:** `.ogg`, `.mp3` ou `.wav`. Para a música e o ambiente, prefere `.ogg` ou `.mp3`, que ocupam menos.

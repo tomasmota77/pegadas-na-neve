@@ -139,3 +139,23 @@ Depois de pores qualquer imagem nova, corre `python tools/prep_images.py`.
 
 **`chama.png`** (256×256, opcional): marca dos níveis Difícil e Super difícil no menu. Sem ela, aparece um círculo com "!" ou "!!".
 > Simple rounded mobile game UI icon of a small cute flame, warm orange and red with a yellow center, thick dark navy outline (#34303C), flat colors, no text, centered, transparent background.
+
+## Versão 2 dos bonecos e das comidas (recomendada)
+
+Gera os três animais **numa só imagem** e as três comidas **noutra**: assim saem com o mesmo traço, o mesmo tamanho e a mesma luz. Depois corta-se com:
+
+```
+python tools/split_sheet.py assets/images/animais.png ourico coelho raposa
+python tools/split_sheet.py assets/images/comidas.png comida_ourico comida_coelho comida_raposa
+python tools/prep_images.py
+```
+
+**`animais.png`** (formato largo, 3:1)
+> A sprite sheet of three cute chibi animal characters for a cozy winter mobile puzzle game, side by side in a single row, evenly spaced with clear empty space between them, all the same size and drawn in exactly the same style. Each sits facing the viewer. Left: a hedgehog with warm dark-brown spikes, a cream face and a teal (#2E8C7E) knitted scarf. Middle: a rabbit with warm caramel-brown fur, a cream belly, long upright ears with pink inside and a raspberry-pink (#C2477A) knitted scarf. Right: a fox with bright orange fur, white cheeks and chest, a fluffy white-tipped tail and a cream knitted scarf with orange stripes. Big round heads (about 60% of the character's height), small simple bodies, large shiny eyes, rosy cheeks, small happy smile. Thick dark navy outline (#34303C) of the same thickness on all three, flat colors with one soft shade, almost no fur texture, no thin lines, readable at 64 pixels. Transparent background, no text, no ground, no shadow.
+
+**`comidas.png`** (formato largo, 3:1)
+> A sprite sheet of three food items for a cozy winter mobile puzzle game, side by side in a single row, evenly spaced with clear empty space between them, all the same size and drawn in exactly the same style, each filling a square of the same size. Left: a round red mushroom with big white spots and a short cream stem. Middle: a short, chubby orange carrot standing upright with a bushy green leafy top. Right: a cluster of three round medium-blue blueberries (#5B74D6) with two green leaves. Each one has a small soft white snow cap on top. No faces, no snowflakes or sparkles around them. Thick dark navy outline (#34303C) of the same thickness on all three, flat colors with one soft shade, simple shapes, readable at 48 pixels. Transparent background, no text, no ground, no shadow.
+
+**`toca.png`** (sem bagas de Natal)
+> Cute cozy winter mobile puzzle game art, a small round animal burrow entrance in a snowy mound, dark round opening, soft white snow cap on top, a few small rocks at the base, no berries, no plants. Thick dark navy outline (#34303C), flat colors with one soft shade, simple shapes, readable at 48 pixels, centered, transparent background, no text, no shadow.
+

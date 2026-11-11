@@ -78,40 +78,36 @@ func _build_chips() -> void:
 		var col: Color = info.color
 		var chip := PanelContainer.new()
 		chip.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		# cartão com a cor do animal e uma borda mais escura em baixo, para ter relevo
 		var box := StyleBoxFlat.new()
-		box.bg_color = col.lerp(Color.WHITE, 0.88)
-		box.set_corner_radius_all(24)
-		box.content_margin_left = 10
-		box.content_margin_right = 10
-		box.content_margin_top = 10
-		box.content_margin_bottom = 12
+		box.bg_color = col.lerp(Color.WHITE, 0.84)
+		box.set_corner_radius_all(26)
+		box.border_width_bottom = 5
+		box.border_color = col.lerp(Color.WHITE, 0.5)
+		box.content_margin_left = 8
+		box.content_margin_right = 8
+		box.content_margin_top = 8
+		box.content_margin_bottom = 8
 		box.anti_aliasing = true
 		chip.add_theme_stylebox_override("panel", box)
 		var col_box := VBoxContainer.new()
-		col_box.add_theme_constant_override("separation", -6)
+		col_box.add_theme_constant_override("separation", -8)
 		col_box.alignment = BoxContainer.ALIGNMENT_CENTER
-		# animal -> comida, para ficar claro de quem é cada comida
-		var icon := HBoxContainer.new()
-		icon.alignment = BoxContainer.ALIGNMENT_CENTER
-		icon.add_theme_constant_override("separation", 2)
-		for part in [[a.type, 60], ["voltar", 26], ["comida_" + a.type, 48]]:
-			var tr_ := TextureRect.new()
-			tr_.texture = Game.texture(part[0])
-			tr_.custom_minimum_size = Vector2(part[1], 60)
-			tr_.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-			tr_.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-			if part[0] == "voltar":
-				tr_.flip_h = true
-				tr_.modulate = Color(1, 1, 1, 0.45)
-			icon.add_child(tr_)
+		# o animal, com a sua comida numa bolha no canto
+		var icon := AnimalBadge.new()
+		icon.animal = a.type
+		icon.custom_minimum_size = Vector2(0, 84)
 		var name_lbl := Label.new()
 		name_lbl.text = Game.animal_text(a.type, "NAME")
 		name_lbl.theme_type_variation = &"ChipTitle"
-		name_lbl.add_theme_color_override("font_color", col.darkened(0.2))
+		name_lbl.add_theme_font_size_override("font_size", 30)
+		name_lbl.add_theme_color_override("font_color", col.darkened(0.25))
 		name_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		var rule := Label.new()
 		rule.text = Game.animal_text(a.type, "RULE")
 		rule.theme_type_variation = &"Small"
+		rule.add_theme_font_size_override("font_size", 23)
+		rule.add_theme_color_override("font_color", col.darkened(0.45).lerp(Game.COLORS.ink_soft, 0.5))
 		rule.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		col_box.add_child(icon)
 		col_box.add_child(name_lbl)
