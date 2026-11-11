@@ -318,7 +318,7 @@ func _trail_points(t: String) -> PackedVector2Array:
 			var n := Vector2(-d.y, d.x)
 			if n.y > 0.0 or (is_zero_approx(n.y) and n.x > 0.0):
 				n = -n
-			var ctrl := (a + b) * 0.5 + n * cell * 0.36
+			var ctrl := (a + b) * 0.5 + n * cell * 0.24
 			for k in range(1, 12):
 				var u := k / 12.0
 				pts.append(a.lerp(ctrl, u).lerp(ctrl.lerp(b, u), u))
@@ -326,47 +326,19 @@ func _trail_points(t: String) -> PackedVector2Array:
 	return pts
 
 
-## Rasto feito só de pegadas, como na neve: as casas pisadas ficam pintadas de
-## leve com a cor do animal e, entre casas, há pegadas mais pequenas, alternadas
-## à esquerda e à direita. O coelho salta: entre casas só um arco tracejado.
-## As pegadas grandes, no centro de cada casa, são desenhadas depois.
+## Rasto: uma linha grossa e lisa na cor do animal (arcos baixos nos saltos do
+## coelho). As pegadas brancas, no centro de cada casa, são desenhadas depois.
 func _draw_trail(t: String) -> void:
 	var p: Array = st.paths[t]
 	if p.size() < 2:
 		return
-	var col: Color = Game.ANIMALS[t].color
-	var gap := maxf(2.0, cell * 0.05)
-	var trod := _box(Color(col, 0.14), cell * 0.2, Color(0, 0, 0, 0), 0)
-	for i in range(1, p.size() - 1):
-		trod.draw(get_canvas_item(), Rect2(origin + Vector2(p[i]) * cell, Vector2(cell, cell)).grow(-gap))
-	if t == "coelho":
-		var pts := _trail_points(t)
-		var dash := cell * 0.09
-		var on := true
-		var left := dash
-		var w := maxf(2.0, cell * 0.045)
-		for i in range(pts.size() - 1):
-			var a := pts[i]
-			var b := pts[i + 1]
-			var seg := a.distance_to(b)
-			var pos := 0.0
-			while pos < seg:
-				var stp := minf(left, seg - pos)
-				if on:
-					draw_line(a.lerp(b, pos / seg), a.lerp(b, (pos + stp) / seg), Color(col, 0.45), w, true)
-				pos += stp
-				left -= stp
-				if left <= 0.0:
-					on = not on
-					left = dash
-		return
-	var paw: Texture2D = _tex["pegada_" + t]
-	for i in range(p.size() - 1):
-		var a := center_of(p[i])
-		var b := center_of(p[i + 1])
-		var d := (b - a).normalized()
-		var side := Vector2(-d.y, d.x) * cell * 0.13 * (1.0 if i % 2 == 0 else -1.0)
-		_draw_tex(paw, a.lerp(b, 0.5) + side, cell * 0.3, atan2(d.x, -d.y), Color(col, 0.55))
+	var col: Color = Game.ANIMALS[t].color.lerp(Color.WHITE, 0.15)
+	var pts := _trail_points(t)
+	var w := cell * 0.3
+	draw_polyline(pts, col, w, true)
+	# juntas e pontas redondas
+	for q in pts:
+		draw_circle(q, w * 0.5, col, true, -1.0, true)
 
 
 func _draw_givens_and_paws() -> void:
@@ -393,9 +365,8 @@ func _draw_givens_and_paws() -> void:
 			if win_anim >= 0.0:
 				var phase := win_anim * (total + 4) - order
 				s *= 1.0 + 0.45 * maxf(0.0, sin(clampf(phase, 0.0, 1.0) * PI))
-			_draw_tex(_tex["pegada_" + t], center_of(p[i]), s, ang, col)
-			if st.givens.has(p[i]):
-				draw_arc(center_of(p[i]), cell * 0.36, 0.0, TAU, 40, Color(col, 0.35), cell * 0.03, true)
+			# pegada branca por cima da linha da cor do animal
+			_draw_tex(_tex["pegada_" + t], center_of(p[i]), s * 0.62, ang, Color(1, 1, 1, 0.95))
 			order += 1
 
 
