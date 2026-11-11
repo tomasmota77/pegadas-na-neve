@@ -326,32 +326,47 @@ func _trail_points(t: String) -> PackedVector2Array:
 	return pts
 
 
-## Rasto: uma faixa suave da cor do animal e, por cima, pontinhos espaçados,
-## como um trilho na neve. As pegadas são desenhadas depois, por cima.
+## Rasto feito só de pegadas, como na neve: as casas pisadas ficam pintadas de
+## leve com a cor do animal e, entre casas, há pegadas mais pequenas, alternadas
+## à esquerda e à direita. O coelho salta: entre casas só um arco tracejado.
+## As pegadas grandes, no centro de cada casa, são desenhadas depois.
 func _draw_trail(t: String) -> void:
 	var p: Array = st.paths[t]
 	if p.size() < 2:
 		return
 	var col: Color = Game.ANIMALS[t].color
-	var pts := _trail_points(t)
-	var w := cell * 0.2
-	var soft := Color(col.lerp(Color.WHITE, 0.55), 0.55)
-	draw_polyline(pts, soft, w, true)
-	for q in [pts[0], pts[pts.size() - 1]]:
-		draw_circle(q, w * 0.5, soft, true, -1.0, true)
-	# pontinhos a cada ~0,2 casa ao longo do rasto
-	var step := cell * 0.2
-	var carry := step * 0.5
-	var dot := Color(col, 0.5)
-	for i in range(pts.size() - 1):
-		var a := pts[i]
-		var b := pts[i + 1]
-		var seg := a.distance_to(b)
-		var pos := carry
-		while pos < seg:
-			draw_circle(a.lerp(b, pos / seg), cell * 0.03, dot, true, -1.0, true)
-			pos += step
-		carry = pos - seg
+	var gap := maxf(2.0, cell * 0.05)
+	var trod := _box(Color(col, 0.14), cell * 0.2, Color(0, 0, 0, 0), 0)
+	for i in range(1, p.size() - 1):
+		trod.draw(get_canvas_item(), Rect2(origin + Vector2(p[i]) * cell, Vector2(cell, cell)).grow(-gap))
+	if t == "coelho":
+		var pts := _trail_points(t)
+		var dash := cell * 0.09
+		var on := true
+		var left := dash
+		var w := maxf(2.0, cell * 0.045)
+		for i in range(pts.size() - 1):
+			var a := pts[i]
+			var b := pts[i + 1]
+			var seg := a.distance_to(b)
+			var pos := 0.0
+			while pos < seg:
+				var stp := minf(left, seg - pos)
+				if on:
+					draw_line(a.lerp(b, pos / seg), a.lerp(b, (pos + stp) / seg), Color(col, 0.45), w, true)
+				pos += stp
+				left -= stp
+				if left <= 0.0:
+					on = not on
+					left = dash
+		return
+	var paw: Texture2D = _tex["pegada_" + t]
+	for i in range(p.size() - 1):
+		var a := center_of(p[i])
+		var b := center_of(p[i + 1])
+		var d := (b - a).normalized()
+		var side := Vector2(-d.y, d.x) * cell * 0.13 * (1.0 if i % 2 == 0 else -1.0)
+		_draw_tex(paw, a.lerp(b, 0.5) + side, cell * 0.3, atan2(d.x, -d.y), Color(col, 0.55))
 
 
 func _draw_givens_and_paws() -> void:
