@@ -18,6 +18,7 @@ IMG = os.path.join(ROOT, "assets", "images")
 SQUARE = {
     "ourico": 512, "coelho": 512, "raposa": 512,
     "comida_ourico": 512, "comida_coelho": 512, "comida_raposa": 512,
+    "esquilo": 512, "comida_esquilo": 512, "pegada_esquilo": 256,
     "rocha": 512, "floco": 512, "vitoria": 512, "toca": 512,
     "pegada_ourico": 256, "pegada_coelho": 256, "pegada_raposa": 256,
     "voltar": 256, "ajuda": 256, "definicoes": 256, "desfazer": 256,

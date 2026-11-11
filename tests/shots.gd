@@ -70,6 +70,15 @@ func _run() -> void:
 	main._current._show_settings()
 	await _wait(30)
 	await _shot("10_definicoes")
+	# nível do Pinhal com esquilo, a meio
+	main.start_level(Game.levels.map(func(l): return l.id).find("s09"))
+	await _wait(30)
+	main._current.get_node("%Sheet").hide()
+	g = main._current
+	sol = g.st.solution
+	_play(g, {"esquilo": sol.esquilo.slice(0, 4), "ourico": sol.ourico.slice(0, 5)})
+	await _wait(5)
+	await _shot("16_pinhal")
 	main.start_level(Game.levels.size() - 1)
 	await _wait(30)
 	main._current.get_node("%Sheet").hide()
