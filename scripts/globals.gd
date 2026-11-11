@@ -24,6 +24,7 @@ const ANIMALS := {
 	"ourico": {"color": Color("2e8c7e")},
 	"coelho": {"color": Color("c2477a")},
 	"raposa": {"color": Color("e3801f")},
+	"esquilo": {"color": Color("7b5cc4")},
 }
 
 ## Mundos, montados a partir do campo "world" de cada nível em data/levels.json:

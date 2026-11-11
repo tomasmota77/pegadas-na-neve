@@ -10,11 +10,11 @@ const EXTS := ["ogg", "mp3", "wav"]
 
 ## Volume de cada som em dB (0 = como vem do ficheiro).
 const VOLUME := {
-	"passo_ourico": -6.0, "passo_coelho": -6.0, "passo_raposa": -6.0, "passo_voltar": -10.0,
+	"passo_ourico": -6.0, "passo_coelho": -6.0, "passo_raposa": -6.0, "passo_esquilo": -6.0, "passo_voltar": -10.0,
 	"nota": -14.0, "chegou": -4.0, "marca": -10.0, "linha": -12.0,
 	"desfazer": -8.0, "limpar": -6.0, "dica": -4.0, "errado": -8.0,
 	"vitoria": -2.0, "estrela": -6.0, "toque": -12.0, "painel": -12.0,
-	"animal_ourico": -4.0, "animal_coelho": -4.0, "animal_raposa": -4.0,
+	"animal_ourico": -4.0, "animal_coelho": -4.0, "animal_raposa": -4.0, "animal_esquilo": -4.0,
 	"musica": -16.0, "ambiente": -20.0,
 }
 

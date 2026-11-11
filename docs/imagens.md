@@ -161,3 +161,16 @@ As folhas originais ficam em `assets/images/fontes/` (o Godot ignora essa pasta)
 **`toca.png`** (sem bagas de Natal)
 > Cute cozy winter mobile puzzle game art, a small round animal burrow entrance in a snowy mound, dark round opening, soft white snow cap on top, a few small rocks at the base, no berries, no plants. Thick dark navy outline (#34303C), flat colors with one soft shade, simple shapes, readable at 48 pixels, centered, transparent background, no text, no shadow.
 
+## Esquilo (mundo Pinhal)
+
+Usa `assets/images/fontes/animais.png` e `fontes/comidas.png` como imagens de referência, para sair no mesmo estilo. Depois: `python tools/prep_images.py` e `python tools/outline.py esquilo comida_esquilo`.
+
+**`esquilo.png`**
+> A single cute chibi squirrel character for a cozy winter mobile puzzle game, exactly the same style, size, proportions and outline as the reference image. Sitting facing the viewer, warm red-brown fur, cream belly and cheeks, a big fluffy curled tail behind it, small tufted ears, large shiny eyes, rosy cheeks, small happy smile, and a violet (#7B5CC4) knitted scarf. Big round head (about 60% of the height), small simple body, thick dark navy outline (#34303C), flat colors with one soft shade, almost no fur texture, readable at 64 pixels. Transparent background, no text, no ground, no shadow.
+
+**`comida_esquilo.png`**
+> A single acorn for a cozy winter mobile puzzle game, exactly the same style as the reference image of food items: a plump round light-brown acorn with a darker textured cap and a tiny stem, a small soft white snow cap on top, upright, filling most of a square. No face, no sparkles. Thick dark navy outline (#34303C), flat colors with one soft shade, simple shapes, readable at 48 pixels. Transparent background, no text, no shadow.
+
+**`pegada_esquilo.png`** (256×256)
+> A single squirrel footprint, pure white silhouette, solid flat white, no outline, no shading, pointing straight up, centered, transparent background: one small oval palm pad with four thin oval toes spread in a fan above it.
+

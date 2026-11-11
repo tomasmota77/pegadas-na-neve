@@ -16,6 +16,8 @@ MOVES = {
     "ourico": [(0, 1), (0, -1), (1, 0), (-1, 0)],
     "coelho": [(0, 2), (0, -2), (2, 0), (-2, 0)],
     "raposa": [(1, 1), (1, -1), (-1, 1), (-1, -1)],
+    # esquilo: salto em L, como o cavalo do xadrez (por cima de tudo)
+    "esquilo": [(1, 2), (2, 1), (-1, 2), (-2, 1), (1, -2), (2, -1), (-1, -2), (-2, -1)],
 }
 
 
@@ -283,6 +285,20 @@ WORLDS = [
          "animals": [("ourico", (12 + i // 2, 16 + i // 2)), ("coelho", (6, 8)), ("raposa", (8, 10 + i // 4))],
          "rocks": 5 + i % 3, **({"givens_range": (0, 2)} if i >= 7 else {})}
         for i in range(1, 13)
+    ]),
+    ("Pinhal", [
+        {"id": "s01", "intro": True, "size": (4, 4), "animals": [("esquilo", (3, 4))], "extra": 1},
+        {"id": "s02", "intro": True, "size": (5, 5), "animals": [("esquilo", (4, 5))], "extra": 2},
+        {"id": "s03", "intro": True, "size": (5, 5), "animals": [("esquilo", (5, 6))], "extra": 1},
+        {"id": "s04", "size": (5, 5), "animals": [("esquilo", (4, 5)), ("ourico", (6, 8))], "extra": 1},
+        {"id": "s05", "size": (6, 6), "animals": [("esquilo", (5, 6)), ("coelho", (4, 6))], "extra": 1},
+        {"id": "s06", "size": (6, 6), "animals": [("esquilo", (5, 7)), ("raposa", (5, 7))], "rocks": 3},
+        {"id": "s07", "size": (6, 6), "animals": [("esquilo", (6, 8)), ("ourico", (8, 10))], "rocks": 2},
+        {"id": "s08", "size": (6, 6), "animals": [("esquilo", (6, 8)), ("coelho", (5, 7))], "rocks": 3},
+        {"id": "s09", "size": (7, 7), "animals": [("esquilo", (6, 8)), ("ourico", (9, 12)), ("raposa", (6, 8))], "rocks": 4},
+        {"id": "s10", "size": (7, 7), "animals": [("esquilo", (7, 9)), ("coelho", (5, 7)), ("ourico", (10, 13))], "rocks": 4},
+        {"id": "s11", "size": (7, 7), "animals": [("esquilo", (7, 9)), ("raposa", (7, 9)), ("coelho", (5, 7))], "rocks": 5},
+        {"id": "s12", "size": (7, 7), "animals": [("esquilo", (8, 10)), ("ourico", (11, 14)), ("raposa", (7, 9))], "rocks": 5, "givens_range": (0, 2)},
     ]),
     ("Nevão", [
         {"id": "n%02d" % i, "size": (8, 8),

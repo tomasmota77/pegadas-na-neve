@@ -311,7 +311,7 @@ func _trail_points(t: String) -> PackedVector2Array:
 	var pts := PackedVector2Array()
 	for i in p.size():
 		var b := center_of(p[i])
-		if i > 0 and t == "coelho":
+		if i > 0 and t in ["coelho", "esquilo"]:
 			# salto: um arco baixo, sempre para cima (ou para a esquerda), dentro das casas
 			var a := center_of(p[i - 1])
 			var d := (b - a).normalized()
