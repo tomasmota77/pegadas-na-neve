@@ -150,6 +150,8 @@ python tools/split_sheet.py assets/images/comidas.png comida_ourico comida_coelh
 python tools/prep_images.py
 ```
 
+As folhas originais ficam em `assets/images/fontes/` (o Godot ignora essa pasta).
+
 **`animais.png`** (formato largo, 3:1)
 > A sprite sheet of three cute chibi animal characters for a cozy winter mobile puzzle game, side by side in a single row, evenly spaced with clear empty space between them, all the same size and drawn in exactly the same style. Each sits facing the viewer. Left: a hedgehog with warm dark-brown spikes, a cream face and a teal (#2E8C7E) knitted scarf. Middle: a rabbit with warm caramel-brown fur, a cream belly, long upright ears with pink inside and a raspberry-pink (#C2477A) knitted scarf. Right: a fox with bright orange fur, white cheeks and chest, a fluffy white-tipped tail and a cream knitted scarf with orange stripes. Big round heads (about 60% of the character's height), small simple bodies, large shiny eyes, rosy cheeks, small happy smile. Thick dark navy outline (#34303C) of the same thickness on all three, flat colors with one soft shade, almost no fur texture, no thin lines, readable at 64 pixels. Transparent background, no text, no ground, no shadow.
 
