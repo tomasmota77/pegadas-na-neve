@@ -31,6 +31,8 @@ var _bounce := {}          # tipo -> 0..1
 var _flash_cells: Array = []   # casas a destacar (dica)
 var _flash_bad := false
 var _flash_t := 0.0
+var _shake := 0.0          # 1..0: abanar o tabuleiro (solução errada)
+var _so := Vector2.ZERO    # deslocamento do abanão neste desenho
 var win_anim := -1.0:
 	set(v):
 		win_anim = v
@@ -154,6 +156,7 @@ func _on_drag(pos: Vector2) -> void:
 		match r:
 			"step":
 				Sfx.step(t, st.paths[t].size())
+				Game.vibrate(8)
 			"back":
 				Sfx.play("passo_voltar")
 			"complete":
@@ -171,6 +174,7 @@ func _on_release() -> void:
 	if _press_action == "mark" and not _moved:
 		st.toggle_mark(_press_cell)
 		Sfx.play("marca", 1.0 if st.marks.has(_press_cell) else 0.85)
+		Game.vibrate(10)
 		changed.emit()
 	st.release()
 	_press_action = ""
@@ -203,6 +207,12 @@ func flash(cells: Array, bad := false) -> void:
 	set_process(true)
 
 
+## Abana o tabuleiro de um lado para o outro (quando a solução está errada).
+func shake() -> void:
+	_shake = 1.0
+	set_process(true)
+
+
 func play_win() -> Tween:
 	_win_total = 0
 	_win_played = 0
@@ -225,6 +235,9 @@ func _process(dt: float) -> void:
 	if _flash_t > 0.0:
 		_flash_t -= dt * 0.6
 		busy = true
+	if _shake > 0.0:
+		_shake = maxf(0.0, _shake - dt * 2.5)
+		busy = true
 	queue_redraw()
 	if not busy:
 		set_process(false)
@@ -235,6 +248,8 @@ func _process(dt: float) -> void:
 func _draw() -> void:
 	if st == null:
 		return
+	_so = Vector2(sin(_shake * 40.0) * cell * 0.12 * _shake, 0) if _shake > 0.0 else Vector2.ZERO
+	draw_set_transform(_so)
 	var C: Dictionary = Game.COLORS
 	var grid := Vector2(cell * st.width, cell * st.height)
 	var pad := cell * 0.14
@@ -435,14 +450,14 @@ func _draw_animal(a: Dictionary) -> void:
 
 
 func _ellipse(c: Vector2, r: float, squash: float, col: Color) -> void:
-	draw_set_transform(c, 0.0, Vector2(1.0, squash))
+	draw_set_transform(c + _so, 0.0, Vector2(1.0, squash))
 	draw_circle(Vector2.ZERO, r, col, true, -1.0, true)
-	draw_set_transform(Vector2.ZERO)
+	draw_set_transform(_so)
 
 
 func _draw_tex(tex: Texture2D, center: Vector2, s: float, ang := 0.0, mod := Color.WHITE) -> void:
 	if tex == null:
 		return
-	draw_set_transform(center, ang)
+	draw_set_transform(center + _so, ang)
 	draw_texture_rect(tex, Rect2(-s * 0.5, -s * 0.5, s, s), false, mod)
-	draw_set_transform(Vector2.ZERO)
+	draw_set_transform(_so)

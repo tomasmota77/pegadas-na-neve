@@ -13,7 +13,8 @@ func _ready() -> void:
 	# todos os botões fazem um "toque" suave ao carregar
 	get_tree().node_added.connect(func(n: Node):
 		if n is BaseButton and not n.pressed.is_connected(_on_any_button):
-			n.pressed.connect(_on_any_button))
+			n.pressed.connect(_on_any_button)
+			n.button_down.connect(_squash.bind(n)))
 	Sfx.refresh_music()
 	_fit_screen()
 	show_menu()
@@ -23,6 +24,17 @@ func _ready() -> void:
 
 func _on_any_button() -> void:
 	Sfx.play("toque")
+
+
+## Ao carregar num botão: vibração curtinha e o botão "afunda" e volta com mola.
+func _squash(b: BaseButton) -> void:
+	if b.disabled:
+		return
+	Game.vibrate(12)
+	b.pivot_offset = b.size * 0.5
+	var tw := b.create_tween()
+	tw.tween_property(b, "scale", Vector2(0.9, 0.9), 0.07).set_ease(Tween.EASE_OUT)
+	tw.tween_property(b, "scale", Vector2.ONE, 0.28).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 
 
 func show_menu() -> void:

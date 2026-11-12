@@ -159,6 +159,8 @@ func _refresh_sounds() -> void:
 	if _lines_ok >= 0:
 		if wrong and not _was_wrong:
 			Sfx.play("errado")
+			board.shake()
+			Game.vibrate(120)
 		elif ok > _lines_ok and not st.is_solved():
 			Sfx.play("linha", 1.0 + 0.04 * ok, 0.0)
 	_lines_ok = ok
