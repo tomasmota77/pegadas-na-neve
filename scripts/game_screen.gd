@@ -105,56 +105,11 @@ func _build_chips() -> void:
 		c.queue_free()
 	var items := _items()
 	for t in items:
-		var col: Color = Game.item_color(t)
-		var is_animal := Game.ANIMALS.has(t)
-		# com 3 ou mais cartões, os que o jogador já conhece ficam compactos (só imagem e nome)
-		var compact := items.size() >= 3 and Game.has_seen(t)
-		var chip := PanelContainer.new()
-		chip.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		# cartão com a cor do animal e uma borda mais escura em baixo, para ter relevo
-		var box := StyleBoxFlat.new()
-		box.bg_color = col.lerp(Color.WHITE, 0.84)
-		box.set_corner_radius_all(26)
-		box.border_width_bottom = 5
-		box.border_color = col.lerp(Color.WHITE, 0.5)
-		box.content_margin_left = 8
-		box.content_margin_right = 8
-		box.content_margin_top = 4 if compact else 8
-		box.content_margin_bottom = 4 if compact else 8
-		box.anti_aliasing = true
-		chip.add_theme_stylebox_override("panel", box)
-		var col_box := VBoxContainer.new()
-		col_box.add_theme_constant_override("separation", -8)
-		col_box.alignment = BoxContainer.ALIGNMENT_CENTER
-		# o animal, com a sua comida numa bolha no canto
-		var icon: Control
-		if is_animal:
-			icon = AnimalBadge.new()
-			icon.animal = t
-		else:
-			icon = TextureRect.new()
-			icon.texture = Game.texture(t)
-			icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-			icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-		icon.custom_minimum_size = Vector2(0, 56 if compact else 84)
-		var name_lbl := Label.new()
-		name_lbl.text = Game.animal_text(t, "NAME")
-		name_lbl.theme_type_variation = &"ChipTitle"
-		name_lbl.add_theme_font_size_override("font_size", 30)
-		name_lbl.add_theme_color_override("font_color", col.darkened(0.25))
-		name_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		var rule := Label.new()
-		rule.visible = not compact
-		rule.text = Game.animal_text(t, "RULE")
-		rule.theme_type_variation = &"Small"
-		rule.add_theme_font_size_override("font_size", 23)
-		rule.add_theme_color_override("font_color", col.darkened(0.45).lerp(Game.COLORS.ink_soft, 0.5))
-		rule.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		col_box.add_child(icon)
-		col_box.add_child(name_lbl)
-		col_box.add_child(rule)
-		chip.add_child(col_box)
-		%Chips.add_child(chip)
+		var card := RuleCard.new()
+		card.item = t
+		# com 4 ou mais cartões ficam todos compactos (sem nome), para caberem
+		card.compact = items.size() >= 4
+		%Chips.add_child(card)
 	%PawIcon.texture = Game.texture("pegada_" + st.animals[0].type)
 	%Chips.queue_sort()
 	%PawIcon.modulate = Game.ANIMALS[st.animals[0].type].color
@@ -166,6 +121,9 @@ func _after_change() -> void:
 
 
 func _refresh() -> void:
+	for card in %Chips.get_children():
+		if card is RuleCard:
+			card.active = card.item == st.active
 	%Status.text = tr(st.status_key())
 	if st.active != "":
 		%Status.text = Game.animal_text(st.active, "LEAD")
