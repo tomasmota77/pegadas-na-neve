@@ -2,6 +2,13 @@
 
 config_version=5
 
+[admob]
+
+general/android/enabled=true
+general/android/app_id="ca-app-pub-9679077125515046~1102427040"
+general/ios/enabled=true
+general/ios/app_id="ca-app-pub-9679077125515046~9324356980"
+
 [application]
 
 config/name="Snow Tracks"
