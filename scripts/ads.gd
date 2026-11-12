@@ -19,8 +19,10 @@ const TEST_IDS := {
 		"rewarded": "ca-app-pub-3940256099942544/1712485313"},
 }
 const REAL_IDS := {
-	"Android": {"interstitial": "", "rewarded": ""},
-	"iOS": {"interstitial": "", "rewarded": ""},
+	"Android": {"interstitial": "ca-app-pub-9679077125515046/3895790543",
+		"rewarded": "ca-app-pub-9679077125515046/4646745370"},
+	"iOS": {"interstitial": "ca-app-pub-9679077125515046/6330382199",
+		"rewarded": "ca-app-pub-9679077125515046/4850100361"},
 }
 
 ## Regras do anúncio entre níveis: nunca nos primeiros níveis, no máximo um a cada
