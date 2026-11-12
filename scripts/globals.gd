@@ -2,6 +2,8 @@ extends Node
 ## Autoload "Game": níveis, progresso guardado e informação dos animais.
 
 const SAVE_PATH := "user://save.json"
+## Política de privacidade (GitHub Pages do repositório); %s = língua (só pt e en existem).
+const PRIVACY_URL := "https://tomasmota77.github.io/pegadas-na-neve/privacidade-%s.html"
 const HINTS_PER_LEVEL := 3
 
 const COLORS := {

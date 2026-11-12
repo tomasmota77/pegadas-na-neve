@@ -68,6 +68,12 @@ func step(animal: String, length: int) -> void:
 
 
 ## Música e ambiente em ciclo. Chamado ao arrancar e quando muda a definição.
+## Pausa a música durante um anúncio (e retoma-a depois).
+func pause_music(on: bool) -> void:
+	_music.stream_paused = on
+	_ambient.stream_paused = on
+
+
 func refresh_music() -> void:
 	_loop(_music, "musica", Game.progress.music)
 	_loop(_ambient, "ambiente", Game.progress.music)

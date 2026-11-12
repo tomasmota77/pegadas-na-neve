@@ -53,6 +53,8 @@ Prompts em inglês para o gerador de efeitos sonoros (por exemplo, o ElevenLabs 
 | `animal_ourico` | Apresentação do ouriço | `Cute tiny hedgehog sniffing and making a small happy squeak, adorable, short` (1 s) |
 | `animal_coelho` | Apresentação do coelho | `Cute small rabbit sniffing quickly with a soft thump of its foot on snow, adorable, short` (1 s) |
 | `animal_raposa` | Apresentação da raposa | `Cute small fox giving a short playful yip, soft and friendly, not loud` (1 s) |
+| `animal_esquilo` | Apresentação do esquilo | `Cute small squirrel chattering quickly, playful and soft, short` (1 s) |
+| `animal_coruja` | Apresentação da coruja | `Cute small owl giving a soft friendly hoot, gentle and warm, not spooky, short` (1 s) |
 
 ### Música e ambiente (tocam sempre, em ciclo)
 

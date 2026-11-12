@@ -149,3 +149,27 @@ O `patch_web.py` comprime o motor (`engine-gz.wasm`), muda o nome do `.pck` para
 godot --headless --path . -s tests/test_puzzle.gd     # lógica dos 60 níveis e dos toques
 godot --path . -- --shots                             # capturas para user://shots/
 ```
+
+## Publicar nas lojas
+
+- **Ficha das lojas** (nomes, descrições, palavras-chave e declaração de dados, nas 5 línguas): `docs/loja.md`.
+- **Capturas**: `store/android/` (1080×1920) e `store/iphone/` (1320×2868), geradas com
+  `godot --path . --resolution 1080x1920 -- --shots` (ficam em `user://shots/`).
+- **Política de privacidade e termos**: `site/` (português e inglês), publicados no GitHub Pages.
+- **Exportação**: perfis "Android" (AAB, alvo API 36, compilação Gradle) e "iOS" em `export_presets.cfg`.
+  No editor: Projeto → Instalar modelo de compilação Android; no iOS preenche o Team ID.
+  O identificador `com.tomasmota.pegadasnaneve` não se pode mudar depois da primeira publicação.
+
+### Anúncios (AdMob)
+
+O plugin da Poing Studios (v5.1.0, MIT) está em `addons/admob/` e o jogo usa-o através de `scripts/ads.gd`:
+consentimento RGPD ao abrir, anúncio entre níveis (nunca nos primeiros 8, no máximo um a cada 3 níveis
+e 150 s) e anúncio com prémio para uma dica extra. Fora do telemóvel não faz nada.
+
+No teu PC, uma vez:
+1. Projeto → Definições do projeto → Plugins → ativa **AdMob** (descarrega as bibliotecas nativas;
+   se falhar: Projeto → Ferramentas → AdMob Manager → Android/iOS → Download & Install).
+2. Cria a app no AdMob (admob.google.com) e põe o **App ID** (tem `~`) no AdMob Manager, em Android e iOS.
+3. Cria dois blocos de anúncios (Intersticial e Com prémio) e põe os IDs em `REAL_IDS` em `scripts/ads.gd`.
+   As compilações de teste usam sempre os anúncios de teste da Google.
+4. No AdMob, em Privacidade e mensagens, cria a mensagem do RGPD (é a que o jogo mostra).

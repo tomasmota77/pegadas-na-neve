@@ -141,3 +141,33 @@ DAILY_LOCKED,Puzzle do dia: acaba o mundo 1,Daily puzzle: finish world 1,Puzle d
 DAILY_STREAK_1,Primeiro dia seguido!,First day in a row!,¡Primer día seguido!,Premier jour d'affilée !,Erster Tag in Folge!
 DAILY_STREAK_N,%d dias seguidos!,%d days in a row!,¡%d días seguidos!,%d jours d'affilée !,%d Tage in Folge!
 DAILY_COME_BACK,Volta amanhã para um puzzle novo.,Come back tomorrow for a new puzzle.,Vuelve mañana para un puzle nuevo.,Reviens demain pour un nouveau puzzle.,Komm morgen für ein neues Rätsel wieder.
+BACK,Voltar,Back,Volver,Retour,Zurück
+PRIVACY_BTN,Privacidade,Privacy,Privacidad,Confidentialité,Datenschutz
+PRIVACY_POLICY,Política de privacidade,Privacy policy,Política de privacidad,Politique de confidentialité,Datenschutzerklärung
+AD_PRIVACY_BTN,Escolhas sobre anúncios,Ad choices,Opciones de anuncios,Choix publicitaires,Werbeeinstellungen
+PRIVACY_BODY,"O teu progresso fica só neste telemóvel. Os anúncios são da Google (AdMob), que pode usar dados do dispositivo conforme a tua escolha de consentimento.","Your progress stays on this phone only. Ads are provided by Google (AdMob), which may use device data according to your consent choice.","Tu progreso se queda solo en este móvil. Los anuncios son de Google (AdMob), que puede usar datos del dispositivo según tu elección de consentimiento.","Ta progression reste uniquement sur ce téléphone. Les publicités sont fournies par Google (AdMob), qui peut utiliser des données de l'appareil selon ton choix de consentement.","Dein Fortschritt bleibt nur auf diesem Handy. Die Werbung kommt von Google (AdMob), das je nach deiner Einwilligung Gerätedaten nutzen kann."
+CREDITS_BTN,Créditos,Credits,Créditos,Crédits,Credits
+CREDITS_BODY,"[b]Pegadas na Neve[/b] de Tomás Mota.
+Ilustrações, sons e níveis: Tomás Mota.
+Fonte Baloo 2 (Ek Type, SIL Open Font License).
+Anúncios: Google Mobile Ads; plugin AdMob da Poing Studios (MIT).
+Feito com o Godot Engine (godotengine.org/license):","[b]Snow Tracks[/b] by Tomás Mota.
+Art, sounds and levels: Tomás Mota.
+Baloo 2 font (Ek Type, SIL Open Font License).
+Ads: Google Mobile Ads; AdMob plugin by Poing Studios (MIT).
+Made with Godot Engine (godotengine.org/license):","[b]Huellas en la Nieve[/b] de Tomás Mota.
+Ilustraciones, sonidos y niveles: Tomás Mota.
+Fuente Baloo 2 (Ek Type, SIL Open Font License).
+Anuncios: Google Mobile Ads; plugin AdMob de Poing Studios (MIT).
+Hecho con Godot Engine (godotengine.org/license):","[b]Traces dans la Neige[/b] de Tomás Mota.
+Illustrations, sons et niveaux : Tomás Mota.
+Police Baloo 2 (Ek Type, SIL Open Font License).
+Publicités : Google Mobile Ads ; plugin AdMob de Poing Studios (MIT).
+Fait avec Godot Engine (godotengine.org/license) :","[b]Spuren im Schnee[/b] von Tomás Mota.
+Grafik, Sounds und Level: Tomás Mota.
+Schrift Baloo 2 (Ek Type, SIL Open Font License).
+Werbung: Google Mobile Ads; AdMob-Plugin von Poing Studios (MIT).
+Erstellt mit der Godot Engine (godotengine.org/license):"
+HINT_AD_TITLE,Mais uma dica?,One more hint?,¿Una pista más?,Un indice de plus ?,Noch ein Tipp?
+HINT_AD_BODY,Já usaste as dicas deste nível. Vê um anúncio curto e ganhas mais uma.,You've used this level's hints. Watch a short ad to get one more.,Ya usaste las pistas de este nivel. Mira un anuncio corto y gana una más.,Tu as utilisé les indices de ce niveau. Regarde une courte publicité pour en gagner un de plus.,Du hast die Tipps dieses Levels verbraucht. Sieh dir eine kurze Werbung an und bekomm noch einen.
+HINT_AD_WATCH,Ver anúncio,Watch ad,Ver anuncio,Voir la pub,Werbung ansehen

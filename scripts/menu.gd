@@ -181,9 +181,32 @@ func _show_settings() -> void:
 		{"text": vib, "plain": true, "action": func():
 			Game.set_vibrate(not Game.progress.vibrate)
 			_show_settings()},
+		{"text": tr("PRIVACY_BTN"), "plain": true, "action": _show_privacy},
+		{"text": tr("CREDITS_BTN"), "plain": true, "action": _show_credits},
 		{"text": tr("RESET"), "plain": true, "action": _confirm_reset},
 		{"text": tr("CLOSE"), "primary": true},
 	])
+
+
+func _show_privacy() -> void:
+	var buttons := [{"text": tr("PRIVACY_POLICY"), "plain": true, "action": func():
+		OS.shell_open(Game.PRIVACY_URL % ("pt" if Game.language() == "pt" else "en"))
+		_show_privacy()}]
+	if Ads.privacy_options_required():
+		buttons.append({"text": tr("AD_PRIVACY_BTN"), "plain": true, "action": Ads.show_privacy_options})
+	buttons.append({"text": tr("BACK"), "primary": true, "action": _show_settings})
+	%Sheet.open(tr("PRIVACY_BTN"), tr("PRIVACY_BODY"), null, buttons)
+
+
+## Créditos e licenças (a licença do Godot tem de aparecer no jogo).
+func _show_credits() -> void:
+	# a licença vem com quebras de linha a meio das frases: junta cada parágrafo numa linha
+	var lic := ""
+	for para in Engine.get_license_text().strip_edges().split("\n\n"):
+		lic += para.replace("\n", " ") + "\n"
+	var body := tr("CREDITS_BODY") + "\n\n[font_size=16]" + lic.strip_edges() \
+		+ "\n\nPortions of this software are copyright © The FreeType Project (www.freetype.org). All rights reserved.[/font_size]"
+	%Sheet.open(tr("CREDITS_BTN"), body, null, [{"text": tr("BACK"), "primary": true, "action": _show_settings}])
 
 
 func _show_languages() -> void:

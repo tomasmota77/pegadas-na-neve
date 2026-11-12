@@ -13,11 +13,16 @@ var running := false
 var _lines_ok := -1      # linhas + colunas certas (para o som "linha"); -1 ao começar
 var _was_wrong := false
 var daily := false          # a jogar o puzzle do dia
+var bonus_hints := 0        # dicas extra ganhas com anúncios neste nível
 
 @onready var board: Board = %Board
 
 
 func _ready() -> void:
+	# contorno branco no título, para se ler bem em qualquer fundo (ex.: o do Nevão)
+	for l in [%LevelLabel, %NameLabel]:
+		l.add_theme_constant_override("outline_size", 12)
+		l.add_theme_color_override("font_outline_color", Color(1, 1, 1, 0.9))
 	%BackBtn.pressed.connect(func(): back_requested.emit())
 	%HelpBtn.pressed.connect(_show_rules)
 	%UndoBtn.pressed.connect(func():
@@ -29,6 +34,7 @@ func _ready() -> void:
 		Sfx.play("limpar")
 		_after_change())
 	%HintBtn.pressed.connect(_on_hint)
+	Ads.rewarded_ready_changed.connect(_refresh)
 	board.changed.connect(_refresh)
 	board.path_completed.connect(func(_t): Game.vibrate(30))
 	board.solved.connect(_on_solved)
@@ -65,6 +71,7 @@ func start_daily() -> void:
 
 
 func _begin() -> void:
+	bonus_hints = 0
 	elapsed = 0.0
 	running = true
 	_lines_ok = -1
@@ -129,9 +136,10 @@ func _refresh() -> void:
 		%Status.text = Game.animal_text(st.active, "LEAD")
 	%UndoBtn.disabled = not st.can_undo()
 	%ClearBtn.disabled = not st.can_undo() and st.marks.is_empty()
-	var left := Game.HINTS_PER_LEVEL - st.hints_used
+	var left := hints_left()
 	%HintBtn.badge = left
-	%HintBtn.disabled = left <= 0 or st.is_solved()
+	# sem dicas: o botão fica ativo se houver um anúncio com prémio pronto
+	%HintBtn.disabled = st.is_solved() or (left <= 0 and not Ads.rewarded_ready())
 	%ProgressLabel.text = "%d/%d" % [st.complete_count(), st.animals.size()]
 	%ProgressLabel.add_theme_color_override("font_color", Game.COLORS.ok if st.all_complete() else Game.COLORS.ink)
 	_refresh_sounds()
@@ -196,7 +204,19 @@ func _show_rules() -> void:
 
 # ---------- dicas e vitória ----------
 
+func hints_left() -> int:
+	return Game.HINTS_PER_LEVEL + bonus_hints - st.hints_used
+
+
 func _on_hint() -> void:
+	if hints_left() <= 0:
+		if Ads.rewarded_ready():
+			%Sheet.open(tr("HINT_AD_TITLE"), tr("HINT_AD_BODY"), Game.texture("dica"), [
+				{"text": tr("HINT_AD_WATCH"), "primary": true, "action": func(): Ads.show_rewarded(func():
+					bonus_hints += 1
+					_on_hint())},
+				{"text": tr("CLOSE"), "plain": true}])
+		return
 	var h := st.hint()
 	if h.kind != "none":
 		Sfx.play("dica")
@@ -245,8 +265,8 @@ func _on_solved() -> void:
 	if last:
 		body += "\n\n" + tr("WIN_ALL")
 	else:
-		buttons.append({"text": tr("NEXT_LEVEL"), "primary": true, "action": func(): next_requested.emit(index + 1)})
-	buttons.append({"text": tr("SEE_LEVELS"), "primary": last, "action": func(): back_requested.emit()})
+		buttons.append({"text": tr("NEXT_LEVEL"), "primary": true, "action": func(): Ads.level_finished(index, func(): next_requested.emit(index + 1))})
+	buttons.append({"text": tr("SEE_LEVELS"), "primary": last, "action": func(): Ads.level_finished(index, func(): back_requested.emit())})
 	%Sheet.open(tr("WIN_TITLE"), body, Game.texture("vitoria"), buttons,
 		{"stars": got, "dismissable": false})
 
