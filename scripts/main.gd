@@ -28,6 +28,8 @@ func _on_any_button() -> void:
 func show_menu() -> void:
 	var m := MENU.instantiate()
 	m.level_chosen.connect(start_level)
+	m.daily_chosen.connect(start_daily)
+	$Bg.set_world(-1)
 	_swap(m)
 
 
@@ -36,8 +38,18 @@ func start_level(i: int) -> void:
 	var g := GAME.instantiate()
 	_swap(g)
 	g.start(i)
+	$Bg.set_world(Game.world_of(i))
 	g.back_requested.connect(show_menu)
 	g.next_requested.connect(start_level)
+
+
+func start_daily() -> void:
+	Game.current = -1
+	var g := GAME.instantiate()
+	_swap(g)
+	g.start_daily()
+	$Bg.set_world(-1)
+	g.back_requested.connect(show_menu)
 
 
 func _swap(node: Control) -> void:

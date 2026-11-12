@@ -10,6 +10,10 @@ func check(cond: bool, msg: String) -> void:
 
 func _init() -> void:
 	var levels: Array = JSON.parse_string(FileAccess.get_file_as_string("res://data/levels.json"))
+	var daily: Array = JSON.parse_string(FileAccess.get_file_as_string("res://data/daily.json"))
+	check(levels.size() == 72, "devia haver 72 níveis")
+	_new_rules(levels)
+	levels = levels + daily
 	for i in levels.size():
 		var st := PuzzleState.new()
 		st.load_level(levels[i])
@@ -19,6 +23,10 @@ func _init() -> void:
 			var sol: Array = st.solution[a.type]
 			check(st.press(sol[0]) == "drag", "nível %d: tocar na toca" % i)
 			for k in range(1, sol.size()):
+				if a.type == "coruja" and k > 1:
+					# a coruja pousa quando se levanta o dedo
+					st.release()
+					st.press(sol[k - 1])
 				var r := st.drag(sol[k])
 				check(r == ("complete" if k == sol.size() - 1 else "step"), "nível %d %s passo %d deu '%s'" % [i, a.type, k, r])
 			st.release()
@@ -41,11 +49,12 @@ func _init() -> void:
 		st.release()
 		st.undo()
 		check(st.paths[t].size() == 1, "nível %d: desfazer falhou" % i)
-	# regras de movimento
+	# regras de movimento (níveis principais)
+	levels = levels.slice(0, 72)
 	# níveis só com um animal (procurados, porque a ordem dos níveis pode mudar)
 	var only := func(t: String) -> Dictionary:
 		for lv in levels:
-			if lv.animals.size() == 1 and lv.animals[0].type == t and lv.solution[t].size() >= 5:
+			if lv.animals.size() == 1 and lv.animals[0].type == t and lv.solution[t].size() >= (5 if t == "ourico" else 2):
 				return lv
 		return {}
 	var lv_coelho: Dictionary = only.call("coelho")
@@ -99,3 +108,68 @@ func _init() -> void:
 	check(tr("LEVEL_N") % 3 == "Level 3", "inglês errado")
 	print("Níveis testados: %d | falhas: %d" % [levels.size(), fails])
 	quit(1 if fails > 0 else 0)
+
+
+## Gelo, coruja e números tapados.
+func _new_rules(levels: Array) -> void:
+	# gelo: depois de pousar no gelo, só o mesmo movimento é aceite
+	var tested_ice := false
+	for lv in levels:
+		if tested_ice or not lv.has("ice"):
+			continue
+		var st := PuzzleState.new()
+		st.load_level(lv)
+		for a in st.animals:
+			var sol: Array = st.solution[a.type]
+			for k in range(1, sol.size() - 1):
+				if st.ice.has(sol[k]) and a.type != "coruja":
+					st.press(sol[0])
+					for j in range(1, k + 1):
+						st.drag(sol[j])
+					var v: Vector2i = sol[k] - sol[k - 1]
+					var others := st.moves_of(a.type).filter(func(m): return m != v)
+					var bad := 0
+					for m in others:
+						if st.can_step(a.type, sol[k], sol[k] + m):
+							bad += 1
+					check(bad == 0, "gelo deixou mudar de direção")
+					check(st.valid_targets(a.type).size() <= 1, "gelo: mais de um destino")
+					st.release()
+					tested_ice = true
+					break
+			if tested_ice:
+				break
+	check(tested_ice, "nenhum nível com gelo a meio de um caminho")
+	# coruja: arrastar em linha reta estica o voo em vez de pousar a meio
+	var tested_owl := false
+	for lv in levels:
+		if tested_owl:
+			break
+		var st := PuzzleState.new()
+		st.load_level(lv)
+		if st.animal("coruja").is_empty():
+			continue
+		var sol: Array = st.solution["coruja"]
+		var a: Vector2i = sol[0]
+		var b: Vector2i = sol[1]
+		var d: Vector2i = (b - a).sign()
+		if (b - a).length() < 2:
+			continue
+		st.press(a)
+		st.drag(a + d)
+		var r := st.drag(b)
+		check(r == "step" or r == "complete", "coruja não esticou o voo")
+		check(st.paths["coruja"].size() == 2, "coruja pousou a meio do voo (%d casas)" % st.paths["coruja"].size())
+		st.release()
+		tested_owl = true
+	check(tested_owl, "nenhum nível com coruja para testar o voo")
+	# números tapados não contam
+	var tested_hidden := false
+	for lv in levels:
+		var st := PuzzleState.new()
+		st.load_level(lv)
+		if st.has_hidden():
+			check(st.row_targets.has(-1) or st.col_targets.has(-1), "número tapado não lido")
+			tested_hidden = true
+			break
+	check(tested_hidden, "nenhum nível com números tapados")

@@ -1,12 +1,6 @@
 """Verificador independente (força bruta) — conta soluções até 2."""
 import json, sys
-import os, sys; sys.path.insert(0, os.path.dirname(__file__)); from gen import MOVES
-
-def effort(level):
-    """Esforço de um resolvedor ingénuo: quantas casas experimenta até ter a certeza
-    de que a solução é única. Serve para ordenar os níveis por dificuldade."""
-    return count(level, 2, stats=True)[1]
-
+import os, sys; sys.path.insert(0, os.path.dirname(__file__)); from rules import moves
 
 def count(level, cap=2, stats=False):
     W, H = level["w"], level["h"]
@@ -16,7 +10,9 @@ def count(level, cap=2, stats=False):
     special = {}
     for a in animals:
         special[tuple(a["den"])] = a["type"]; special[tuple(a["food"])] = a["type"]
-    rows, cols = level["rows"], level["cols"]
+    rows = [99 if v is None else v for v in level["rows"]]
+    cols = [99 if v is None else v for v in level["cols"]]
+    ice = set(map(tuple, level.get("ice", [])))
     rc, cc = [0]*H, [0]*W
     used = set()
     diags = set()
@@ -42,7 +38,8 @@ def count(level, cap=2, stats=False):
     def go(i, path):
         if len(found) >= cap: return
         if i == len(animals):
-            if rc == rows and cc == cols:
+            if all(v is None or v == rc[k] for k, v in enumerate(level["rows"])) and \
+                    all(v is None or v == cc[k] for k, v in enumerate(level["cols"])):
                 found.append(1)
             return
         a = animals[i]; t = a["type"]; food = tuple(a["food"])
@@ -58,7 +55,10 @@ def count(level, cap=2, stats=False):
             else:
                 go(i+1, None)
             return
-        for dr, dc in MOVES[t]:
+        mv = moves(t, W, H)
+        if cur in ice and len(path) >= 2:
+            mv = [(cur[0] - path[-2][0], cur[1] - path[-2][1])]
+        for dr, dc in mv:
             n = (cur[0]+dr, cur[1]+dc)
             if not can(n, t): continue
             if n == tuple(a["den"]): continue
@@ -80,20 +80,22 @@ def draw(lv):
     H, W = lv["h"], lv["w"]
     g = [["." for _ in range(W)] for _ in range(H)]
     for r, c in lv["rocks"]: g[r][c] = "#"
-    sym = {"ourico": "o", "coelho": "c", "raposa": "r"}
+    sym = {"ourico": "o", "coelho": "c", "raposa": "r", "esquilo": "e", "coruja": "u"}
+    for r, c in lv.get("ice", []): g[r][c] = "~"
     for t, p in lv["solution"].items():
         for (r, c) in p: g[r][c] = sym[t]
         g[p[0][0]][p[0][1]] = sym[t].upper()
         g[p[-1][0]][p[-1][1]] = "*"
     for gv in lv["givens"]:
         r, c = gv["cell"]; g[r][c] = "+"
-    print("   " + " ".join(map(str, lv["cols"])))
+    show = lambda v: "?" if v is None else str(v)
+    print("   " + " ".join(show(v) for v in lv["cols"]))
     for r in range(H):
-        print(f"{lv['rows'][r]:2} " + " ".join(g[r]))
+        print(f"{show(lv['rows'][r]):>2} " + " ".join(g[r]))
 
 if __name__ == "__main__":
     levels = json.load(open(sys.argv[1] if len(sys.argv) > 1 else "data/levels.json"))
     for i, lv in enumerate(levels):
         n = count(lv)
-        print(f"--- {i+1} {lv.get('id', lv.get('name'))} soluções={n} pistas={len(lv['givens'])} esforço={effort(lv)}")
+        print(f"--- {i+1} {lv.get('id')} soluções={n} pistas={len(lv['givens'])} nota={lv.get('diff')}")
         draw(lv)

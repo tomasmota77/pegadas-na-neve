@@ -25,7 +25,26 @@ const ANIMALS := {
 	"coelho": {"color": Color("c2477a")},
 	"raposa": {"color": Color("e3801f")},
 	"esquilo": {"color": Color("7b5cc4")},
+	"coruja": {"color": Color("3d7fc1")},
 }
+
+## Novidades de terreno, tratadas como os animais nos cartões e apresentações
+## (chaves NAME_GELO, RULE_GELO... em data/traducoes.csv; imagem gelo.png / nevao.png).
+const TERRAIN := {
+	"gelo": {"color": Color("4aa6d6")},
+	"nevao": {"color": Color("7d8ea6")},
+}
+
+## Estilo de cada mundo: tom do tabuleiro. O fundo é fundo_mundo<N>.png (se existir)
+## e a faixa do menu é mundo_<N>.png.
+const WORLD_STYLES := [
+	{"board": Color("ffffff")},   # Clareira
+	{"board": Color("eef5e9")},   # Bosque
+	{"board": Color("e6f3fb")},   # Lago gelado
+	{"board": Color("f3efe6")},   # Pinhal
+	{"board": Color("eceef3")},   # Montanha
+	{"board": Color("e9ecf4")},   # Nevão
+]
 
 ## Mundos, montados a partir do campo "world" de cada nível em data/levels.json:
 ## [{"levels": [índices]}, ...]. Nome de cada mundo: chave WORLD_<n> em data/traducoes.csv.
@@ -34,7 +53,7 @@ var WORLDS: Array = []
 ## Versão do ficheiro de gravação.
 ## 2: os níveis do Bosque passaram de 6-11 para 12-17 (a Clareira ganhou mais 6 níveis).
 ## 3: o progresso passou a ser guardado pelo id do nível em vez do número.
-const SAVE_VERSION := 3
+const SAVE_VERSION := 4
 
 ## Ordem dos níveis na versão 2 (número -> id), para converter gravações antigas.
 const LEGACY_ORDER_V2 := ["Primeiros passos", "Caracol", "Salto a salto", "Vizinhos", "Trilhos cruzados",
@@ -51,7 +70,9 @@ const LANGS := {"pt": "Português", "en": "English", "es": "Español", "fr": "Fr
 var levels: Array = []
 ## done: índice (texto) -> {"t": melhor tempo em s, "s": melhores estrelas}
 ## lang: "" segue a língua do telemóvel
-var progress := {"done": {}, "seen": [], "vibrate": true, "lang": "", "music": true, "sfx": true}
+var progress := {"done": {}, "seen": [], "vibrate": true, "lang": "", "music": true, "sfx": true, "daily": {}}
+## Puzzles do dia (data/daily.json): um por dia, em ciclo.
+var daily_levels: Array = []
 var current := 0
 
 
@@ -64,6 +85,8 @@ func _ready() -> void:
 		while WORLDS.size() <= w:
 			WORLDS.append({"levels": []})
 		WORLDS[w].levels.append(i)
+	if FileAccess.file_exists("res://data/daily.json"):
+		daily_levels = JSON.parse_string(FileAccess.get_file_as_string("res://data/daily.json"))
 	_load()
 	_apply_language()
 
@@ -105,6 +128,15 @@ const TAG_COLORS := {"hard": Color("f08a24"), "super": Color("d9434f")}
 ## Nome mostrado por baixo de "Nível N": o nome do mundo.
 func level_name(i: int) -> String:
 	return world_name(world_of(i))
+
+
+func world_style(w: int) -> Dictionary:
+	return WORLD_STYLES[clampi(w, 0, WORLD_STYLES.size() - 1)]
+
+
+## Cor de um animal ou novidade de terreno.
+func item_color(t: String) -> Color:
+	return ANIMALS[t].color if ANIMALS.has(t) else TERRAIN[t].color
 
 
 func world_name(w: int) -> String:
@@ -169,6 +201,47 @@ func first_unsolved() -> int:
 		if not is_done(i):
 			return i
 	return levels.size() - 1
+
+
+# ---------- puzzle do dia ----------
+
+## Número do dia (dias desde 1 jan 2026), na hora local.
+func day_number() -> int:
+	var t: float = Time.get_unix_time_from_system() + Time.get_time_zone_from_system().bias * 60.0
+	return int((t - 1767225600) / 86400.0)
+
+
+func daily_key(day := -1) -> String:
+	return "d%d" % (day_number() if day < 0 else day)
+
+
+func daily_level() -> Dictionary:
+	if daily_levels.is_empty():
+		return {}
+	return daily_levels[posmod(day_number(), daily_levels.size())]
+
+
+func daily_done(day := -1) -> bool:
+	return progress.daily.has(daily_key(day))
+
+
+## Dias seguidos com o puzzle do dia resolvido (conta hoje ou, se ainda não, até ontem).
+func daily_streak() -> int:
+	var d := day_number()
+	if not daily_done(d):
+		d -= 1
+	var n := 0
+	while daily_done(d):
+		n += 1
+		d -= 1
+	return n
+
+
+func mark_daily(seconds: float, got_stars: int) -> void:
+	var k := daily_key()
+	var prev: Dictionary = progress.daily.get(k, {})
+	progress.daily[k] = {"t": minf(seconds, float(prev.get("t", INF))), "s": maxi(got_stars, int(prev.get("s", 0)))}
+	_save()
 
 
 func world_of(i: int) -> int:
@@ -236,6 +309,12 @@ func _load() -> void:
 		return
 	var done = data.get("done", {})
 	var version := int(data.get("version", 1))
+	# versão 4: os níveis foram todos refeitos (novos mundos e regras); o progresso recomeça
+	if version < 4:
+		done = {}
+	var daily = data.get("daily", {})
+	if daily is Dictionary:
+		progress.daily = daily
 	if done is Dictionary:
 		for k in done:
 			# formato antigo: só o tempo

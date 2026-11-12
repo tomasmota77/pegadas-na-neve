@@ -9,6 +9,29 @@ Puzzle de lógica para telemóvel (Godot 4.7, GDScript, renderizador Compatibili
 | Ouriço | 1 casa para cima, baixo ou lados |
 | Coelho | Salta sempre 2 casas em linha reta, por cima de tudo |
 | Raposa | 1 casa na diagonal; o caminho não se cruza em X |
+| Esquilo | Salto em L (cavalo do xadrez), por cima de tudo |
+| Coruja | Voa em linha reta quantas casas quiser, por cima de tudo; só deixa pegada onde pousa (no jogo, pousa ao levantar o dedo) |
+
+| Novidade | Regra |
+|---|---|
+| Rocha | Ninguém pousa lá |
+| Gelo | Quem pousa no gelo tem de repetir o mesmo movimento (mesma direção e tamanho) |
+| Nevão | Alguns números das bordas estão tapados e não contam |
+
+## Mundos
+
+Cada mundo traz uma novidade; as anteriores voltam misturadas. Em cada mundo: 3 níveis de introdução, 9 normais a subir de dificuldade, com o **Difícil** em 6.º lugar e o **Super difícil** a fechar.
+
+| Mundo | Novidade | Grelhas |
+|---|---|---|
+| 1 Clareira | Ouriço e coelho | 4×4 a 6×6 |
+| 2 Bosque | Raposa e rochas | 4×4 a 7×7 |
+| 3 Lago gelado | Gelo | 4×4 a 7×7 |
+| 4 Pinhal | Esquilo | 4×4 a 7×7 |
+| 5 Montanha | Coruja | 5×5 a 8×8 |
+| 6 Nevão | Números tapados, todos os animais | 5×5 a 8×8 |
+
+Há também um **puzzle do dia** (`data/daily.json`, 120 puzzles em ciclo), que abre depois do mundo 1 e conta os dias seguidos.
 
 ## Estrutura
 
@@ -77,18 +100,36 @@ O jogo está em português, inglês, espanhol, francês e alemão. Escolhe a lí
 
 Todos os textos estão em `data/traducoes.csv`: uma linha por texto e uma coluna por língua. Para juntar uma língua, acrescenta a coluna, junta o ficheiro `data/traducoes.<código>.translation` em `project.godot` e o nome em `Game.LANGS` (`scripts/globals.gd`).
 
+### Imagens novas (prompts em `docs/imagens.md`)
+
+Já têm marcadores provisórios simples; substitui-os pelos finais com o mesmo nome.
+
+| Ficheiro | Tamanho | O quê |
+|---|---|---|
+| `coruja.png` | 512×512 | Coruja |
+| `comida_coruja.png` | 512×512 | Ninho (destino da coruja) |
+| `pegada_coruja.png` | 256×256 | Pegada **branca** da coruja, a apontar para cima |
+| `gelo.png` | 512×512 | Casa de gelo do tabuleiro (também no cartão) |
+| `nevao.png` | 512×512 | Cartão e apresentação do nevão |
+| `numero_tapado.png` | 256×256 | Substitui os números tapados |
+| `calendario.png` | 256×256 | Ícone do puzzle do dia (opcional) |
+| `fundo_mundo1.png` … `fundo_mundo6.png` | 1080×1920 | Fundo de cada mundo durante o jogo (sem transparência) |
+| `mundo_1.png` … `mundo_6.png` | 1200×400 | Faixa de cada mundo no menu (sem transparência) |
+
 ## Gerar níveis
 
-Há 60 níveis em 5 mundos (Clareira, Bosque, Lago gelado, Montanha, Nevão), 12 por mundo, definidos em `WORLDS` no fim de `tools/gen.py`. Cada nível tem um `id` fixo: ao correr o gerador, os que já existem em `data/levels.json` ficam iguais e só os novos são gerados. Para juntar níveis, acrescenta entradas com ids novos e corre outra vez. O nome de cada mundo está em `data/traducoes.csv` (`WORLD_<n>`).
+Os mundos estão em `WORLDS` em `tools/gen.py`: para cada um, os níveis de introdução e os modelos dos níveis normais (tamanho, animais, rochas, gelo, números tapados). As regras estão em `tools/rules.py`.
 
-Dentro de cada mundo, os níveis marcados `"intro"` (os que ensinam um animal) ficam primeiro, pela ordem escrita. Os outros são ordenados pela dificuldade medida (`effort`: quantas casas um resolvedor simples experimenta, ver `tools/verify.py`). O segundo mais difícil vira o nível **Difícil** a meio do mundo e o mais difícil o **Super difícil** no fim (campo `tag`).
+Cada nível tem uma única solução (confirmada com CP-SAT) e uma **medida de esforço** (`tools/rate.py`): um resolvedor que pensa como uma pessoa, por deduções (contagens, alcance de cada animal, ligações) e, quando estas param, por "e se" de um e dois passos. Níveis que só se resolvem a adivinhar são deitados fora. De todos os candidatos de um mundo, o gerador escolhe 9 espalhados pela faixa desse mundo (`BANDS`), para a dificuldade subir de forma suave. O campo `diff` (1 a 10) é a nota no jogo todo.
 
-O progresso dos jogadores é guardado pelo `id` de cada nível, por isso mudar a ordem não estraga nada.
+Os candidatos ficam guardados em `tools/cache/`: correr outra vez reaproveita-os. Para refazer um mundo, apaga os ficheiros dele nessa pasta. O progresso dos jogadores é guardado pelo `id` (`w3-07` = mundo 3, nível 7).
 
 ```
 pip install ortools
-python tools/gen.py 11       # gera só os níveis novos → data/levels.json
-python tools/verify.py       # confirma por força bruta que cada nível tem 1 solução
+python tools/gen.py              # 6 mundos x 12 níveis → data/levels.json
+python tools/gen.py daily 120    # puzzles do dia → data/daily.json
+python tools/rate.py             # esforço medido de cada nível
+python tools/verify.py           # confirma por força bruta que cada nível tem 1 solução
 ```
 
 ## Versão web

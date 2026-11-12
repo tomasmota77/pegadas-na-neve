@@ -2,6 +2,7 @@ extends Control
 ## Menu principal: continuar, escolher níveis por mundo e definições.
 
 signal level_chosen(index: int)
+signal daily_chosen
 
 
 func _ready() -> void:
@@ -19,8 +20,36 @@ func _ready() -> void:
 	%SettingsBtn.pressed.connect(_show_settings)
 	var stars := [Game.total_stars(), Game.levels.size() * 3]
 	%StarsLabel.text = "%d/%d" % stars if Icons.has("estrela") else tr("STARS_N") % stars
+	_add_daily_button()
 	for w in Game.WORLDS.size():
 		%Worlds.add_child(_world_card(w, next))
+
+
+## Puzzle do dia: abre depois de resolver o mundo 1 (já se conhecem as regras base).
+func _add_daily_button() -> void:
+	if Game.daily_levels.is_empty():
+		return
+	var btn := Button.new()
+	btn.theme_type_variation = &"SoftButton"
+	btn.custom_minimum_size = Vector2(500, 100)
+	btn.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	var unlocked := Game.is_done(Game.WORLDS[0].levels.back())
+	var streak := Game.daily_streak()
+	if not unlocked:
+		btn.text = tr("DAILY_LOCKED")
+		btn.disabled = true
+	elif Game.daily_done():
+		btn.text = tr("DAILY_DONE") % streak
+	else:
+		btn.text = tr("DAILY_PLAY") if streak == 0 else tr("DAILY_PLAY_STREAK") % streak
+	var cal := Game.texture("calendario")
+	if cal:
+		btn.icon = cal
+		btn.expand_icon = false
+	btn.pressed.connect(func(): daily_chosen.emit())
+	var parent := %PlayBtn.get_parent()
+	parent.add_child(btn)
+	parent.move_child(btn, %PlayBtn.get_index() + 1)
 
 
 ## Botão "voltar" do Android: fecha o painel se estiver aberto. Devolve true se tratou.
@@ -39,6 +68,16 @@ func _world_card(w: int, next: int) -> Control:
 	var box := VBoxContainer.new()
 	box.add_theme_constant_override("separation", 18)
 	card.add_child(box)
+	# faixa ilustrada do mundo (mundo_<N>.png), se existir
+	var banner_tex := Game.texture("mundo_%d" % (w + 1))
+	if banner_tex:
+		var banner := TextureRect.new()
+		banner.texture = banner_tex
+		banner.custom_minimum_size = Vector2(0, 150)
+		banner.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		banner.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+		banner.clip_contents = true
+		box.add_child(banner)
 	var open: bool = Game.is_unlocked(levels[0])
 	if not open:
 		card.modulate = Color(1, 1, 1, 0.75)
@@ -62,6 +101,11 @@ func _world_card(w: int, next: int) -> Control:
 	for i in levels:
 		for a in Game.levels[i].animals:
 			seen[a.type] = true
+	for i in levels:
+		if Game.levels[i].has("ice"):
+			seen["gelo"] = true
+		if null in Game.levels[i].rows or null in Game.levels[i].cols:
+			seen["nevao"] = true
 	for t in seen:
 		var icon := TextureRect.new()
 		icon.texture = Game.texture(t)

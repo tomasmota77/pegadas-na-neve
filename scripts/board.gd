@@ -20,6 +20,7 @@ var _closed_box: StyleBoxFlat
 var _card_box: StyleBoxFlat
 var _pill_box: StyleBoxFlat
 var _bad_box: StyleBoxFlat
+var _ice_box: StyleBoxFlat
 
 var _press_cell := Vector2i(-1, -1)
 var _press_action := ""
@@ -49,6 +50,8 @@ func setup(state: PuzzleState) -> void:
 		_tex["comida_" + t] = Game.texture("comida_" + t)
 		_tex["pegada_" + t] = Game.texture("pegada_" + t)
 	_tex["rocha"] = Game.texture("rocha")
+	_tex["gelo"] = Game.texture("gelo")
+	_tex["numero_tapado"] = Game.texture("numero_tapado")
 	_tex["toca"] = Game.texture("toca")
 	_layout()
 	queue_redraw()
@@ -73,7 +76,9 @@ func _layout() -> void:
 	_snow_box = _box(C.snow, cell * 0.2, Color(C.frost_dark, 0.55), cell * 0.05)
 	_rock_box = _box(Color(C.frost, 0.55), cell * 0.2, Color(0, 0, 0, 0), 0)
 	_closed_box = _box(Color(C.frost, 0.4), cell * 0.2, Color(0, 0, 0, 0), 0)
-	_card_box = _box(Color(C.snow, 0.5), cell * 0.32, Color(C.frost_dark, 0.35), cell * 0.06)
+	var tint: Color = Game.world_style(Game.world_of(Game.current)).board
+	_card_box = _box(Color(tint, 0.62), cell * 0.32, Color(C.frost_dark, 0.35), cell * 0.06)
+	_ice_box = _box(Color("cdeaf8"), cell * 0.2, Color("8cc4e3"), cell * 0.05)
 	_pill_box = _box(Color(C.ok, 0.14), hdr * 0.4, Color(0, 0, 0, 0), 0)
 	_bad_box = _box(Color(C.bad, 0.12), hdr * 0.4, Color(0, 0, 0, 0), 0)
 
@@ -237,10 +242,10 @@ func _draw() -> void:
 	# ajuda: linhas e colunas que já têm as casas todas
 	var full_row := []
 	for y in st.height:
-		full_row.append(st.row_count(y) >= st.row_targets[y])
+		full_row.append(st.row_targets[y] >= 0 and st.row_count(y) >= st.row_targets[y])
 	var full_col := []
 	for x in st.width:
-		full_col.append(st.col_count(x) >= st.col_targets[x])
+		full_col.append(st.col_targets[x] >= 0 and st.col_count(x) >= st.col_targets[x])
 	for y in st.height:
 		for x in st.width:
 			var c := Vector2i(x, y)
@@ -252,6 +257,15 @@ func _draw() -> void:
 					and not st.givens.has(c):
 				# casa vazia numa linha ou coluna já cheia: ninguém pode passar aqui
 				_closed_box.draw(get_canvas_item(), r)
+			elif st.ice.has(c):
+				# gelo: azul claro com brilho (ou a imagem gelo.png)
+				_ice_box.draw(get_canvas_item(), r)
+				if _tex.gelo:
+					_draw_tex(_tex.gelo, center_of(c), cell * 0.9)
+				else:
+					var g0 := r.position + r.size * Vector2(0.25, 0.3)
+					draw_line(g0, g0 + r.size * Vector2(0.22, -0.12), Color(1, 1, 1, 0.9), cell * 0.06, true)
+					draw_line(g0 + r.size * Vector2(0.1, 0.18), g0 + r.size * Vector2(0.24, 0.1), Color(1, 1, 1, 0.75), cell * 0.05, true)
 			else:
 				_snow_box.draw(get_canvas_item(), r)
 			if st.marks.has(c):
@@ -296,6 +310,14 @@ func _counter(r: Rect2, cur: int, target: int, fs: int, C: Dictionary, strict: b
 	var col: Color = C.ink
 	var s := minf(r.size.x, r.size.y) * 0.86
 	var pill := Rect2(r.get_center() - Vector2(s, s) * 0.5, Vector2(s, s))
+	if target < 0:
+		# número tapado pelo nevão
+		if _tex.numero_tapado:
+			_draw_tex(_tex.numero_tapado, r.get_center(), s * 0.95)
+		else:
+			var b2 := r.get_center().y + (FONT.get_ascent(fs) - FONT.get_descent(fs)) * 0.5
+			draw_string(FONT, Vector2(r.position.x, b2), "?", HORIZONTAL_ALIGNMENT_CENTER, r.size.x, fs, Color(C.ink_soft, 0.7))
+		return
 	if cur == target:
 		col = C.ok
 		_pill_box.draw(get_canvas_item(), pill)
@@ -311,7 +333,7 @@ func _trail_points(t: String) -> PackedVector2Array:
 	var pts := PackedVector2Array()
 	for i in p.size():
 		var b := center_of(p[i])
-		if i > 0 and t in ["coelho", "esquilo"]:
+		if i > 0 and t in ["coelho", "esquilo", "coruja"]:
 			# salto: um arco baixo, sempre para cima (ou para a esquerda), dentro das casas
 			var a := center_of(p[i - 1])
 			var d := (b - a).normalized()

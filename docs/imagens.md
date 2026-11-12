@@ -174,3 +174,49 @@ Usa `assets/images/fontes/animais.png` e `fontes/comidas.png` como imagens de re
 **`pegada_esquilo.png`** (256×256)
 > A single squirrel footprint, pure white silhouette, solid flat white, no outline, no shading, pointing straight up, centered, transparent background: one small oval palm pad with four thin oval toes spread in a fan above it.
 
+
+## Coruja (mundo Montanha)
+
+Usa o `esquilo.png` (ou outro boneco) como imagem de referência, para sair no mesmo estilo.
+
+**`coruja.png`** (512×512)
+> A single cute chibi owl character for a cozy winter mobile puzzle game, exactly the same style, size, proportions and outline as the reference image. Sitting facing the viewer, soft grey-brown feathers with a cream belly, small ear tufts, very large round shiny eyes, a tiny orange beak, rosy cheeks, small happy expression, and a blue (#3D7FC1) knitted scarf. Round body, wings folded, thick dark navy outline (#34303C), flat colors with one soft shade, almost no feather texture, readable at 64 pixels. Transparent background, no text, no ground, no shadow.
+
+**`comida_coruja.png`** (512×512): o ninho, destino da coruja
+> A small round bird nest made of twigs with three pale blue eggs inside and a soft white snow cap on one side, for a cozy winter mobile puzzle game, exactly the same style as the reference image of food items, filling most of a square. Thick dark navy outline (#34303C), flat colors with one soft shade, simple shapes, readable at 48 pixels. Transparent background, no text, no shadow.
+
+**`pegada_coruja.png`** (256×256)
+> A single owl footprint, pure white silhouette, solid flat white, no outline, no shading, pointing straight up, centered, transparent background: three thick rounded toes spreading forward and one toe pointing backward, joined at a small round center.
+
+## Terreno e nevão
+
+**`gelo.png`** (512×512): a casa de gelo do tabuleiro (fica por cima de um quadrado azul claro)
+> A square tile of smooth frozen ice for a cozy winter mobile puzzle game board, seen from above, very light icy blue (#CDEAF8) with two short white diagonal shine streaks in the top left and a few tiny faint cracks, rounded corners, soft and calm, low contrast so footprints on top stay readable. Flat colors, no outline, no text, transparent background around the rounded square.
+
+**`nevao.png`** (512×512): imagem do cartão e da apresentação do nevão
+> A small fluffy grey-blue snow cloud with a few big round snowflakes falling from it and a gentle swirl of wind, cozy winter mobile puzzle game style, thick dark navy outline (#34303C), flat colors with one soft shade, simple shapes, centered, transparent background, no text, no face.
+
+**`numero_tapado.png`** (256×256): substitui os números que o nevão tapou
+> A small soft pile of white snow with a light blue shadow underneath and a dark navy-grey question mark (#7D8EA6) pressed into it, cozy winter mobile game UI style, flat colors, simple rounded shape, centered, transparent background, no outline.
+
+**`calendario.png`** (256×256, opcional): ícone do botão do puzzle do dia
+> Simple rounded mobile game UI icon of a small calendar page with a snowflake on it, single flat color dark navy (#20304A), thick rounded strokes, no outline, no shading, no text, centered with generous padding, transparent background.
+
+## Um fundo e uma faixa por mundo
+
+Cada mundo passa a ter o seu fundo durante o jogo (`fundo_mundo1.png` a `fundo_mundo6.png`, **1080×1920**, sem transparência) e uma faixa ilustrada no cartão do menu (`mundo_1.png` a `mundo_6.png`, **1200×400**, sem transparência). Usa o `fundo.png` como referência para o estilo. Enquanto não existirem, o jogo usa o `fundo.png` e o cartão aparece sem faixa.
+
+Começo comum para os fundos:
+> Soft calm winter landscape background for a vertical mobile puzzle game, flat pastel colors, low contrast, thick soft shapes, lots of empty calm space in the middle two thirds so the game board can sit on top, scenery only along the top 15% and bottom 20% of the image, no characters, no text.
+
+Começo comum para as faixas:
+> Wide horizontal illustrated banner for a world card in a cozy winter mobile puzzle game menu, flat pastel colors with one soft shade, thick dark navy outline (#34303C) on the main shapes, cute and simple, no characters, no text.
+
+| Mundo | Fundo (`fundo_mundoN.png`): acrescenta ao começo | Faixa (`mundo_N.png`): acrescenta ao começo |
+|---|---|---|
+| 1 Clareira | Pale blue sky (#E7EFF6), a sunny snowy meadow with soft round hills, a few small bushes and a single tree at the edge. | A sunny snowy meadow clearing with soft round hills, a few small bushes and a trail of tiny footprints. |
+| 2 Bosque | Pale mint and blue sky, snowy forest edge with round deciduous trees, a few grey rocks peeking from the snow. | A snowy forest with round bare and leafy trees, grey rocks peeking from the snow, a fox den in a mound. |
+| 3 Lago gelado | Pale icy blue sky, a big frozen lake with shiny turquoise ice along the bottom, snowy shores, a few reeds. | A big frozen turquoise lake with shiny ice, snowy shores and reeds, small ice cracks. |
+| 4 Pinhal | Warm pale cream sky, tall snowy pine trees on the sides, pine cones on the snow. | A dense snowy pine forest with tall dark green pines, pine cones and a hollow tree trunk. |
+| 5 Montanha | Pale lilac-blue sky, big snowy mountain peaks far away at the top, rocky slopes at the bottom. | Tall snowy mountain peaks with rocky slopes, a small wooden signpost and a nest on a ledge. |
+| 6 Nevão | Grey-blue stormy sky, strong diagonal wind lines and many big snowflakes, snow drifts at the bottom. Still calm in the middle. | A snowstorm over snowy hills, diagonal wind lines, many big snowflakes and deep snow drifts. |

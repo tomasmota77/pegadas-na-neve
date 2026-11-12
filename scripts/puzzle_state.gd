@@ -11,11 +11,13 @@ const MOVES := {
 	# esquilo: salto em L, como o cavalo do xadrez (por cima de tudo)
 	"esquilo": [Vector2i(2, 1), Vector2i(1, 2), Vector2i(-1, 2), Vector2i(-2, 1),
 		Vector2i(-2, -1), Vector2i(-1, -2), Vector2i(1, -2), Vector2i(2, -1)],
+	# coruja: voa em linha reta quantas casas quiser (ver moves_of)
 }
 
 var width := 0
 var height := 0
 var rocks := {}            # Vector2i -> true
+var ice := {}              # Vector2i -> true (quem pousa no gelo repete o movimento)
 var animals: Array = []    # [{type, den: Vector2i, food: Vector2i}]
 var row_targets: Array = []
 var col_targets: Array = []
@@ -28,6 +30,8 @@ var active := ""           # animal a ser arrastado agora
 var hints_used := 0
 var _history: Array = []
 var _grab := -1            # índice do caminho onde o dedo pegou (corte adiado até mexer)
+var _gesture_steps := 0    # passos acrescentados neste gesto (a coruja estica o voo)
+var _owl_moves: Array = []
 
 
 static func _cell(a: Array) -> Vector2i:
@@ -40,11 +44,18 @@ func load_level(d: Dictionary) -> void:
 	rocks.clear()
 	for r in d.rocks:
 		rocks[_cell(r)] = true
+	ice.clear()
+	for r in d.get("ice", []):
+		ice[_cell(r)] = true
+	_owl_moves.clear()
+	for k in range(1, maxi(width, height)):
+		_owl_moves.append_array([Vector2i(k, 0), Vector2i(-k, 0), Vector2i(0, k), Vector2i(0, -k)])
 	animals.clear()
 	for a in d.animals:
 		animals.append({"type": a.type, "den": _cell(a.den), "food": _cell(a.food)})
-	row_targets = d.rows.map(func(v): return int(v))
-	col_targets = d.cols.map(func(v): return int(v))
+	# -1 = número tapado pelo nevão
+	row_targets = d.rows.map(func(v): return -1 if v == null else int(v))
+	col_targets = d.cols.map(func(v): return -1 if v == null else int(v))
 	givens.clear()
 	for g in d.givens:
 		givens[_cell(g.cell)] = g.type
@@ -61,11 +72,20 @@ func reset() -> void:
 	marks.clear()
 	active = ""
 	_grab = -1
+	_gesture_steps = 0
 	hints_used = 0
 	_history.clear()
 
 
 # ---------- consultas ----------
+
+func moves_of(t: String) -> Array:
+	return _owl_moves if t == "coruja" else MOVES[t]
+
+
+func has_hidden() -> bool:
+	return row_targets.has(-1) or col_targets.has(-1)
+
 
 func animal(t: String) -> Dictionary:
 	for a in animals:
@@ -120,10 +140,10 @@ func col_count(col: int) -> int:
 
 func counts_ok() -> bool:
 	for r in height:
-		if row_count(r) != row_targets[r]:
+		if row_targets[r] >= 0 and row_count(r) != row_targets[r]:
 			return false
 	for c in width:
-		if col_count(c) != col_targets[c]:
+		if col_targets[c] >= 0 and col_count(c) != col_targets[c]:
 			return false
 	return true
 
@@ -152,7 +172,7 @@ func valid_targets(t: String) -> Array:
 	var tip := tip_of(t)
 	if tip == animal(t).food:
 		return out
-	for m in MOVES[t]:
+	for m in moves_of(t):
 		var n: Vector2i = tip + m
 		if can_step(t, tip, n):
 			out.append(n)
@@ -171,8 +191,14 @@ func can_step(t: String, from: Vector2i, to: Vector2i) -> bool:
 		return false
 	if from == animal(t).food:
 		return false
-	if not (to - from in MOVES[t]):
+	if not (to - from in moves_of(t)):
 		return false
+	# gelo: quem pousou no gelo tem de repetir o movimento com que lá chegou
+	if ice.has(from):
+		var p: Array = paths[t]
+		var k := p.find(from)
+		if k >= 1 and to - from != from - p[k - 1]:
+			return false
 	var o := occupant(to)
 	if o != "" and not (o == t and t == active and _grab >= 0 and paths[t].find(to) > _grab):
 		return false
@@ -215,6 +241,7 @@ func press(c: Vector2i) -> String:
 	if t != "":
 		active = t
 		_grab = paths[t].find(c)
+		_gesture_steps = 0
 		return "drag"
 	if s.is_empty() and not rocks.has(c):
 		return "mark"
@@ -242,10 +269,24 @@ func drag(c: Vector2i) -> String:
 		return ""
 	if p.size() >= 2 and c == p[p.size() - 2]:
 		p.pop_back()
+		_gesture_steps = maxi(0, _gesture_steps - 1)
 		return "back"
+	# coruja: enquanto o dedo segue em linha reta, o voo estica (só pousa ao levantar o dedo)
+	if active == "coruja" and _gesture_steps > 0 and p.size() >= 2:
+		var a: Vector2i = p[p.size() - 2]
+		var dir: Vector2i = (p.back() - a).sign()
+		var off := c - a
+		if off.sign() == dir and (off.x == 0 or off.y == 0) and c != p.back():
+			var b: Vector2i = p.pop_back()
+			if can_step(active, a, c):
+				marks.erase(c)
+				p.append(c)
+				return "complete" if c == animal(active).food else "step"
+			p.append(b)
 	if can_step(active, p.back(), c):
 		marks.erase(c)
 		p.append(c)
+		_gesture_steps += 1
 		return "complete" if c == animal(active).food else "step"
 	return ""
 
@@ -253,6 +294,7 @@ func drag(c: Vector2i) -> String:
 func release() -> void:
 	active = ""
 	_grab = -1
+	_gesture_steps = 0
 
 
 func toggle_mark(c: Vector2i) -> void:

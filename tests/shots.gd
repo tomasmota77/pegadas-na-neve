@@ -31,7 +31,7 @@ func _run() -> void:
 	var main = get_parent()
 	await _wait(40)
 	await _shot("01_menu")
-	main.start_level(Game.levels.map(func(l): return l.id).find("Vizinhos"))
+	main.start_level(Game.levels.map(func(l): return l.id).find("w1-06"))
 	await _wait(30)
 	await _shot("02_tutorial")
 	main._current.get_node("%Sheet").hide()
@@ -51,7 +51,7 @@ func _run() -> void:
 	await _shot("05_vitoria_anim")
 	await get_tree().create_timer(1.6).timeout
 	await _shot("06_vitoria")
-	main.start_level(Game.levels.map(func(l): return l.id).find("Bosque cerrado"))
+	main.start_level(Game.levels.map(func(l): return l.id).find("w2-12"))
 	await _wait(30)
 	main._current.get_node("%Sheet").hide()
 	g = main._current
@@ -71,14 +71,28 @@ func _run() -> void:
 	await _wait(30)
 	await _shot("10_definicoes")
 	# nível do Pinhal com esquilo, a meio
-	main.start_level(Game.levels.map(func(l): return l.id).find("s09"))
+	main.start_level(Game.levels.map(func(l): return l.id).find("w4-06"))
 	await _wait(30)
 	main._current.get_node("%Sheet").hide()
 	g = main._current
 	sol = g.st.solution
-	_play(g, {"esquilo": sol.esquilo.slice(0, 4), "ourico": sol.ourico.slice(0, 5)})
+	_half(g)
 	await _wait(5)
 	await _shot("16_pinhal")
+	# mundos novos: gelo, coruja (com a apresentação), nevão e puzzle do dia
+	for spec in [["w3-08", "17_lago"], ["w5-01", "18_coruja_apresentacao"], ["w5-09", "19_montanha"], ["w6-02", "20_nevao_apresentacao"], ["w6-10", "21_nevao"]]:
+		main.start_level(Game.levels.map(func(l): return l.id).find(spec[0]))
+		await _wait(30)
+		if not spec[1].ends_with("apresentacao"):
+			main._current.get_node("%Sheet").hide()
+			_half(main._current)
+			await _wait(5)
+		await _shot(spec[1])
+	main.start_daily()
+	await _wait(30)
+	main._current.get_node("%Sheet").hide()
+	await _wait(5)
+	await _shot("22_diario")
 	main.start_level(Game.levels.size() - 1)
 	await _wait(30)
 	main._current.get_node("%Sheet").hide()
@@ -99,9 +113,28 @@ func _run() -> void:
 		main.show_menu()
 		await _wait(30)
 		await _shot("12_menu_" + lang)
-		main.start_level(Game.levels.map(func(l): return l.id).find("Bosque cerrado"))
+		main.start_level(Game.levels.map(func(l): return l.id).find("w2-12"))
 		await _wait(30)
 		main._current.get_node("%Sheet").hide()
 		await _wait(5)
 		await _shot("13_jogo_" + lang)
 	get_tree().quit()
+
+
+## Joga metade do caminho de cada animal.
+func _half(g) -> void:
+	var cells := {}
+	for t in g.st.solution:
+		var sol: Array = g.st.solution[t]
+		cells[t] = sol.slice(0, maxi(2, sol.size() / 2))
+	for t in cells:
+		var c: Array = cells[t]
+		g.st.press(c[0])
+		for k in range(1, c.size()):
+			if t == "coruja" and k > 1:
+				g.st.release()
+				g.st.press(c[k - 1])
+			g.st.drag(c[k])
+		g.st.release()
+	g.board.queue_redraw()
+	g._refresh()

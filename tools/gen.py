@@ -1,30 +1,28 @@
 """Gerador de níveis para Pegadas na Neve.
 
-Regras:
-- Cada animal vai da toca até à comida, movendo-se à sua maneira:
-  ourico: 1 casa ortogonal | coelho: salta exatamente 2 casas ortogonal (por cima de tudo)
-  raposa: 1 casa na diagonal
-- Nenhuma casa é pisada duas vezes (por ninguém). Rochas não se pisam.
-- Dois movimentos diagonais não se podem cruzar em X.
-- Números nas bordas = casas pisadas (inclui toca e comida) em cada linha/coluna.
-- Pegadas visíveis (pistas) indicam uma casa por onde passa aquela espécie.
+Regras: ver tools/rules.py. Cada nível tem uma única solução (confirmada com CP-SAT)
+e uma nota de dificuldade (tools/rate.py, que resolve como uma pessoa).
+
+Uso:
+    python tools/gen.py            # gera data/levels.json (6 mundos x 12 níveis)
+    python tools/gen.py daily 120  # gera data/daily.json (puzzles do dia)
 """
 import json, os, random, sys
+from multiprocessing import Pool
 from ortools.sat.python import cp_model
 
-MOVES = {
-    "ourico": [(0, 1), (0, -1), (1, 0), (-1, 0)],
-    "coelho": [(0, 2), (0, -2), (2, 0), (-2, 0)],
-    "raposa": [(1, 1), (1, -1), (-1, 1), (-1, -1)],
-    # esquilo: salto em L, como o cavalo do xadrez (por cima de tudo)
-    "esquilo": [(1, 2), (2, 1), (-1, 2), (-2, 1), (1, -2), (2, -1), (-1, -2), (-2, -1)],
-}
+sys.path.insert(0, os.path.dirname(__file__))
+from rules import moves, diag_cross, check_solution
+import rate
 
 
-def solve(level, limit=2, exclude_edges=None):
-    """Devolve lista de soluções (até `limit`). Solução = {animal: [células em ordem]}."""
+# ---------------------------------------------------------------- solucionador
+
+def solve(level, limit=2):
+    """Devolve até `limit` soluções ({tipo: [células]})."""
     W, H = level["w"], level["h"]
     rocks = set(map(tuple, level["rocks"]))
+    ice = set(map(tuple, level.get("ice", [])))
     animals = level["animals"]
     cells = [(r, c) for r in range(H) for c in range(W)]
     idx = {cell: i for i, cell in enumerate(cells)}
@@ -40,63 +38,67 @@ def solve(level, limit=2, exclude_edges=None):
         t = a["type"]
         den, food = tuple(a["den"]), tuple(a["food"])
         arcs = []
+        ins, outs = {}, {}
         for cell in cells:
-            ok = cell not in rocks and (cell not in special or special[cell] == t) and (cell not in givens or givens[cell] == t)
-            v = m.NewBoolVar(f"x_{t}_{cell}")
+            ok = cell not in rocks and (cell not in special or special[cell] == t) and \
+                (cell not in givens or givens[cell] == t)
+            v = m.NewBoolVar("")
             x[t, cell] = v
             if not ok:
                 m.Add(v == 0)
-            if cell in (den, food):
+            if cell in (den, food) or givens.get(cell) == t:
                 m.Add(v == 1)
-            # self loop when not visited
             arcs.append((idx[cell], idx[cell], v.Not()))
         for (r, c) in cells:
-            for dr, dc in MOVES[t]:
+            if (r, c) in rocks or (r, c) == food:
+                continue
+            for dr, dc in moves(t, W, H):
                 n = (r + dr, c + dc)
-                if n not in idx:
+                if n not in idx or n in rocks or n == den:
                     continue
-                if (r, c) == food or n == den:
-                    continue
-                e = m.NewBoolVar(f"e_{t}_{r}_{c}_{n}")
+                e = m.NewBoolVar("")
                 edges[t, (r, c), n] = e
                 m.AddImplication(e, x[t, (r, c)])
                 m.AddImplication(e, x[t, n])
                 arcs.append((idx[(r, c)], idx[n], e))
+                outs.setdefault((r, c), []).append(((dr, dc), e))
+                ins.setdefault(n, []).append(((dr, dc), e))
                 if t == "raposa":
                     diag.append(((r, c), n, e))
-        # closing arc food -> den
-        one = m.NewBoolVar("one"); m.Add(one == 1); arcs.append((idx[food], idx[den], one))
+        one = m.NewBoolVar("")
+        m.Add(one == 1)
+        arcs.append((idx[food], idx[den], one))
         m.AddCircuit(arcs)
-        if t in givens.values():
-            for cell, gt in givens.items():
-                if gt == t:
-                    m.Add(x[t, cell] == 1)
+        # gelo: o movimento que sai tem de ser igual ao que entrou
+        for cell in ice:
+            for vi, ei in ins.get(cell, []):
+                for vo, eo in outs.get(cell, []):
+                    if vi != vo:
+                        m.AddBoolOr([ei.Not(), eo.Not()])
 
     for cell in cells:
         m.Add(sum(x[a["type"], cell] for a in animals) <= 1)
-    # diagonal crossings
     seg = {}
     for (u, v, e) in diag:
         key = (min(u[0], v[0]), min(u[1], v[1]), (u[0] - v[0]) * (u[1] - v[1]) > 0)
         seg.setdefault(key, []).append(e)
     for (r, c, main), es in list(seg.items()):
         other = seg.get((r, c, not main), [])
-        if other:
-            a_ = m.NewBoolVar("")
-            m.AddMaxEquality(a_, es)
-            b_ = m.NewBoolVar("")
-            m.AddMaxEquality(b_, other)
-            m.AddBoolOr([a_.Not(), b_.Not()])
-    # counts
+        if other and main:
+            for a_ in es:
+                for b_ in other:
+                    m.AddBoolOr([a_.Not(), b_.Not()])
     for r in range(H):
-        m.Add(sum(x[a["type"], (r, c)] for a in animals for c in range(W)) == level["rows"][r])
+        if level["rows"][r] is not None:
+            m.Add(sum(x[a["type"], (r, c)] for a in animals for c in range(W)) == level["rows"][r])
     for c in range(W):
-        m.Add(sum(x[a["type"], (r, c)] for a in animals for r in range(H)) == level["cols"][c])
+        if level["cols"][c] is not None:
+            m.Add(sum(x[a["type"], (r, c)] for a in animals for r in range(H)) == level["cols"][c])
 
     sols = []
     solver = cp_model.CpSolver()
-    solver.parameters.num_workers = 8
-    solver.parameters.max_time_in_seconds = 20
+    solver.parameters.num_workers = 1
+    solver.parameters.max_time_in_seconds = 30
     while len(sols) < limit:
         st = solver.Solve(m)
         if st not in (cp_model.OPTIMAL, cp_model.FEASIBLE):
@@ -115,60 +117,81 @@ def solve(level, limit=2, exclude_edges=None):
     return sols
 
 
-def random_path(t, start, W, H, blocked, length, rng):
-    """Caminho aleatório auto-evitante de `length` casas."""
-    for _ in range(400):
+# ---------------------------------------------------------------- construção
+
+def random_path(t, start, W, H, blocked, ice, length, rng, diag_segs):
+    mv = moves(t, W, H)
+    for _ in range(300):
         p = [start]
         used = set(blocked) | {start}
         ok = True
         while len(p) < length:
             r, c = p[-1]
+            if p[-1] in ice and len(p) >= 2:
+                opts_mv = [(r - p[-2][0], c - p[-2][1])]
+            else:
+                opts_mv = mv
             opts = []
-            for dr, dc in MOVES[t]:
+            for dr, dc in opts_mv:
                 n = (r + dr, c + dc)
                 if 0 <= n[0] < H and 0 <= n[1] < W and n not in used:
-                    if t == "raposa" and crosses(p, (r, c), n):
+                    if t == "raposa" and any(diag_cross((r, c), n, a, b) for a, b in diag_segs + list(zip(p, p[1:]))):
                         continue
                     opts.append(n)
             if not opts:
                 ok = False
                 break
+            # o ouriço prefere seguir em frente às vezes (caminhos menos enrolados)
             n = rng.choice(opts)
             p.append(n)
             used.add(n)
-        if ok:
+        if ok and p[-1] not in ice:
             return p
     return None
 
 
-_diag_segments = []
+def grow_ice(W, H, n, rocks, rng):
+    ice = set()
+    tries = 0
+    while len(ice) < n and tries < 500:
+        tries += 1
+        if not ice or rng.random() < 0.25:
+            c = (rng.randrange(H), rng.randrange(W))
+        else:
+            r, cc = rng.choice(sorted(ice))
+            dr, dc = rng.choice([(0, 1), (0, -1), (1, 0), (-1, 0)])
+            c = (r + dr, cc + dc)
+        if 0 <= c[0] < H and 0 <= c[1] < W and c not in rocks:
+            ice.add(c)
+    return ice
 
 
-def crosses(p, u, v):
-    for s in _diag_segments + list(zip(p, p[1:])):
-        a, b = s
-        if abs(a[0] - b[0]) == 1 and abs(a[1] - b[1]) == 1:
-            if {a, b} == {(u[0], v[1]), (v[0], u[1])}:
-                return True
-    return False
+def counts_of(paths, W, H):
+    rows, cols = [0] * H, [0] * W
+    for p in paths.values():
+        for (r, c) in p:
+            rows[r] += 1
+            cols[c] += 1
+    return rows, cols
 
 
-def make_level(spec, rng):
+def make_level(spec, rng, attempts=60):
     W, H = spec["size"]
-    for attempt in range(300):
-        _diag_segments.clear()
+    for attempt in range(attempts):
         rocks = set()
         while len(rocks) < spec.get("rocks", 0):
             rocks.add((rng.randrange(H), rng.randrange(W)))
+        ice = grow_ice(W, H, spec.get("ice", 0), rocks, rng) if spec.get("ice") else set()
         occupied = set(rocks)
         paths = {}
+        diag_segs = []
         fail = False
         for t, (lo, hi) in spec["animals"]:
-            free = [(r, c) for r in range(H) for c in range(W) if (r, c) not in occupied]
+            free = [(r, c) for r in range(H) for c in range(W) if (r, c) not in occupied and (r, c) not in ice]
             rng.shuffle(free)
             path = None
-            for s in free[:20]:
-                path = random_path(t, s, W, H, occupied, rng.randint(lo, hi), rng)
+            for s in free[:25]:
+                path = random_path(t, s, W, H, occupied, ice, rng.randint(lo, hi), rng, diag_segs)
                 if path:
                     break
             if not path:
@@ -177,38 +200,32 @@ def make_level(spec, rng):
             paths[t] = path
             occupied |= set(path)
             if t == "raposa":
-                _diag_segments.extend(zip(path, path[1:]))
+                diag_segs.extend(zip(path, path[1:]))
         if fail:
             continue
-        # rochas inúteis fora? ok
-        rows = [0] * H
-        cols = [0] * W
-        for p in paths.values():
-            for (r, c) in p:
-                rows[r] += 1
-                cols[c] += 1
+        # o gelo tem de contar: casas de gelo a meio de caminhos
+        if spec.get("ice_used", 0):
+            used_ice = sum(1 for p in paths.values() for c in p[1:-1] if c in ice)
+            if used_ice < spec["ice_used"]:
+                continue
+        rows, cols = counts_of(paths, W, H)
         level = {
-            "w": W, "h": H, "rocks": sorted(map(list, rocks)),
+            "w": W, "h": H, "rocks": sorted(map(list, rocks)), "ice": sorted(map(list, ice)),
             "animals": [{"type": t, "den": list(p[0]), "food": list(p[-1])} for t, p in paths.items()],
             "rows": rows, "cols": cols, "givens": [],
         }
-        # tornar único adicionando pistas
+        if not ice:
+            level.pop("ice")
         ok = True
-        for _ in range(40):
+        for _ in range(30):
             sols = solve(level, 2)
             if not sols:
                 ok = False
                 break
             if len(sols) == 1:
                 break
-            # escolher a solução que não é a nossa; adicionar pista que a elimina
             alt = sols[0] if sols[0] != paths else sols[1]
-            cand = []
-            for t, p in paths.items():
-                alt_cells = set(alt[t])
-                for cell in p[1:-1]:
-                    if cell not in alt_cells:
-                        cand.append((t, cell))
+            cand = [(t, cell) for t, p in paths.items() for cell in p[1:-1] if cell not in set(alt[t])]
             if not cand:
                 ok = False
                 break
@@ -218,7 +235,6 @@ def make_level(spec, rng):
             ok = False
         if not ok or len(solve(level, 2)) != 1:
             continue
-        # minimizar pistas
         gs = level["givens"][:]
         rng.shuffle(gs)
         for g in gs:
@@ -226,134 +242,250 @@ def make_level(spec, rng):
             trial["givens"] = [h for h in level["givens"] if h is not g]
             if len(solve(trial, 2)) == 1:
                 level = trial
-        # pistas extra para níveis fáceis
+        if len(level["givens"]) > spec.get("max_givens", 3):
+            continue
+        # nevão: tapar números enquanto a solução continuar única
+        hide = spec.get("hidden", 0)
+        if hide:
+            lines = [("rows", i) for i in range(H)] + [("cols", i) for i in range(W)]
+            rng.shuffle(lines)
+            hidden = 0
+            for k, i in lines:
+                if hidden >= hide:
+                    break
+                trial = json.loads(json.dumps(level))
+                trial[k][i] = None
+                if len(solve(trial, 2)) == 1:
+                    level = trial
+                    hidden += 1
+            if hidden < hide:
+                continue
         extra = spec.get("extra", 0)
         pool = [(t, c) for t, p in paths.items() for c in p[1:-1]
                 if {"type": t, "cell": list(c)} not in level["givens"]]
         rng.shuffle(pool)
         for t, c in pool[:extra]:
             level["givens"].append({"type": t, "cell": list(c)})
-        mn, mx = spec.get("givens_range", (0, 99))
-        if not (mn <= len(level["givens"]) <= mx):
-            continue
         level["solution"] = {t: [list(c) for c in p] for t, p in paths.items()}
+        assert check_solution(level, level["solution"])
+        s, r = rate.score(level)
+        if not r["solved"] and r["left"] > 6:
+            continue  # precisa de adivinhar: injusto para uma pessoa
+        level["score"] = s
         return level
-    raise RuntimeError(f"falhou {spec}")
+    return None
 
 
-# Mundos e níveis. Cada nível tem um "id" fixo: ao correr outra vez, os níveis
-# que já existem em data/levels.json são mantidos tal e qual (o progresso dos
-# jogadores aponta para eles); só os ids novos são gerados.
+# ---------------------------------------------------------------- mundos
+
+def L(t, W, scale=1.0):
+    """Comprimento do caminho (número de casas) por animal e tamanho."""
+    base = {
+        "ourico": (int(W * W * 0.26), int(W * W * 0.38)),
+        "coelho": (W - 1, W + 2),
+        "raposa": (W - 1, W + 2),
+        "esquilo": (W - 2, W + 1),
+        "coruja": (W - 2, W + 1),
+    }[t]
+    return (max(3, int(base[0] * scale)), max(4, int(base[1] * scale)))
+
+
+def S(size, animals, **kw):
+    W = size
+    return {"size": (W, W), "animals": [(t, L(t, W, kw.pop("scale", 1.0))) for t in animals], **kw}
+
+
+# Cada mundo: níveis de introdução (por esta ordem) e modelos para os restantes 9.
+# Dos candidatos gerados com os modelos, escolhem-se 9 do mais fácil ao mais difícil;
+# o 2.º mais difícil fica em 6.º lugar (Difícil) e o mais difícil fecha o mundo (Super difícil).
 WORLDS = [
-    # Os primeiros níveis de cada mundo ensinam: caminhos curtos e quase tudo marcado.
     ("Clareira", [
-        {"id": "e01", "intro": True, "size": (4, 4), "animals": [("ourico", (4, 5))], "extra": 2},
-        {"id": "e02", "intro": True, "size": (4, 4), "animals": [("ourico", (6, 7))], "extra": 2},
-        {"id": "e03", "intro": True, "size": (5, 5), "animals": [("ourico", (7, 8))], "extra": 2},
-        {"id": "e04", "intro": True, "size": (4, 4), "animals": [("coelho", (3, 4))], "extra": 1},
-        {"id": "Salto a salto", "size": (5, 5), "animals": [("coelho", (5, 6))], "extra": 1},
-        {"id": "c07", "size": (5, 5), "animals": [("coelho", (6, 7))], "extra": 1},
-        {"id": "Primeiros passos", "size": (4, 4), "animals": [("ourico", (7, 9))], "extra": 2},
-        {"id": "Caracol", "size": (5, 5), "animals": [("ourico", (10, 13))], "extra": 1},
-        {"id": "Vizinhos", "size": (5, 5), "animals": [("ourico", (7, 9)), ("coelho", (4, 5))], "extra": 1},
-        {"id": "Trilhos cruzados", "size": (6, 6), "animals": [("ourico", (10, 13)), ("coelho", (5, 6))]},
-        {"id": "c09", "size": (6, 6), "animals": [("coelho", (6, 8)), ("ourico", (8, 10))]},
-        {"id": "c10", "size": (6, 6), "animals": [("ourico", (13, 16)), ("coelho", (6, 8))], "givens_range": (0, 2)},
+        S(4, ["ourico"], extra=2, scale=0.6),
+        S(4, ["ourico"], extra=1),
+        S(4, ["coelho"], extra=1),
+    ], [
+        S(5, ["coelho"]), S(5, ["ourico"]), S(5, ["ourico", "coelho"]),
+        S(6, ["ourico", "coelho"]), S(6, ["coelho", "ourico"], max_givens=2),
     ]),
     ("Bosque", [
-        {"id": "r01", "intro": True, "size": (4, 4), "animals": [("raposa", (4, 5))], "rocks": 1, "extra": 2},
-        {"id": "r02", "intro": True, "size": (5, 5), "animals": [("raposa", (5, 6))], "rocks": 2, "extra": 2},
-        {"id": "Passo de raposa", "size": (5, 5), "animals": [("raposa", (6, 8))], "rocks": 3, "extra": 1},
-        {"id": "b07", "size": (6, 6), "animals": [("raposa", (8, 10))], "rocks": 4, "extra": 1},
-        {"id": "Por cima das pedras", "size": (6, 6), "animals": [("coelho", (5, 7)), ("raposa", (6, 8))], "rocks": 4},
-        {"id": "b08", "size": (6, 6), "animals": [("raposa", (7, 9)), ("ourico", (8, 10))], "rocks": 3},
-        {"id": "Entre rochas", "size": (5, 5), "animals": [("ourico", (7, 9)), ("raposa", (5, 6))], "rocks": 3, "extra": 1},
-        {"id": "b09", "size": (6, 6), "animals": [("raposa", (7, 9)), ("coelho", (5, 7))], "rocks": 4},
-        {"id": "b10", "size": (7, 7), "animals": [("raposa", (8, 11)), ("ourico", (10, 13))], "rocks": 5},
-        {"id": "Três trilhos", "size": (6, 6), "animals": [("ourico", (8, 11)), ("coelho", (4, 6)), ("raposa", (5, 7))], "rocks": 3},
-        {"id": "b12", "size": (7, 7), "animals": [("ourico", (13, 17)), ("coelho", (6, 8)), ("raposa", (8, 10))], "rocks": 6, "givens_range": (0, 2)},
-        {"id": "Bosque cerrado", "size": (7, 7), "animals": [("ourico", (11, 15)), ("coelho", (5, 7)), ("raposa", (7, 9))], "rocks": 5},
+        S(4, ["raposa"], rocks=1, extra=2),
+        S(5, ["raposa"], rocks=2, extra=1),
+        S(5, ["raposa", "ourico"], rocks=2, extra=1),
+    ], [
+        S(5, ["raposa", "ourico"], rocks=3), S(6, ["raposa", "coelho"], rocks=3),
+        S(6, ["raposa", "ourico"], rocks=4), S(6, ["ourico", "coelho", "raposa"], rocks=3),
+        S(7, ["raposa", "ourico", "coelho"], rocks=5, max_givens=2),
     ]),
     ("Lago gelado", [
-        {"id": "l%02d" % i, "size": (7, 7),
-         "animals": [("ourico", (9 + i // 2, 12 + i // 2)), ("coelho", (5, 7)), ("raposa", (6, 8 + i // 4))],
-         "rocks": 3 + i % 3, **({"extra": 1} if i <= 3 else {}), **({"givens_range": (0, 2)} if i >= 9 else {})}
-        for i in range(1, 13)
-    ]),
-    ("Montanha", [
-        {"id": "m%02d" % i, "size": (8, 8) if i > 4 else (7, 7),
-         "animals": [("ourico", (12 + i // 2, 16 + i // 2)), ("coelho", (6, 8)), ("raposa", (8, 10 + i // 4))],
-         "rocks": 5 + i % 3, **({"givens_range": (0, 2)} if i >= 7 else {})}
-        for i in range(1, 13)
+        S(4, ["ourico"], ice=4, ice_used=1, extra=1),
+        S(5, ["ourico"], ice=6, ice_used=2, extra=1),
+        S(5, ["coelho", "ourico"], ice=6, ice_used=2, extra=1, scale=0.8),
+    ], [
+        S(6, ["ourico", "coelho"], ice=8, ice_used=2, rocks=2),
+        S(6, ["raposa", "ourico"], ice=8, ice_used=2, rocks=2),
+        S(6, ["ourico", "coelho", "raposa"], ice=7, ice_used=2, rocks=2),
+        S(7, ["ourico", "raposa", "coelho"], ice=10, ice_used=3, rocks=3, max_givens=2),
     ]),
     ("Pinhal", [
-        {"id": "s01", "intro": True, "size": (4, 4), "animals": [("esquilo", (3, 4))], "extra": 1},
-        {"id": "s02", "intro": True, "size": (5, 5), "animals": [("esquilo", (4, 5))], "extra": 2},
-        {"id": "s03", "intro": True, "size": (5, 5), "animals": [("esquilo", (5, 6))], "extra": 1},
-        {"id": "s04", "size": (5, 5), "animals": [("esquilo", (4, 5)), ("ourico", (6, 8))], "extra": 1},
-        {"id": "s05", "size": (6, 6), "animals": [("esquilo", (5, 6)), ("coelho", (4, 6))], "extra": 1},
-        {"id": "s06", "size": (6, 6), "animals": [("esquilo", (5, 7)), ("raposa", (5, 7))], "rocks": 3},
-        {"id": "s07", "size": (6, 6), "animals": [("esquilo", (6, 8)), ("ourico", (8, 10))], "rocks": 2},
-        {"id": "s08", "size": (6, 6), "animals": [("esquilo", (6, 8)), ("coelho", (5, 7))], "rocks": 3},
-        {"id": "s09", "size": (7, 7), "animals": [("esquilo", (6, 8)), ("ourico", (9, 12)), ("raposa", (6, 8))], "rocks": 4},
-        {"id": "s10", "size": (7, 7), "animals": [("esquilo", (7, 9)), ("coelho", (5, 7)), ("ourico", (10, 13))], "rocks": 4},
-        {"id": "s11", "size": (7, 7), "animals": [("esquilo", (7, 9)), ("raposa", (7, 9)), ("coelho", (5, 7))], "rocks": 5},
-        {"id": "s12", "size": (7, 7), "animals": [("esquilo", (8, 10)), ("ourico", (11, 14)), ("raposa", (7, 9))], "rocks": 5, "givens_range": (0, 2)},
+        S(4, ["esquilo"], extra=1),
+        S(5, ["esquilo"], rocks=2, extra=1),
+        S(5, ["esquilo", "ourico"], rocks=2, extra=1, scale=0.8),
+    ], [
+        S(6, ["esquilo", "ourico"], rocks=3), S(6, ["esquilo", "coelho"], rocks=3),
+        S(6, ["esquilo", "raposa"], rocks=3), S(6, ["esquilo", "ourico"], ice=6, ice_used=1, rocks=2),
+        S(7, ["esquilo", "ourico", "raposa"], rocks=4, max_givens=2),
+        S(7, ["esquilo", "coelho", "ourico"], rocks=4, ice=6, ice_used=1, max_givens=2),
+    ]),
+    ("Montanha", [
+        S(5, ["coruja"], rocks=3, extra=1),
+        S(5, ["coruja"], rocks=4, extra=1),
+        S(6, ["coruja", "ourico"], rocks=4, extra=1, scale=0.8),
+    ], [
+        S(6, ["coruja", "ourico"], rocks=5), S(6, ["coruja", "raposa"], rocks=5),
+        S(7, ["coruja", "esquilo"], rocks=5), S(7, ["coruja", "coelho", "ourico"], rocks=6),
+        S(7, ["coruja", "ourico", "raposa"], rocks=6, ice=6, ice_used=1, max_givens=2),
+        S(8, ["coruja", "esquilo", "ourico"], rocks=7, max_givens=2),
     ]),
     ("Nevão", [
-        {"id": "n%02d" % i, "size": (8, 8),
-         "animals": [("ourico", (16 + i // 2, 20 + i // 2)), ("coelho", (7, 9)), ("raposa", (9, 12))],
-         "rocks": 6 + i % 3, "givens_range": (0, 1 if i >= 6 else 2)}
-        for i in range(1, 13)
+        S(5, ["ourico", "coelho"], hidden=1, extra=1),
+        S(6, ["raposa", "ourico"], rocks=3, hidden=2, extra=1),
+        S(6, ["esquilo", "coruja"], rocks=3, hidden=2),
+    ], [
+        S(6, ["ourico", "coelho", "raposa"], rocks=3, hidden=2),
+        S(6, ["esquilo", "ourico"], rocks=3, hidden=2),
+        S(7, ["raposa", "coruja", "coelho"], rocks=4, ice=5, ice_used=1, hidden=2),
+        S(7, ["ourico", "esquilo", "raposa"], rocks=5, hidden=3),
+        S(7, ["coruja", "ourico", "coelho"], rocks=5, ice=5, ice_used=1, hidden=3),
+        S(8, ["ourico", "esquilo", "coruja"], rocks=6, hidden=3, max_givens=2),
     ]),
 ]
 
-# Em cada mundo: os níveis "intro" primeiro, pela ordem escrita (ensinam um animal);
-# depois os outros do mais fácil para o mais difícil, com dois picos ao estilo
-# Meowdoku: um "Difícil" a meio e um "Super difícil" a fechar o mundo.
-HARD_POS = {0: 7}   # mundo -> posição (0 = primeiro) do nível Difícil; por omissão 5
+CANDIDATES = 30   # candidatos por lote para os 9 níveis principais
+
+# Faixa de esforço (tools/rate.py) de cada mundo: os níveis normais ficam entre lo e hi,
+# o Super difícil até top. Cada mundo começa um pouco abaixo de onde o anterior acabou.
+BANDS = [(3, 12, 17), (4, 16, 23), (5, 20, 29), (6, 25, 36), (7, 30, 44), (8, 36, 55)]
+INTRO_MAX = [3, 6, 8, 8, 9, 12]   # esforço máximo dos níveis de introdução (o 1.º é sempre fácil)
+CACHE = os.path.join(os.path.dirname(__file__), "cache")
 
 
-def arrange(levels, specs, w, verify):
-    intro_ids = [sp["id"] for sp in specs if sp.get("intro")]
-    for lv in levels:
-        lv.setdefault("effort", verify.effort(lv))
-        lv.pop("tag", None)
-    intro = [lv for i in intro_ids for lv in levels if lv["id"] == i]
-    rest = sorted([lv for lv in levels if lv["id"] not in intro_ids], key=lambda lv: lv["effort"])
-    super_ = rest.pop()          # o mais difícil fecha o mundo
-    hard = rest.pop()            # o segundo mais difícil é o pico a meio
-    super_["tag"] = "super"
-    hard["tag"] = "hard"
-    seq = intro + rest
-    seq.insert(min(HARD_POS.get(w, 5), len(seq)), hard)
-    return seq + [super_]
+def _job(args):
+    spec, seed = args
+    return make_level(spec, random.Random(seed))
+
+
+def pick_curve(cands, band):
+    """7 níveis normais espalhados pela faixa, o Difícil perto do topo e o Super difícil acima."""
+    lo, hi, top = band
+    normal = sorted([lv for lv in cands if lo <= lv["score"] <= hi], key=lambda lv: lv["score"])
+    above = sorted([lv for lv in cands if hi * 0.8 <= lv["score"] <= top], key=lambda lv: lv["score"])
+    if len(normal) < 8 or not above:
+        return None
+    super_ = above[-1]
+    rest = [lv for lv in normal if lv is not super_]
+    hard = rest[-1]
+    rest = rest[:-1]
+    out = []
+    for k in range(7):
+        target = lo + (hi * 0.85 - lo) * k / 6
+        best = min((lv for lv in rest if lv not in out), key=lambda lv: abs(lv["score"] - target))
+        out.append(best)
+    out.sort(key=lambda lv: lv["score"])
+    return out, hard, super_
+
+
+def _cached(w, name):
+    path = os.path.join(CACHE, f"w{w + 1}_{name}.json")
+    return json.load(open(path)) if os.path.exists(path) else []
+
+
+def _store(w, name, data):
+    os.makedirs(CACHE, exist_ok=True)
+    json.dump(data, open(os.path.join(CACHE, f"w{w + 1}_{name}.json"), "w"))
+
+
+def build_world(w, specs_intro, specs_main, pool, base_seed):
+    intro = _cached(w, "intro")
+    if len(intro) != len(specs_intro):
+        intro = []
+        for k, sp in enumerate(specs_intro):
+            cap = (3 if w < 5 else 6) if k == 0 else INTRO_MAX[w]
+            for tries in range(12):
+                lv = _job((sp, base_seed + k * 50 + tries))
+                if lv and lv["score"] <= cap:
+                    break
+            else:
+                raise RuntimeError(f"introdução {k + 1} falhou no mundo {w + 1}")
+            intro.append(lv)
+        _store(w, "intro", intro)
+    cands = _cached(w, "cands")
+    batch = len(cands) // CANDIDATES
+    picked = pick_curve(cands, BANDS[w])
+    while picked is None and batch < 6:
+        jobs = [(specs_main[k % len(specs_main)], base_seed + 1000 + batch * CANDIDATES + k) for k in range(CANDIDATES)]
+        cands += [lv for lv in pool.map(_job, jobs) if lv]
+        _store(w, "cands", cands)
+        batch += 1
+        picked = pick_curve(cands, BANDS[w])
+    if picked is None:
+        raise RuntimeError(f"mundo {w + 1}: candidatos insuficientes na faixa {BANDS[w]}: "
+                           f"{sorted(lv['score'] for lv in cands)}")
+    rest, hard, super_ = picked
+    hard["tag"], super_["tag"] = "hard", "super"
+    return intro + rest[:2] + [hard] + rest[2:] + [super_]
+
+
+def finish(levels, prefix):
+    """Ids estáveis por posição e nota 1-10 pela ordem global de esforço."""
+    scores = sorted(lv["score"] for lv in levels)
+    for k, lv in enumerate(levels):
+        lv["id"] = prefix(k)
+        rank = scores.index(lv["score"]) / max(1, len(scores) - 1)
+        lv["diff"] = 1 + round(rank * 9)
+    return levels
+
+
+def main_levels():
+    out = []
+    with Pool(2) as pool:
+        for w, (name, intro, main) in enumerate(WORLDS):
+            seq = build_world(w, intro, main, pool, 1000 * (w + 1))
+            for lv in seq:
+                lv["world"] = w + 1
+            out += seq
+            print(name, [(lv["score"], lv.get("tag", "")) for lv in seq], file=sys.stderr, flush=True)
+            json.dump(out, open("data/levels.json.tmp", "w"))
+    finish(out, lambda k: "w%d-%02d" % (out[k]["world"], k % 12 + 1))
+    os.replace("data/levels.json.tmp", "data/levels.json")
+    json.dump(out, open("data/levels.json", "w"))
+    print("níveis:", len(out), file=sys.stderr)
+
+
+DAILY_SPECS = [
+    S(6, ["ourico", "coelho"], rocks=2), S(6, ["raposa", "ourico"], rocks=3),
+    S(6, ["esquilo", "coelho"], rocks=3), S(6, ["coruja", "ourico"], rocks=4),
+    S(6, ["ourico", "coelho"], ice=6, ice_used=2, rocks=2),
+    S(7, ["ourico", "raposa", "coelho"], rocks=4, max_givens=2),
+    S(7, ["esquilo", "ourico", "coruja"], rocks=4, max_givens=2),
+]
+
+
+def daily_levels(n):
+    with Pool(2) as pool:
+        jobs = [(DAILY_SPECS[k % len(DAILY_SPECS)], 900000 + k) for k in range(int(n * 1.15))]
+        cands = [lv for lv in pool.map(_job, jobs) if lv]
+    # tira os mais fáceis e os mais difíceis, baralha para variar de dia para dia
+    cands.sort(key=lambda lv: lv["score"])
+    cut = (len(cands) - n) // 2
+    cands = cands[cut:cut + n]
+    random.Random(5).shuffle(cands)
+    finish(cands, lambda k: "d%03d" % (k + 1))
+    json.dump(cands, open("data/daily.json", "w"))
+    print("puzzles do dia:", len(cands), file=sys.stderr)
 
 
 if __name__ == "__main__":
-    seed = int(sys.argv[1]) if len(sys.argv) > 1 else 7
-    rng = random.Random(seed)
-    try:
-        old = {lv.get("id", lv.get("name")): lv for lv in json.load(open("data/levels.json"))}
-    except FileNotFoundError:
-        old = {}
-    import verify  # aqui para evitar import circular (verify usa MOVES deste ficheiro)
-    out = []
-    for w, (world, specs) in enumerate(WORLDS):
-        start = len(out)
-        for spec in specs:
-            if spec["id"] in old:
-                lv = old[spec["id"]]
-            else:
-                lv = make_level(spec, rng)
-                print(len(out) + 1, spec["id"], f'{lv["w"]}x{lv["h"]}', "pistas:", len(lv["givens"]), file=sys.stderr, flush=True)
-            lv["id"] = spec["id"]
-            lv["world"] = w + 1
-            lv.pop("name", None)
-            out.append(lv)
-            json.dump(out, open("data/levels.json.tmp", "w"))  # guarda o progresso
-        out[start:] = arrange(out[start:], specs, w, verify)
-        json.dump(out, open("data/levels.json.tmp", "w"))
-        print(world, [(lv["effort"], lv.get("tag", "")) for lv in out[start:]], file=sys.stderr, flush=True)
-    os.replace("data/levels.json.tmp", "data/levels.json")
-    print("níveis:", len(out), file=sys.stderr)
+    if len(sys.argv) > 1 and sys.argv[1] == "daily":
+        daily_levels(int(sys.argv[2]) if len(sys.argv) > 2 else 120)
+    else:
+        main_levels()

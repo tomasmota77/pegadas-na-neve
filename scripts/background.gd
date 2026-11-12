@@ -1,6 +1,6 @@
 extends Control
-## Fundo do ecrã. Usa assets/images/fundo.png (a cobrir o ecrã) se existir;
-## senão, um degradê suave com as cores do tema.
+## Fundo do ecrã. Em cada mundo usa assets/images/fundo_mundo<N>.png, se existir;
+## senão fundo.png (a cobrir o ecrã); senão, um degradê suave com as cores do tema.
 
 var _tex: Texture2D
 
@@ -8,6 +8,13 @@ var _tex: Texture2D
 func _ready() -> void:
 	_tex = Game.texture("fundo")
 	resized.connect(queue_redraw)
+
+
+## w: índice do mundo, ou -1 para o fundo geral (menu, puzzle do dia).
+func set_world(w: int) -> void:
+	var t: Texture2D = Game.texture("fundo_mundo%d" % (w + 1)) if w >= 0 else null
+	_tex = t if t else Game.texture("fundo")
+	queue_redraw()
 
 
 func _draw() -> void:

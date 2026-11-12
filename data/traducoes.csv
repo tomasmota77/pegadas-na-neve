@@ -108,13 +108,36 @@ SOUNDS_OFF,Sons: desligados,Sounds: off,Sonidos: desactivados,Sons : désactivé
 MUSIC_ON,Música: ligada,Music: on,Música: activada,Musique : activée,Musik: an
 MUSIC_OFF,Música: desligada,Music: off,Música: desactivada,Musique : désactivée,Musik: aus
 WORLD_3,Lago gelado,Frozen Lake,Lago helado,Lac gelé,Zugefrorener See
-WORLD_4,Montanha,Mountain,Montaña,Montagne,Berg
+WORLD_4,Pinhal,Pine Forest,Pinar,Pinède,Kiefernwald
 TAG_HARD,Difícil,Hard,Difícil,Difficile,Schwer
 TAG_SUPER,Super difícil,Super hard,Superdifícil,Très difficile,Superschwer
-WORLD_5,Pinhal,Pine Forest,Pinar,Pinède,Kiefernwald
+WORLD_5,Montanha,Mountain,Montaña,Montagne,Berg
 WORLD_6,Nevão,Blizzard,Ventisca,Tempête de neige,Schneesturm
 NAME_ESQUILO,Esquilo,Squirrel,Ardilla,Écureuil,Eichhörnchen
 RULE_ESQUILO,Salta em L,Jumps in an L,Salta en L,Saute en L,Springt im L
 DETAIL_ESQUILO,"Salta em L, como o cavalo do xadrez: 2 casas para um lado e 1 para o outro, por cima do que estiver no caminho.","Jumps in an L, like the knight in chess: 2 squares one way and 1 the other, over anything in between.","Salta en L, como el caballo del ajedrez: 2 casillas hacia un lado y 1 hacia el otro, por encima de lo que haya en medio.","Saute en L, comme le cavalier aux échecs : 2 cases dans un sens et 1 dans l'autre, par-dessus ce qui se trouve au milieu.","Springt im L wie das Pferd beim Schach: 2 Felder in eine Richtung und 1 zur Seite, über alles dazwischen."
 MEET_ESQUILO,Conhece o Esquilo,Meet the Squirrel,Conoce a la Ardilla,Voici l'Écureuil,Das ist das Eichhörnchen
 LEAD_ESQUILO,Leva o Esquilo até à bolota.,Take the squirrel to the acorn.,Lleva a la ardilla hasta la bellota.,Emmène l'écureuil jusqu'au gland.,Bring das Eichhörnchen zur Eichel.
+NAME_CORUJA,Coruja,Owl,Búho,Hibou,Eule
+RULE_CORUJA,Voa em linha reta,Flies in a straight line,Vuela en línea recta,Vole en ligne droite,Fliegt geradeaus
+DETAIL_CORUJA,"Voa em linha reta, para cima, para baixo ou para os lados, quantas casas quiser e por cima de tudo. Só deixa pegada onde pousa. Para pousar, levanta o dedo.","Flies in a straight line, up, down or sideways, as many squares as it likes and over anything. It only leaves a footprint where it lands. Lift your finger to land.","Vuela en línea recta, hacia arriba, abajo o a los lados, tantas casillas como quiera y por encima de todo. Solo deja huella donde se posa. Para posarse, levanta el dedo.","Vole en ligne droite, vers le haut, le bas ou les côtés, d'autant de cases qu'il veut et par-dessus tout. Il ne laisse une empreinte que là où il se pose. Pour se poser, lève le doigt.","Fliegt geradeaus nach oben, unten oder zur Seite, so viele Felder sie will und über alles hinweg. Sie hinterlässt nur dort eine Spur, wo sie landet. Zum Landen den Finger heben."
+MEET_CORUJA,Conhece a Coruja,Meet the Owl,Conoce al Búho,Voici le Hibou,Das ist die Eule
+LEAD_CORUJA,Leva a Coruja até ao ninho.,Take the owl to its nest.,Lleva al búho hasta su nido.,Emmène le hibou jusqu'à son nid.,Bring die Eule zu ihrem Nest.
+NAME_GELO,Gelo,Ice,Hielo,Glace,Eis
+RULE_GELO,Escorrega,Slippery,Resbala,Ça glisse,Rutschig
+DETAIL_GELO,"Quem pousa numa casa de gelo escorrega: o movimento seguinte tem de ser igual ao anterior, na mesma direção e com o mesmo tamanho.","Anyone who lands on an ice square slides: the next move must be the same as the last one, in the same direction and the same length.","Quien se posa en una casilla de hielo resbala: el siguiente movimiento tiene que ser igual al anterior, en la misma dirección y con el mismo tamaño.","Qui se pose sur une case de glace glisse : le mouvement suivant doit être identique au précédent, dans la même direction et de la même longueur.","Wer auf einem Eisfeld landet, rutscht: Der nächste Zug muss genauso sein wie der letzte, in dieselbe Richtung und gleich weit."
+MEET_GELO,Cuidado com o gelo,Watch out for ice,Cuidado con el hielo,Attention à la glace,"Vorsicht, Eis"
+LEAD_GELO,"No gelo, repete o último movimento.","On ice, repeat the last move.","En el hielo, repite el último movimiento.","Sur la glace, répète le dernier mouvement.",Auf dem Eis den letzten Zug wiederholen.
+NAME_NEVAO,Nevão,Blizzard,Ventisca,Tempête,Schneesturm
+RULE_NEVAO,Números tapados,Hidden numbers,Números tapados,Nombres cachés,Verdeckte Zahlen
+DETAIL_NEVAO,O nevão tapou alguns números das bordas. Nessas linhas e colunas pode haver quantas pegadas forem precisas: descobre-as com as outras pistas.,The blizzard has covered some of the numbers on the edges. Those rows and columns can have as many footprints as needed: work them out from the other clues.,La ventisca ha tapado algunos números de los bordes. En esas filas y columnas puede haber las huellas que hagan falta: descúbrelas con las demás pistas.,La tempête a caché certains nombres des bords. Ces lignes et colonnes peuvent avoir autant d'empreintes qu'il faut : déduis-les avec les autres indices.,Der Schneesturm hat einige Zahlen am Rand verdeckt. In diesen Reihen und Spalten können so viele Spuren sein wie nötig: Finde sie mit den anderen Hinweisen heraus.
+MEET_NEVAO,Chegou o nevão,The blizzard is here,Llegó la ventisca,La tempête arrive,Der Schneesturm ist da
+LEAD_NEVAO,Os números tapados não contam.,Hidden numbers don't count.,Los números tapados no cuentan.,Les nombres cachés ne comptent pas.,Verdeckte Zahlen zählen nicht.
+DAILY_TITLE,Puzzle do dia,Daily puzzle,Puzle del día,Puzzle du jour,Rätsel des Tages
+DAILY_PLAY,Puzzle do dia,Daily puzzle,Puzle del día,Puzzle du jour,Rätsel des Tages
+DAILY_PLAY_STREAK,Puzzle do dia · %d dias seguidos,Daily puzzle · %d-day streak,Puzle del día · %d días seguidos,Puzzle du jour · %d jours d'affilée,Rätsel des Tages · %d Tage in Folge
+DAILY_DONE,Feito hoje · %d dias seguidos,Done today · %d-day streak,Hecho hoy · %d días seguidos,Fait aujourd'hui · %d jours d'affilée,Heute gelöst · %d Tage in Folge
+DAILY_LOCKED,Puzzle do dia: acaba o mundo 1,Daily puzzle: finish world 1,Puzle del día: termina el mundo 1,Puzzle du jour : finis le monde 1,Rätsel des Tages: Welt 1 beenden
+DAILY_STREAK_1,Primeiro dia seguido!,First day in a row!,¡Primer día seguido!,Premier jour d'affilée !,Erster Tag in Folge!
+DAILY_STREAK_N,%d dias seguidos!,%d days in a row!,¡%d días seguidos!,%d jours d'affilée !,%d Tage in Folge!
+DAILY_COME_BACK,Volta amanhã para um puzzle novo.,Come back tomorrow for a new puzzle.,Vuelve mañana para un puzle nuevo.,Reviens demain pour un nouveau puzzle.,Komm morgen für ein neues Rätsel wieder.
