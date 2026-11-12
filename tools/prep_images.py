@@ -19,6 +19,8 @@ SQUARE = {
     "ourico": 512, "coelho": 512, "raposa": 512,
     "comida_ourico": 512, "comida_coelho": 512, "comida_raposa": 512,
     "esquilo": 512, "comida_esquilo": 512, "pegada_esquilo": 256,
+    "coruja": 512, "comida_coruja": 512, "pegada_coruja": 256,
+    "gelo": 512, "nevao": 512, "numero_tapado": 256, "calendario": 256,
     "rocha": 512, "floco": 512, "vitoria": 512, "toca": 512,
     "pegada_ourico": 256, "pegada_coelho": 256, "pegada_raposa": 256,
     "voltar": 256, "ajuda": 256, "definicoes": 256, "desfazer": 256,
@@ -93,6 +95,15 @@ def main():
     if os.path.exists(p):
         cover(Image.open(p).convert("RGB"), 1080, 1920).save(p, optimize=True)
         print("ok fundo")
+    # fundo e faixa de cada mundo
+    for n in range(1, 7):
+        for name, w, h in (("fundo_mundo%d" % n, 1080, 1920), ("mundo_%d" % n, 1200, 400)):
+            p = os.path.join(IMG, name + ".png")
+            if os.path.exists(p):
+                im = Image.open(p).convert("RGB")
+                if im.size != (w, h):
+                    cover(im, w, h).save(p, optimize=True)
+                    print("ok", name)
     p = os.path.join(ROOT, "icon.png")
     if os.path.exists(p):
         im = Image.open(p).convert("RGB")

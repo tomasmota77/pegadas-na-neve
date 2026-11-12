@@ -313,7 +313,7 @@ func _counter(r: Rect2, cur: int, target: int, fs: int, C: Dictionary, strict: b
 	if target < 0:
 		# número tapado pelo nevão
 		if _tex.numero_tapado:
-			_draw_tex(_tex.numero_tapado, r.get_center(), s * 0.95)
+			_draw_tex(_tex.numero_tapado, r.get_center(), s * 1.35)
 		else:
 			var b2 := r.get_center().y + (FONT.get_ascent(fs) - FONT.get_descent(fs)) * 0.5
 			draw_string(FONT, Vector2(r.position.x, b2), "?", HORIZONTAL_ALIGNMENT_CENTER, r.size.x, fs, Color(C.ink_soft, 0.7))

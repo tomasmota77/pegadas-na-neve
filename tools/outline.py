@@ -14,7 +14,8 @@ from PIL import Image, ImageFilter
 
 IMG = os.path.join(os.path.dirname(__file__), "..", "assets", "images")
 NAVY = (52, 48, 60, 255)
-DEFAULT = ["ourico", "coelho", "raposa", "comida_ourico", "comida_coelho", "comida_raposa", "rocha", "toca"]
+DEFAULT = ["ourico", "coelho", "raposa", "comida_ourico", "comida_coelho", "comida_raposa", "rocha", "toca",
+           "esquilo", "comida_esquilo", "coruja", "comida_coruja"]
 
 
 def thicken(path, px):
