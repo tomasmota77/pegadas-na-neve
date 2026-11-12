@@ -40,6 +40,7 @@ func _init() -> void:
 				break
 			n += 1
 		check(st.hints_used > 0 or levels[i].givens.size() > 0, "nível %d: dica não fez nada" % i)
+		check(st.is_solved(), "nível %d: só com dicas não chega à solução" % i)
 		# desfazer volta ao estado anterior
 		st.reset()
 		var t: String = st.animals[0].type

@@ -28,6 +28,8 @@ var paths := {}            # tipo -> Array[Vector2i] (começa sempre na toca)
 var marks := {}            # Vector2i -> true (casas marcadas com X pelo jogador)
 var active := ""           # animal a ser arrastado agora
 var hints_used := 0
+## Quantas casas uma dica desenha de uma vez.
+const HINT_STEPS := 3
 var _history: Array = []
 var _grab := -1            # índice do caminho onde o dedo pegou (corte adiado até mexer)
 var _gesture_steps := 0    # passos acrescentados neste gesto (a coruja estica o voo)
@@ -348,22 +350,31 @@ func hint() -> Dictionary:
 				paths[t] = p.slice(0, i)
 				hints_used += 1
 				return {"kind": "fix", "type": t, "cell": p[i]}
+	# está tudo certo até aqui: avança o caminho do animal que vai mais atrasado
+	# HINT_STEPS passos e deixa-os marcados com pegadas, para não se perderem
+	var best := ""
+	var best_left := 0
 	for a in animals:
-		var t: String = a.type
-		var p: Array = paths[t]
-		var sol: Array = solution[t]
-		if p.size() < sol.size():
-			# próxima casa ainda sem pista
-			for i in range(p.size(), sol.size() - 1):
-				var c: Vector2i = sol[i]
-				if not givens.has(c):
-					_snapshot()
-					givens[c] = t
-					marks.erase(c)
-					_clear_others_at(c, t)
-					hints_used += 1
-					return {"kind": "reveal", "type": t, "cell": c}
-	return {"kind": "none"}
+		var left: int = solution[a.type].size() - paths[a.type].size()
+		if left > best_left:
+			best = a.type
+			best_left = left
+	if best == "":
+		return {"kind": "none"}
+	_snapshot()
+	var t := best
+	var sol: Array = solution[t]
+	var added := []
+	for i in range(paths[t].size(), mini(paths[t].size() + HINT_STEPS, sol.size())):
+		var c: Vector2i = sol[i]
+		_clear_others_at(c, t)
+		marks.erase(c)
+		paths[t].append(c)
+		added.append(c)
+		if c != animal(t).food:
+			givens[c] = t
+	hints_used += 1
+	return {"kind": "reveal", "type": t, "cell": added[0], "cells": added, "complete": is_complete(t)}
 
 
 func _clear_others_at(c: Vector2i, t: String) -> void:

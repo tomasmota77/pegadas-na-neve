@@ -222,17 +222,24 @@ func _on_hint() -> void:
 		Sfx.play("dica")
 	match h.kind:
 		"fix":
-			board.flash(h.cell)
+			# o passo errado pisca a vermelho e o caminho volta ao último passo certo
+			board.flash([h.cell], true)
 			_refresh()
 			%Status.text = tr("HINT_FIX")
 		"reveal":
-			board.flash(h.cell)
+			# os passos novos ficam desenhados e piscam a verde
+			board.flash(h.cells)
 			_refresh()
-			%Status.text = tr("HINT_REVEAL")
+			%Status.text = tr("HINT_REVEAL") % Game.animal_text(h.type, "NAME")
+			if h.complete:
+				Sfx.play("chegou")
+				Game.vibrate(30)
 		_:
 			_refresh()
 			%Status.text = tr("HINT_NONE")
 	board.queue_redraw()
+	if st.is_solved():
+		_on_solved()
 
 
 func _on_solved() -> void:

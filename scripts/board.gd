@@ -28,7 +28,8 @@ var _moved := false
 var _last_pos := Vector2.ZERO
 
 var _bounce := {}          # tipo -> 0..1
-var _flash_cell := Vector2i(-1, -1)
+var _flash_cells: Array = []   # casas a destacar (dica)
+var _flash_bad := false
 var _flash_t := 0.0
 var win_anim := -1.0:
 	set(v):
@@ -194,8 +195,10 @@ func _win_sounds() -> void:
 		_win_played += 1
 
 
-func flash(c: Vector2i) -> void:
-	_flash_cell = c
+## Destaca casas durante ~1,5 s: a verde (passos mostrados) ou a vermelho (passo errado).
+func flash(cells: Array, bad := false) -> void:
+	_flash_cells = cells
+	_flash_bad = bad
 	_flash_t = 1.0
 	set_process(true)
 
@@ -220,7 +223,7 @@ func _process(dt: float) -> void:
 		else:
 			busy = true
 	if _flash_t > 0.0:
-		_flash_t -= dt * 0.7
+		_flash_t -= dt * 0.6
 		busy = true
 	queue_redraw()
 	if not busy:
@@ -275,10 +278,13 @@ func _draw() -> void:
 				draw_line(m - Vector2(k, k), m + Vector2(k, k), col, cell * 0.06, true)
 				draw_line(m + Vector2(-k, k), m + Vector2(k, -k), col, cell * 0.06, true)
 
-	if _flash_t > 0.0 and _flash_cell.x >= 0:
-		var fr := Rect2(origin + Vector2(_flash_cell) * cell, Vector2(cell, cell)).grow(-gap)
-		var fb := _box(Color(C.ok, 0.35 * _flash_t), cell * 0.2, Color(0, 0, 0, 0), 0)
-		fb.draw(get_canvas_item(), fr)
+	if _flash_t > 0.0:
+		var fcol: Color = C.bad if _flash_bad else C.ok
+		var fb := _box(Color(fcol, 0.45 * _flash_t), cell * 0.2, Color(0, 0, 0, 0), 0)
+		for fc in _flash_cells:
+			var fr := Rect2(origin + Vector2(fc) * cell, Vector2(cell, cell)).grow(-gap)
+			fb.draw(get_canvas_item(), fr)
+			draw_arc(center_of(fc), cell * 0.44, 0.0, TAU, 40, Color(fcol, _flash_t), cell * 0.06, true)
 
 	for a in st.animals:
 		_draw_trail(a.type)
