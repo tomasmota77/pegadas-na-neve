@@ -110,6 +110,11 @@ func _world_card(w: int, next: int) -> Control:
 			seen["gelo"] = true
 		if null in Game.levels[i].rows or null in Game.levels[i].cols:
 			seen["nevao"] = true
+	# com muitos ícones (mundos 7-12) ficam numa linha própria, por baixo do nome
+	var icon_row := head
+	if seen.size() > 4:
+		icon_row = HBoxContainer.new()
+		icon_row.add_theme_constant_override("separation", 2)
 	for t in seen:
 		var icon := TextureRect.new()
 		icon.texture = Game.texture(t)
@@ -117,8 +122,10 @@ func _world_card(w: int, next: int) -> Control:
 		icon.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 		icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-		head.add_child(icon)
+		icon_row.add_child(icon)
 	box.add_child(head)
+	if icon_row != head:
+		box.add_child(icon_row)
 
 	# barra de progresso
 	var done := 0

@@ -115,6 +115,10 @@ func _run() -> void:
 	main._current.get_node("%Scroll").scroll_vertical = 1400
 	await _wait(10)
 	await _shot("15_menu_mundos")
+	var sc: ScrollContainer = main._current.get_node("%Scroll")
+	sc.scroll_vertical = int(sc.get_v_scroll_bar().max_value)
+	await _wait(10)
+	await _shot("15b_menu_fim")
 	main._current._show_settings()
 	await _wait(30)
 	main._current._show_languages()
