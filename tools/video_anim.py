@@ -9,6 +9,7 @@ O jogo usa assets/anim/festa_<animal>.png no ecrã de vitória (ver Game.festa()
 Uso:
     python tools/video_anim.py video.mp4 festa_ourico
     python tools/video_anim.py video.mp4 festa_ourico --fps 12 --size 320 --start 0.2 --end 4.5
+    python tools/video_anim.py video.mp4 festa_raposa --outline 7   # se o vídeo perdeu o contorno grosso
 
 Também prepara as imagens de partida para gerar os vídeos (animal no meio, fundo verde):
     python tools/video_anim.py --start-frames
@@ -21,7 +22,7 @@ import subprocess
 import tempfile
 
 import numpy as np
-from PIL import Image
+from PIL import Image, ImageFilter
 
 ROOT = os.path.join(os.path.dirname(__file__), "..")
 IMG = os.path.join(ROOT, "assets", "images")
@@ -48,12 +49,14 @@ def start_frames(dest):
 def key(frame, bg):
     """Alfa pela distância à cor do fundo; tira o reflexo verde das bordas."""
     f = frame.astype(np.float32)
-    d = np.sqrt(((f - bg) ** 2).sum(axis=2))
-    alpha = np.clip((d - 60.0) / 80.0, 0.0, 1.0)
-    # despill: onde o canal dominante do fundo sobressai, baixa-o para o nível dos outros
     ch = int(np.argmax(bg))
     others = [c for c in range(3) if c != ch]
     cap = f[..., others].max(axis=2)
+    # quanto o canal do fundo (verde) sobressai: alto no fundo e nas sombras verdes escuras,
+    # perto de zero no animal (até no cachecol verde-azulado do ouriço)
+    dom = f[..., ch] - cap
+    alpha = np.clip((90.0 - dom) / 50.0, 0.0, 1.0)
+    # despill: onde o canal dominante do fundo sobressai, baixa-o para o nível dos outros
     spill = f[..., ch] > cap
     edge = alpha < 0.999
     f[..., ch] = np.where(spill & edge, cap, f[..., ch])
@@ -62,7 +65,17 @@ def key(frame, bg):
     return Image.fromarray(rgba, "RGBA")
 
 
-def convert(video, name, fps, size, start, end, cols):
+def outline(tile, px):
+    """Contorno azul-marinho à volta do animal (como tools/outline.py), para vídeos que o perdem."""
+    a = tile.getchannel("A").point(lambda v: 255 if v > 40 else 0)
+    grown = a.filter(ImageFilter.MaxFilter(px * 2 + 1)).filter(ImageFilter.GaussianBlur(0.7))
+    out = Image.new("RGBA", tile.size, (52, 48, 60, 255))
+    out.putalpha(grown)
+    out.alpha_composite(tile)
+    return out
+
+
+def convert(video, name, fps, size, start, end, cols, thick=0):
     with tempfile.TemporaryDirectory() as tmp:
         cmd = ["ffmpeg", "-v", "error", "-y"]
         if start:
@@ -90,6 +103,8 @@ def convert(video, name, fps, size, start, end, cols):
     cx, cy = (x0 + x1) // 2, (y0 + y1) // 2
     box = (cx - side // 2, cy - side // 2, cx - side // 2 + side, cy - side // 2 + side)
     tiles = [k.crop(box).resize((size, size), Image.LANCZOS) for k in keyed]
+    if thick:
+        tiles = [outline(t, thick) for t in tiles]
     rows = (len(tiles) + cols - 1) // cols
     sheet = Image.new("RGBA", (cols * size, rows * size), (0, 0, 0, 0))
     for i, t in enumerate(tiles):
@@ -110,9 +125,10 @@ if __name__ == "__main__":
     ap.add_argument("--start", type=float, default=0.0)
     ap.add_argument("--end", type=float, default=0.0)
     ap.add_argument("--cols", type=int, default=8)
+    ap.add_argument("--outline", type=int, default=0, help="engrossa o contorno (píxeis)")
     ap.add_argument("--start-frames", action="store_true")
     a = ap.parse_args()
     if a.start_frames:
         start_frames(os.path.join(ROOT, "assets", "images", "fontes", "videos"))
     else:
-        convert(a.video, a.name, a.fps, a.size, a.start, a.end, a.cols)
+        convert(a.video, a.name, a.fps, a.size, a.start, a.end, a.cols, a.outline)
