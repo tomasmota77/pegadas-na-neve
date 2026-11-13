@@ -96,7 +96,7 @@ def main():
         cover(Image.open(p).convert("RGB"), 1080, 1920).save(p, optimize=True)
         print("ok fundo")
     # fundo e faixa de cada mundo
-    for n in range(1, 7):
+    for n in range(1, 13):
         for name, w, h in (("fundo_mundo%d" % n, 1080, 1920), ("mundo_%d" % n, 1200, 400)):
             p = os.path.join(IMG, name + ".png")
             if os.path.exists(p):

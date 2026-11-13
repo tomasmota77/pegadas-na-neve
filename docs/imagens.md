@@ -204,7 +204,7 @@ Usa o `esquilo.png` (ou outro boneco) como imagem de referência, para sair no m
 
 ## Um fundo e uma faixa por mundo
 
-Cada mundo passa a ter o seu fundo durante o jogo (`fundo_mundo1.png` a `fundo_mundo6.png`, **1080×1920**, sem transparência) e uma faixa ilustrada no cartão do menu (`mundo_1.png` a `mundo_6.png`, **1200×400**, sem transparência). Usa o `fundo.png` como referência para o estilo. Enquanto não existirem, o jogo usa o `fundo.png` e o cartão aparece sem faixa.
+Cada mundo passa a ter o seu fundo durante o jogo (`fundo_mundo1.png` a `fundo_mundo12.png`, **1080×1920**, sem transparência) e uma faixa ilustrada no cartão do menu (`mundo_1.png` a `mundo_12.png`, **1200×400**, sem transparência). Usa o `fundo.png` como referência para o estilo. Enquanto não existirem, o jogo usa o `fundo.png` e o cartão aparece sem faixa.
 
 Começo comum para os fundos:
 > Soft calm winter landscape background for a vertical mobile puzzle game, flat pastel colors, low contrast, thick soft shapes, lots of empty calm space in the middle two thirds so the game board can sit on top, scenery only along the top 15% and bottom 20% of the image, no characters, no text.
@@ -220,12 +220,12 @@ Começo comum para as faixas:
 | 4 Pinhal | Warm pale cream sky, tall snowy pine trees on the sides, pine cones on the snow. | A dense snowy pine forest with tall dark green pines, pine cones and a hollow tree trunk. |
 | 5 Montanha | Pale lilac-blue sky, big snowy mountain peaks far away at the top, rocky slopes at the bottom. | Tall snowy mountain peaks with rocky slopes, a small wooden signpost and a nest on a ledge. |
 | 6 Nevão | Grey-blue stormy sky, strong diagonal wind lines and many big snowflakes, snow drifts at the bottom. Still calm in the middle. | A snowstorm over snowy hills, diagonal wind lines, many big snowflakes and deep snow drifts. |
-| 7 Aurora | Deep twilight blue sky at the top fading to pale lilac, soft green and pink northern lights ribbons, small stars, snowy hills at the bottom. | Soft green and pink northern lights over snowy hills at dusk, small stars, a few pine trees in silhouette. |
+| 7 Aurora | Soft twilight blue sky at the top fading to pale lilac, soft green and pink northern lights ribbons, small stars, snowy hills at the bottom. | Soft green and pink northern lights over snowy hills at dusk, small stars, a few pine trees in silhouette. |
 | 8 Gruta de gelo | Pale cyan, the inside of a big ice cave: smooth blue ice walls and a few round icicles hanging along the top, frosty crystals at the bottom. | The inside of a glowing blue ice cave, round icicles hanging from the top, smooth shiny ice floor, a few small ice crystals. |
 | 9 Vale escondido | Soft morning fog, pale mint-grey sky, gentle snowy valley with misty hills on the sides, a small frozen stream at the bottom. | A misty snowy valley at dawn with soft fog between round hills, a small frozen stream and a wooden bridge. |
 | 10 Floresta encantada | Pale violet sky, snowy forest with round trees decorated with tiny warm glowing lights, a few big mushrooms with snow caps at the bottom. | A magical snowy forest with round trees and tiny warm glowing lights, big snowy mushrooms and sparkles. |
 | 11 Pico gelado | Very pale icy blue sky, sharp snowy mountain summit far away at the top, icy blue rocks and frozen crystals at the bottom. | A tall icy mountain summit with a little flag on top, blue icy rocks, frozen crystals and wispy clouds below. |
-| 12 Grande tempestade | Dark slate-blue stormy sky, swirling snow and strong wind curls, big snowflakes, deep snow drifts at the bottom. Still calm in the middle. | A big swirling winter storm over snowy hills, wind curls, many big snowflakes, a tiny glowing lantern in the snow. |
+| 12 Grande tempestade | Muted grey-blue stormy sky, swirling snow and strong wind curls, big snowflakes, deep snow drifts at the bottom. Still calm in the middle. | A big swirling winter storm over snowy hills, wind curls, many big snowflakes, a tiny glowing lantern in the snow. |
 
 ## Roupas dos animais (roupeiro)
 

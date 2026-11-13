@@ -113,8 +113,8 @@ Já têm marcadores provisórios simples; substitui-os pelos finais com o mesmo 
 | `nevao.png` | 512×512 | Cartão e apresentação do nevão |
 | `numero_tapado.png` | 256×256 | Substitui os números tapados |
 | `calendario.png` | 256×256 | Ícone do puzzle do dia (opcional) |
-| `fundo_mundo1.png` … `fundo_mundo6.png` | 1080×1920 | Fundo de cada mundo durante o jogo (sem transparência) |
-| `mundo_1.png` … `mundo_6.png` | 1200×400 | Faixa de cada mundo no menu (sem transparência) |
+| `fundo_mundo1.png` … `fundo_mundo12.png` | 1080×1920 | Fundo de cada mundo durante o jogo (sem transparência) |
+| `mundo_1.png` … `mundo_12.png` | 1200×400 | Faixa de cada mundo no menu (sem transparência) |
 
 ## Gerar níveis
 
