@@ -113,6 +113,12 @@ TAG_HARD,Difícil,Hard,Difícil,Difficile,Schwer
 TAG_SUPER,Super difícil,Super hard,Superdifícil,Très difficile,Superschwer
 WORLD_5,Montanha,Mountain,Montaña,Montagne,Berg
 WORLD_6,Nevão,Blizzard,Ventisca,Tempête de neige,Schneesturm
+WORLD_7,Aurora,Northern Lights,Aurora boreal,Aurore boréale,Polarlicht
+WORLD_8,Gruta de gelo,Ice Cave,Cueva de hielo,Grotte de glace,Eishöhle
+WORLD_9,Vale escondido,Hidden Valley,Valle escondido,Vallée cachée,Verborgenes Tal
+WORLD_10,Floresta encantada,Enchanted Forest,Bosque encantado,Forêt enchantée,Zauberwald
+WORLD_11,Pico gelado,Frozen Peak,Pico helado,Pic gelé,Eisgipfel
+WORLD_12,Grande tempestade,Great Storm,Gran tormenta,Grande tempête,Großer Sturm
 NAME_ESQUILO,Esquilo,Squirrel,Ardilla,Écureuil,Eichhörnchen
 RULE_ESQUILO,Salta em L,Jumps in an L,Salta en L,Saute en L,Springt im L
 DETAIL_ESQUILO,"Salta em L, como o cavalo do xadrez: 2 casas para um lado e 1 para o outro, por cima do que estiver no caminho.","Jumps in an L, like the knight in chess: 2 squares one way and 1 the other, over anything in between.","Salta en L, como el caballo del ajedrez: 2 casillas hacia un lado y 1 hacia el otro, por encima de lo que haya en medio.","Saute en L, comme le cavalier aux échecs : 2 cases dans un sens et 1 dans l'autre, par-dessus ce qui se trouve au milieu.","Springt im L wie das Pferd beim Schach: 2 Felder in eine Richtung und 1 zur Seite, über alles dazwischen."

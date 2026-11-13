@@ -11,7 +11,7 @@ func check(cond: bool, msg: String) -> void:
 func _init() -> void:
 	var levels: Array = JSON.parse_string(FileAccess.get_file_as_string("res://data/levels.json"))
 	var daily: Array = JSON.parse_string(FileAccess.get_file_as_string("res://data/daily.json"))
-	check(levels.size() == 72, "devia haver 72 níveis")
+	check(levels.size() == 144, "devia haver 144 níveis")
 	_new_rules(levels)
 	levels = levels + daily
 	for i in levels.size():
@@ -51,7 +51,7 @@ func _init() -> void:
 		st.undo()
 		check(st.paths[t].size() == 1, "nível %d: desfazer falhou" % i)
 	# regras de movimento (níveis principais)
-	levels = levels.slice(0, 72)
+	levels = levels.slice(0, 144)
 	# níveis só com um animal (procurados, porque a ordem dos níveis pode mudar)
 	var only := func(t: String) -> Dictionary:
 		for lv in levels:

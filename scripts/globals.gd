@@ -46,6 +46,12 @@ const WORLD_STYLES := [
 	{"board": Color("f3efe6")},   # Pinhal
 	{"board": Color("eceef3")},   # Montanha
 	{"board": Color("e9ecf4")},   # Nevão
+	{"board": Color("eeeaf6")},   # Aurora
+	{"board": Color("e3f1f6")},   # Gruta de gelo
+	{"board": Color("eef3ea")},   # Vale escondido
+	{"board": Color("f1ecf3")},   # Floresta encantada
+	{"board": Color("e8eef5")},   # Pico gelado
+	{"board": Color("e6e9f1")},   # Grande tempestade
 ]
 
 ## Mundos, montados a partir do campo "world" de cada nível em data/levels.json:

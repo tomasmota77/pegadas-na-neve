@@ -358,14 +358,75 @@ WORLDS = [
         S(7, ["coruja", "ourico", "coelho"], rocks=5, ice=5, ice_used=1, hidden=3),
         S(8, ["ourico", "esquilo", "coruja"], rocks=6, hidden=3, max_givens=2),
     ]),
+    # ---- mundos 7-12: sem regras novas, misturam tudo o que já se aprendeu ----
+    ("Aurora", [
+        S(6, ["esquilo", "coelho"], rocks=3, extra=1),
+        S(6, ["coruja", "raposa"], rocks=3, extra=1),
+        S(6, ["ourico", "esquilo", "coruja"], rocks=3, extra=1, scale=0.8),
+    ], [
+        S(7, ["ourico", "coelho", "raposa"], rocks=4), S(7, ["esquilo", "coruja", "ourico"], rocks=4),
+        S(7, ["raposa", "esquilo", "coelho"], rocks=4), S(7, ["coruja", "coelho", "raposa"], rocks=5),
+        S(7, ["ourico", "raposa", "esquilo", "coelho"], rocks=4, scale=0.8, max_givens=2),
+    ]),
+    ("Gruta de gelo", [
+        S(6, ["ourico", "coelho"], ice=8, ice_used=2, rocks=2, extra=1),
+        S(6, ["esquilo", "raposa"], ice=8, ice_used=2, rocks=2, extra=1),
+        S(6, ["coruja", "ourico"], ice=8, ice_used=2, rocks=3, extra=1),
+    ], [
+        S(7, ["ourico", "coelho", "raposa"], ice=10, ice_used=3, rocks=3),
+        S(7, ["esquilo", "ourico", "coelho"], ice=10, ice_used=3, rocks=3),
+        S(7, ["coruja", "raposa", "ourico"], ice=10, ice_used=2, rocks=4),
+        S(7, ["esquilo", "coruja", "coelho"], ice=10, ice_used=2, rocks=4, max_givens=2),
+    ]),
+    ("Vale escondido", [
+        S(6, ["ourico", "esquilo"], rocks=2, hidden=2, extra=1),
+        S(6, ["coelho", "coruja"], rocks=3, hidden=2, extra=1),
+        S(6, ["raposa", "esquilo", "ourico"], rocks=3, hidden=3, extra=1, scale=0.8),
+    ], [
+        S(7, ["ourico", "coelho", "esquilo"], rocks=4, hidden=3),
+        S(7, ["raposa", "coruja", "ourico"], rocks=4, hidden=3),
+        S(7, ["esquilo", "raposa", "coelho"], rocks=4, hidden=4),
+        S(7, ["coruja", "ourico", "coelho"], rocks=5, hidden=4, max_givens=2),
+    ]),
+    ("Floresta encantada", [
+        S(6, ["ourico", "coelho", "raposa"], rocks=2, extra=1, scale=0.8),
+        S(7, ["esquilo", "coruja", "ourico"], rocks=3, extra=1, scale=0.8),
+        S(7, ["ourico", "coelho", "raposa", "esquilo"], rocks=3, extra=2, scale=0.7),
+    ], [
+        S(7, ["ourico", "coelho", "raposa", "esquilo"], rocks=4, scale=0.8),
+        S(7, ["coruja", "ourico", "coelho", "raposa"], rocks=4, scale=0.8),
+        S(7, ["esquilo", "coruja", "ourico", "coelho"], rocks=4, scale=0.8),
+        S(8, ["ourico", "raposa", "esquilo", "coruja"], rocks=5, scale=0.8, max_givens=2),
+    ]),
+    ("Pico gelado", [
+        S(7, ["ourico", "raposa"], ice=8, ice_used=2, rocks=4, extra=1),
+        S(7, ["coruja", "esquilo"], ice=8, ice_used=2, rocks=5, extra=1),
+        S(7, ["coelho", "ourico", "coruja"], ice=8, ice_used=2, rocks=5, extra=1),
+    ], [
+        S(8, ["ourico", "coelho", "raposa"], ice=10, ice_used=2, rocks=6),
+        S(8, ["esquilo", "coruja", "ourico"], ice=10, ice_used=2, rocks=6),
+        S(8, ["raposa", "esquilo", "coelho"], ice=10, ice_used=2, rocks=6),
+        S(8, ["coruja", "ourico", "coelho", "raposa"], ice=10, ice_used=2, rocks=6, scale=0.8, max_givens=2),
+    ]),
+    ("Grande tempestade", [
+        S(7, ["ourico", "coelho", "raposa"], rocks=4, ice=6, ice_used=1, hidden=2, extra=1),
+        S(7, ["esquilo", "coruja", "ourico"], rocks=4, ice=6, ice_used=1, hidden=2, extra=1),
+        S(7, ["raposa", "esquilo", "coelho", "ourico"], rocks=4, hidden=2, extra=1, scale=0.8),
+    ], [
+        S(7, ["ourico", "coelho", "raposa", "esquilo"], rocks=4, ice=6, ice_used=1, hidden=2, scale=0.8),
+        S(8, ["coruja", "raposa", "ourico"], rocks=6, ice=8, ice_used=2, hidden=3),
+        S(8, ["esquilo", "coruja", "coelho", "ourico"], rocks=6, ice=8, ice_used=1, hidden=3, scale=0.8),
+        S(8, ["ourico", "raposa", "esquilo", "coruja"], rocks=6, ice=8, ice_used=2, hidden=3, scale=0.8, max_givens=2),
+    ]),
 ]
 
 CANDIDATES = 30   # candidatos por lote para os 9 níveis principais
 
 # Faixa de esforço (tools/rate.py) de cada mundo: os níveis normais ficam entre lo e hi,
 # o Super difícil até top. Cada mundo começa um pouco abaixo de onde o anterior acabou.
-BANDS = [(3, 12, 17), (4, 16, 23), (5, 20, 29), (6, 25, 36), (7, 30, 44), (8, 36, 55)]
-INTRO_MAX = [3, 6, 8, 8, 9, 12]   # esforço máximo dos níveis de introdução (o 1.º é sempre fácil)
+BANDS = [(3, 12, 17), (4, 16, 23), (5, 20, 29), (6, 25, 36), (7, 30, 44), (8, 36, 55),
+         (20, 38, 55), (22, 41, 60), (24, 44, 65), (26, 47, 70), (28, 50, 75), (30, 54, 85)]
+INTRO_MAX = [3, 6, 8, 8, 9, 12, 16, 18, 20, 24, 26, 30]   # esforço máximo dos níveis de introdução (o 1.º é sempre fácil)
 CACHE = os.path.join(os.path.dirname(__file__), "cache")
 
 
@@ -409,8 +470,8 @@ def build_world(w, specs_intro, specs_main, pool, base_seed):
     if len(intro) != len(specs_intro):
         intro = []
         for k, sp in enumerate(specs_intro):
-            cap = (3 if w < 5 else 6) if k == 0 else INTRO_MAX[w]
-            for tries in range(12):
+            cap = ((3 if w < 5 else 6) if w < 6 else INTRO_MAX[w] * 0.6) if k == 0 else INTRO_MAX[w]
+            for tries in range(12 if w < 6 else 40):
                 lv = _job((sp, base_seed + k * 50 + tries))
                 if lv and lv["score"] <= cap:
                     break
@@ -421,7 +482,7 @@ def build_world(w, specs_intro, specs_main, pool, base_seed):
     cands = _cached(w, "cands")
     batch = len(cands) // CANDIDATES
     picked = pick_curve(cands, BANDS[w])
-    while picked is None and batch < 6:
+    while picked is None and batch < (6 if w < 6 else 8):
         jobs = [(specs_main[k % len(specs_main)], base_seed + 1000 + batch * CANDIDATES + k) for k in range(CANDIDATES)]
         cands += [lv for lv in pool.map(_job, jobs) if lv]
         _store(w, "cands", cands)
@@ -446,10 +507,15 @@ def finish(levels, prefix):
 
 
 def main_levels():
+    """Os mundos que já estão em data/levels.json ficam iguais (o progresso guarda-se por id);
+    só se geram os mundos que faltam."""
+    old = json.load(open("data/levels.json")) if os.path.exists("data/levels.json") else []
     out = []
-    with Pool(2) as pool:
+    with Pool(4) as pool:
         for w, (name, intro, main) in enumerate(WORLDS):
-            seq = build_world(w, intro, main, pool, 1000 * (w + 1))
+            seq = [lv for lv in old if lv["world"] == w + 1]
+            if len(seq) != 12:
+                seq = build_world(w, intro, main, pool, 1000 * (w + 1))
             for lv in seq:
                 lv["world"] = w + 1
             out += seq
