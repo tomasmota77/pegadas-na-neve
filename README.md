@@ -155,6 +155,8 @@ godot --path . -- --shots                             # capturas para user://sho
 - **Ficha das lojas** (nomes, descrições, palavras-chave e declaração de dados, nas 5 línguas): `docs/loja.md`.
 - **Capturas**: `store/android/` (1080×1920) e `store/iphone/` (1320×2868), geradas com
   `godot --path . --resolution 1080x1920 -- --shots` (ficam em `user://shots/`).
+- **Gráfico de destaque do Google Play** (1024×500, obrigatório): `store/android/grafico_destaque.png`.
+  O original está em `assets/images/fontes/caminhada_alegre_na_neve.png`.
 - **Política de privacidade e termos**: `site/` (português e inglês), publicados no GitHub Pages.
 - **Exportação**: perfis "Android" (AAB, alvo API 36, compilação Gradle) e "iOS" em `export_presets.cfg`.
   No editor: Projeto → Instalar modelo de compilação Android; no iOS preenche o Team ID.
