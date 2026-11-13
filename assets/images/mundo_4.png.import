@@ -15,9 +15,9 @@ dest_files=["res://.godot/imported/mundo_4.png-1a2a5bc3330d4816620c9b7c55d44493.
 
 [params]
 
-compress/mode=0
+compress/mode=1
 compress/high_quality=false
-compress/lossy_quality=0.7
+compress/lossy_quality=0.85
 compress/uastc_level=0
 compress/rdo_quality_loss=0.0
 compress/hdr_compression=1
