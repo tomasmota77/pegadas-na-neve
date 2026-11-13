@@ -79,8 +79,13 @@ func _world_card(w: int, next: int) -> Control:
 		banner.texture = banner_tex
 		banner.custom_minimum_size = Vector2(0, 150)
 		banner.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-		banner.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
-		banner.clip_contents = true
+		banner.stretch_mode = TextureRect.STRETCH_SCALE
+		# a faixa aparece inteira (sem cortes em cima nem em baixo): a altura acompanha a largura
+		var ratio := float(banner_tex.get_width()) / banner_tex.get_height()
+		banner.resized.connect(func():
+			var h := roundf(banner.size.x / ratio)
+			if absf(banner.custom_minimum_size.y - h) > 0.5:
+				banner.custom_minimum_size.y = h)
 		box.add_child(banner)
 	var open: bool = Game.is_unlocked(levels[0])
 	if not open:
