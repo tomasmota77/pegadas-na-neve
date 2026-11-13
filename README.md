@@ -157,7 +157,7 @@ godot --path . -- --shots                             # capturas para user://sho
   `godot --path . --resolution 1080x1920 -- --shots` (ficam em `user://shots/`).
 - **Gráfico de destaque do Google Play** (1024×500, obrigatório): `store/android/grafico_destaque_<língua>.png`
   (um por língua, com o logótipo traduzido). Refaz com `python tools/feature_graphic.py`;
-  a ilustração original está em `assets/images/fontes/caminhada_alegre_na_neve.png`.
+  a ilustração está em `assets/images/fontes/caminhada_destaque.png`.
 - **Política de privacidade e termos**: `site/` (português e inglês), publicados no GitHub Pages.
 - **Exportação**: perfis "Android" (AAB, alvo API 36, compilação Gradle) e "iOS" em `export_presets.cfg`.
   No editor: Projeto → Instalar modelo de compilação Android; no iOS preenche o Team ID.

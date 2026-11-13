@@ -7,10 +7,10 @@ import os
 from PIL import Image, ImageFilter
 
 ROOT = os.path.join(os.path.dirname(__file__), "..")
-ART = os.path.join(ROOT, "assets", "images", "fontes", "caminhada_alegre_na_neve.png")
+ART = os.path.join(ROOT, "assets", "images", "fontes", "caminhada_destaque.png")
 OUT = os.path.join(ROOT, "store", "android")
 W, H = 1024, 500
-BOX = (24, 14, 470, 222)  # onde cabe o logótipo: no céu, à esquerda, sem tapar os animais
+BOX = (28, 26, 470, 240)  # onde cabe o logótipo: o céu vazio à esquerda, sem tapar os animais
 
 
 def make(lang):
