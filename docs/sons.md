@@ -50,11 +50,11 @@ Prompts em inglês para o gerador de efeitos sonoros (por exemplo, o ElevenLabs 
 | `linha` | Mais uma linha ou coluna bate certo | `A tiny soft wooden marimba blip, single note, very short, dry` (0,3 s) |
 | `errado` | Todos chegaram à comida, mas a solução está errada | `Soft low muted two-note marimba phrase going down, like a friendly "hmm", gentle, not harsh` (0,5 s) |
 | `painel` | Abre um painel (regras, vitória, definições) | `Soft airy whoosh, like a light winter breeze, short` (0,4 s) |
-| `animal_ourico` | Apresentação do ouriço | `Cute tiny hedgehog sniffing and making a small happy squeak, adorable, short` (1 s) |
-| `animal_coelho` | Apresentação do coelho | `Cute small rabbit sniffing quickly with a soft thump of its foot on snow, adorable, short` (1 s) |
-| `animal_raposa` | Apresentação da raposa | `Cute small fox giving a short playful yip, soft and friendly, not loud` (1 s) |
-| `animal_esquilo` | Apresentação do esquilo | `Cute small squirrel chattering quickly, playful and soft, short` (1 s) |
-| `animal_coruja` | Apresentação da coruja | `Cute small owl giving a soft friendly hoot, gentle and warm, not spooky, short` (1 s) |
+| `animal_ourico` | Apresentação do ouriço | Melodia curta feita com a nota de celesta (`python tools/motifs.py`). A versão antiga do ElevenLabs está em `alternativas/animal_ourico_ia.ogg` |
+| `animal_coelho` | Apresentação do coelho | Melodia curta feita com a nota de celesta (`python tools/motifs.py`). A versão antiga do ElevenLabs está em `alternativas/animal_coelho_ia.ogg` |
+| `animal_raposa` | Apresentação da raposa | Melodia curta feita com a nota de celesta (`python tools/motifs.py`). A versão antiga do ElevenLabs está em `alternativas/animal_raposa_ia.ogg` |
+| `animal_esquilo` | Apresentação do esquilo | Melodia curta feita com a nota de celesta (`python tools/motifs.py`). A versão antiga do ElevenLabs está em `alternativas/animal_esquilo_ia.ogg` |
+| `animal_coruja` | Apresentação da coruja | Melodia curta feita com a nota de celesta (`python tools/motifs.py`). A versão antiga do ElevenLabs está em `alternativas/animal_coruja_ia.ogg` |
 
 ### Música e ambiente (tocam sempre, em ciclo)
 
