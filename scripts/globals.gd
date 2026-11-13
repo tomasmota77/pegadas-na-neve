@@ -72,7 +72,16 @@ const LANGS := {"pt": "Português", "en": "English", "es": "Español", "fr": "Fr
 var levels: Array = []
 ## done: índice (texto) -> {"t": melhor tempo em s, "s": melhores estrelas}
 ## lang: "" segue a língua do telemóvel
-var progress := {"done": {}, "seen": [], "vibrate": true, "lang": "", "music": true, "sfx": true, "daily": {}}
+var progress := {"done": {}, "seen": [], "vibrate": true, "lang": "", "music": true, "sfx": true, "daily": {},
+	"no_ads": false, "skins": {}, "wear": {}, "spent": 0, "resume": {}, "reminder_hour": -1, "review_asked": []}
+
+## Roupas dos animais, compradas com estrelas. Cada uma é uma imagem completa do
+## animal: assets/images/<animal>_<id>.png. Só aparecem na loja as que existem.
+const SKINS := [
+	{"id": "gorro", "cost": 8},
+	{"id": "protetores", "cost": 20},
+	{"id": "festivo", "cost": 35},
+]
 ## Puzzles do dia (data/daily.json): um por dia, em ciclo.
 var daily_levels: Array = []
 var current := 0
@@ -157,6 +166,15 @@ var _textures := {}  # nome -> Texture2D ou null
 ## Fica guardada: uma textura carregada só dentro de um _draw() era libertada
 ## logo a seguir e aparecia como um quadrado branco.
 func texture(name: String) -> Texture2D:
+	# animal com roupa vestida: usa a imagem dessa roupa
+	if ANIMALS.has(name) and progress.wear.has(name):
+		var dressed := texture_raw("%s_%s" % [name, progress.wear[name]])
+		if dressed:
+			return dressed
+	return texture_raw(name)
+
+
+func texture_raw(name: String) -> Texture2D:
 	if not _textures.has(name):
 		var path := "res://assets/images/%s.png" % name
 		_textures[name] = load(path) if ResourceLoader.exists(path) else null
@@ -196,6 +214,75 @@ func total_stars() -> int:
 	for i in levels.size():
 		n += stars(i)
 	return n
+
+
+# ---------- estrelas para gastar e roupas ----------
+
+## Estrelas ganhas no puzzle do dia (somam-se às dos níveis para gastar).
+func daily_stars() -> int:
+	var n := 0
+	for k in progress.daily:
+		n += int(progress.daily[k].get("s", 0))
+	return n
+
+
+func star_balance() -> int:
+	return total_stars() + daily_stars() - int(progress.spent)
+
+
+func skin_exists(t: String, id: String) -> bool:
+	return texture_raw("%s_%s" % [t, id]) != null
+
+
+func any_skin_exists() -> bool:
+	for t in ANIMALS:
+		for sk in SKINS:
+			if skin_exists(t, sk.id):
+				return true
+	return false
+
+
+func owns_skin(t: String, id: String) -> bool:
+	return id in progress.skins.get(t, [])
+
+
+func buy_skin(t: String, id: String, cost: int) -> bool:
+	if owns_skin(t, id) or star_balance() < cost:
+		return false
+	progress.spent = int(progress.spent) + cost
+	var owned: Array = progress.skins.get(t, [])
+	owned.append(id)
+	progress.skins[t] = owned
+	wear_skin(t, id)
+	return true
+
+
+## id vazio = sem roupa.
+func wear_skin(t: String, id: String) -> void:
+	if id == "":
+		progress.wear.erase(t)
+	else:
+		progress.wear[t] = id
+	_save()
+
+
+# ---------- retomar o nível a meio ----------
+
+## Guarda o nível em curso (para o reabrir se a app for fechada a meio).
+func save_resume(data: Dictionary) -> void:
+	progress.resume = data
+	_save()
+
+
+func clear_resume() -> void:
+	if not progress.resume.is_empty():
+		progress.resume = {}
+		_save()
+
+
+func set_no_ads(on: bool) -> void:
+	progress.no_ads = on
+	_save()
 
 
 func first_unsolved() -> int:
@@ -300,6 +387,8 @@ func vibrate(ms: int) -> void:
 func reset_progress() -> void:
 	progress.done = {}
 	progress.seen = []
+	progress.resume = {}
+	progress.spent = 0
 	_save()
 
 
@@ -335,6 +424,14 @@ func _load() -> void:
 	var seen = data.get("seen", [])
 	if seen is Array:
 		progress.seen = seen
+	for k in ["skins", "wear", "resume"]:
+		if data.get(k) is Dictionary:
+			progress[k] = data[k]
+	progress.no_ads = bool(data.get("no_ads", false))
+	progress.spent = int(data.get("spent", 0))
+	progress.reminder_hour = int(data.get("reminder_hour", -1))
+	if data.get("review_asked") is Array:
+		progress.review_asked = data.review_asked
 	progress.vibrate = bool(data.get("vibrate", true))
 	progress.lang = str(data.get("lang", ""))
 	progress.music = bool(data.get("music", true))

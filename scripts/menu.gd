@@ -21,6 +21,10 @@ func _ready() -> void:
 	var stars := [Game.total_stars(), Game.levels.size() * 3]
 	%StarsLabel.text = "%d/%d" % stars if Icons.has("estrela") else tr("STARS_N") % stars
 	_add_daily_button()
+	_add_wardrobe_button()
+	Store.changed.connect(func():
+		if %Sheet.visible and %Sheet.get_node("%Title").text == tr("SETTINGS"):
+			_show_settings())
 	for w in Game.WORLDS.size():
 		%Worlds.add_child(_world_card(w, next))
 
@@ -169,23 +173,155 @@ func _world_card(w: int, next: int) -> Control:
 # ---------- definições ----------
 
 func _show_settings() -> void:
-	var vib := tr("VIBRATION_ON") if Game.progress.vibrate else tr("VIBRATION_OFF")
-	%Sheet.open(tr("SETTINGS"), tr("SETTINGS_STARS") % [Game.total_stars(), Game.levels.size() * 3], null, [
+	var buttons := [
 		{"text": tr("LANGUAGE_BTN") % Game.LANGS[Game.language()], "plain": true, "action": _show_languages},
-		{"text": tr("SOUNDS_ON") if Game.progress.sfx else tr("SOUNDS_OFF"), "plain": true, "action": func():
-			Game.set_sfx(not Game.progress.sfx)
+		{"text": tr("SOUND_MENU"), "plain": true, "action": _show_sound},
+		{"text": tr("REMINDER_BTN") % Reminder.hour_label(Game.progress.reminder_hour), "plain": true, "action": func():
+			# percorre: desligado → 9:00 → 13:00 → 19:00 → 21:00 → desligado
+			var hours: Array = Reminder.HOURS
+			var k := hours.find(Game.progress.reminder_hour)
+			Reminder.set_hour(hours[(k + 1) % hours.size()])
 			_show_settings()},
-		{"text": tr("MUSIC_ON") if Game.progress.music else tr("MUSIC_OFF"), "plain": true, "action": func():
-			Game.set_music(not Game.progress.music)
-			_show_settings()},
-		{"text": vib, "plain": true, "action": func():
-			Game.set_vibrate(not Game.progress.vibrate)
-			_show_settings()},
+	]
+	if not Game.progress.no_ads and Store.available:
+		buttons.append({"text": tr("REMOVE_ADS_BTN") % Store.price, "plain": true, "action": Store.buy})
+	buttons.append_array([
 		{"text": tr("PRIVACY_BTN"), "plain": true, "action": _show_privacy},
-		{"text": tr("CREDITS_BTN"), "plain": true, "action": _show_credits},
-		{"text": tr("RESET"), "plain": true, "action": _confirm_reset},
+		{"text": tr("MORE_BTN"), "plain": true, "action": _show_more},
 		{"text": tr("CLOSE"), "primary": true},
 	])
+	%Sheet.open(tr("SETTINGS"), tr("SETTINGS_STARS") % [Game.total_stars(), Game.levels.size() * 3], null, buttons)
+
+
+func _show_sound() -> void:
+	var vib := tr("VIBRATION_ON") if Game.progress.vibrate else tr("VIBRATION_OFF")
+	%Sheet.open(tr("SOUND_MENU"), "", null, [
+		{"text": tr("SOUNDS_ON") if Game.progress.sfx else tr("SOUNDS_OFF"), "plain": true, "action": func():
+			Game.set_sfx(not Game.progress.sfx)
+			_show_sound()},
+		{"text": tr("MUSIC_ON") if Game.progress.music else tr("MUSIC_OFF"), "plain": true, "action": func():
+			Game.set_music(not Game.progress.music)
+			_show_sound()},
+		{"text": vib, "plain": true, "action": func():
+			Game.set_vibrate(not Game.progress.vibrate)
+			_show_sound()},
+		{"text": tr("BACK"), "primary": true, "action": _show_settings},
+	])
+
+
+func _show_more() -> void:
+	var buttons := [{"text": tr("CREDITS_BTN"), "plain": true, "action": _show_credits}]
+	if Store.available or OS.get_name() == "iOS":
+		buttons.append({"text": tr("RESTORE_BTN"), "plain": true, "action": func():
+			Store.restore()
+			_show_more()})
+	buttons.append({"text": tr("RESET"), "plain": true, "action": _confirm_reset})
+	buttons.append({"text": tr("BACK"), "primary": true, "action": _show_settings})
+	var body := tr("NO_ADS_THANKS") if Game.progress.no_ads else ""
+	%Sheet.open(tr("MORE_BTN"), body, null, buttons)
+
+
+# ---------- guarda-roupa: roupas dos animais compradas com estrelas ----------
+
+func _add_wardrobe_button() -> void:
+	if not Game.any_skin_exists():
+		return
+	var btn := Button.new()
+	btn.theme_type_variation = &"SoftButton"
+	btn.text = tr("WARDROBE")
+	var tex := Game.texture("roupas")
+	if tex:
+		btn.icon = tex
+		btn.expand_icon = true
+	btn.custom_minimum_size = Vector2(0, 88)
+	btn.pressed.connect(_show_wardrobe)
+	var row := %SettingsBtn.get_parent()
+	row.add_child(btn)
+	row.move_child(btn, %SettingsBtn.get_index())
+
+
+func _show_wardrobe() -> void:
+	var list := VBoxContainer.new()
+	list.add_theme_constant_override("separation", 18)
+	for t in Game.ANIMALS:
+		if not Game.has_seen(t):
+			continue
+		var skins := Game.SKINS.filter(func(sk): return Game.skin_exists(t, sk.id))
+		if skins.is_empty():
+			continue
+		var name_lbl := Label.new()
+		name_lbl.text = Game.animal_text(t, "NAME")
+		name_lbl.theme_type_variation = &"H2"
+		list.add_child(name_lbl)
+		var row := HBoxContainer.new()
+		row.add_theme_constant_override("separation", 8)
+		row.add_child(_skin_card(t, {"id": "", "cost": 0}))
+		for sk in skins:
+			row.add_child(_skin_card(t, sk))
+		list.add_child(row)
+	if list.get_child_count() == 0:
+		var none := Label.new()
+		none.text = tr("WARDROBE_EMPTY")
+		none.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		none.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		list.add_child(none)
+	var scroll := ScrollContainer.new()
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	scroll.custom_minimum_size.y = minf(get_viewport_rect().size.y * 0.55, 760.0)
+	list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	scroll.add_child(list)
+	%Sheet.open(tr("WARDROBE"), tr("WARDROBE_BODY") % Game.star_balance(), null,
+		[{"text": tr("CLOSE"), "primary": true}], {"content": scroll})
+
+
+## Um cartão da loja: imagem do animal com a roupa e o botão (comprar, vestir ou a usar).
+func _skin_card(t: String, sk: Dictionary) -> Control:
+	var id: String = sk.id
+	var box := VBoxContainer.new()
+	box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	box.custom_minimum_size.x = 10
+	box.add_theme_constant_override("separation", 6)
+	var img := TextureRect.new()
+	img.texture = Game.texture_raw(t if id == "" else "%s_%s" % [t, id])
+	img.custom_minimum_size = Vector2(0, 120)
+	img.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	img.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	box.add_child(img)
+	var btn := Button.new()
+	btn.custom_minimum_size = Vector2(10, 64)
+	btn.clip_text = true
+	btn.add_theme_font_size_override("font_size", 22)
+	var worn: String = Game.progress.wear.get(t, "")
+	if worn == id:
+		var lbl := Label.new()
+		lbl.text = tr("SKIN_WORN")
+		lbl.theme_type_variation = &"Small"
+		lbl.custom_minimum_size.y = 64
+		lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		box.add_child(lbl)
+		btn.queue_free()
+		return box
+	elif id == "" or Game.owns_skin(t, id):
+		btn.text = tr("SKIN_WEAR")
+		btn.theme_type_variation = &"SoftButton"
+		btn.pressed.connect(func():
+			Game.wear_skin(t, id)
+			_show_wardrobe())
+	else:
+		btn.text = str(sk.cost)
+		btn.icon = Game.texture("estrela")
+		btn.expand_icon = false
+		btn.add_theme_constant_override("icon_max_width", 26)
+		btn.theme_type_variation = &"PrimaryButton"
+		btn.disabled = Game.star_balance() < int(sk.cost)
+		btn.pressed.connect(func():
+			if Game.buy_skin(t, id, sk.cost):
+				Sfx.play("estrela")
+				Game.vibrate(40)
+			_show_wardrobe())
+	box.add_child(btn)
+	return box
 
 
 func _show_privacy() -> void:

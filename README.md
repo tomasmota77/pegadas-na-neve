@@ -173,3 +173,19 @@ No teu PC, uma vez:
 3. Cria dois blocos de anúncios (Intersticial e Com prémio) e põe os IDs em `REAL_IDS` em `scripts/ads.gd`.
    As compilações de teste usam sempre os anúncios de teste da Google.
 4. No AdMob, em Privacidade e mensagens, cria a mensagem do RGPD (é a que o jogo mostra).
+
+### Compra "remover anúncios", avaliação e lembrete diário
+
+Plugins (já no repositório, ativos em `project.godot`):
+- **godot-iap** 1.2.9 (`addons/godot-iap/`, MIT) usado por `scripts/store.gd`: compra única `remover_anuncios`.
+- **In-app Review** 5.3 (`addons/InappReviewPlugin/`, MIT) usado por `scripts/review.gd`: pede avaliação no fim do mundo 1, do mundo 3 e aos 7 dias seguidos do puzzle do dia (uma vez cada).
+- **Notification Scheduler** 6.0 (`addons/NotificationSchedulerPlugin/`, MIT) usado por `scripts/reminder.gd`: "O puzzle de hoje está pronto" à hora escolhida nas definições.
+
+No teu PC, uma vez:
+1. Projeto → Instalar modelo de compilação Android (se ainda não fizeste).
+2. Copia `android_res/drawable/ic_notificacao.png` para `android/build/res/drawable/` (ícone branco da notificação).
+3. **Google Play Console** → a tua app → Monetizar → Produtos → Produtos na app → Criar produto:
+   ID `remover_anuncios`, nome "Remover anúncios", preço (ex.: 2,99 €), ativar. Precisa de uma conta de comerciante.
+4. **App Store Connect** → a tua app → Monetização → Compras na app → "+" → **Não consumível**,
+   ID do produto `remover_anuncios`, preço e uma captura do ecrã das definições (pede a Apple).
+5. As compras só funcionam em compilações instaladas pela loja (teste interno no Play, TestFlight no iOS).

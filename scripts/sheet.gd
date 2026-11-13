@@ -18,7 +18,8 @@ func _ready() -> void:
 
 
 ## buttons: Array de {text, primary (bool), plain (bool), action (Callable, opcional)}
-## opts: {stars: int (mostra 3 estrelas), dismissable: bool (fecha ao tocar fora; por omissão true)}
+## opts: {stars: int (mostra 3 estrelas), dismissable: bool (fecha ao tocar fora; por omissão true),
+##        content: Control (conteúdo extra entre o texto e os botões)}
 func open(title: String, body: String, image: Texture2D = null, buttons: Array = [], opts := {}) -> void:
 	%Title.text = title
 	%Body.text = "[center]%s[/center]" % body
@@ -26,6 +27,17 @@ func open(title: String, body: String, image: Texture2D = null, buttons: Array =
 	%Image.visible = image != null
 	%Stars.visible = opts.has("stars")
 	_dismissable = opts.get("dismissable", true)
+	# conteúdo extra (ex.: a grelha da loja), entre o texto e os botões
+	var holder: Node = %Buttons.get_parent()
+	var old := holder.get_node_or_null("Extra")
+	if old:
+		holder.remove_child(old)
+		old.queue_free()
+	if opts.has("content"):
+		var extra: Control = opts.content
+		extra.name = "Extra"
+		holder.add_child(extra)
+		holder.move_child(extra, %Buttons.get_index())
 	for c in %Buttons.get_children():
 		c.queue_free()
 	if buttons.is_empty():

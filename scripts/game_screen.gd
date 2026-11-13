@@ -14,6 +14,7 @@ var _lines_ok := -1      # linhas + colunas certas (para o som "linha"); -1 ao c
 var _was_wrong := false
 var daily := false          # a jogar o puzzle do dia
 var bonus_hints := 0        # dicas extra ganhas com anúncios neste nível
+var _dirty := 0.0           # segundos desde a última mudança por guardar (-1 = nada por guardar)
 
 @onready var board: Board = %Board
 
@@ -24,6 +25,7 @@ func _ready() -> void:
 		l.add_theme_constant_override("outline_size", 12)
 		l.add_theme_color_override("font_outline_color", Color(1, 1, 1, 0.9))
 	%BackBtn.pressed.connect(func(): back_requested.emit())
+	back_requested.connect(func(): _save_resume(false))
 	%HelpBtn.pressed.connect(_show_rules)
 	%UndoBtn.pressed.connect(func():
 		st.undo()
@@ -71,9 +73,11 @@ func start_daily() -> void:
 
 
 func _begin() -> void:
+	_dirty = -1.0
 	bonus_hints = 0
 	elapsed = 0.0
 	running = true
+	_restore()
 	_lines_ok = -1
 	_was_wrong = false
 	_build_chips()
@@ -105,6 +109,46 @@ func _process(dt: float) -> void:
 	if running and not %Sheet.visible:
 		elapsed += dt
 	%TimerLabel.text = Game.format_time(elapsed)
+	# guarda o nível em curso um segundo depois da última jogada
+	if _dirty >= 0.0:
+		_dirty += dt
+		if _dirty > 1.0:
+			_save_resume(true)
+
+
+# ---------- retomar o nível a meio ----------
+
+func _notification(what: int) -> void:
+	# a app foi para segundo plano ou vai fechar: guarda já
+	if what in [NOTIFICATION_APPLICATION_PAUSED, NOTIFICATION_APPLICATION_FOCUS_OUT, NOTIFICATION_WM_CLOSE_REQUEST]:
+		_save_resume(true)
+
+
+## open: reabrir este nível sozinho na próxima vez que a app abrir
+## (falso quando o jogador sai para o menu de propósito).
+func _save_resume(open: bool) -> void:
+	_dirty = -1.0
+	if not running or st.animals.is_empty():
+		return
+	var data := st.export_state()
+	data.kind = "daily" if daily else "level"
+	data.key = Game.daily_key() if daily else Game.level_id(index)
+	data.elapsed = elapsed
+	data.bonus = bonus_hints
+	data.open = open
+	Game.save_resume(data)
+
+
+func _restore() -> void:
+	var r: Dictionary = Game.progress.resume
+	if r.is_empty() or r.get("kind") != ("daily" if daily else "level"):
+		return
+	if r.get("key") != (Game.daily_key() if daily else Game.level_id(index)):
+		return
+	if st.import_state(r):
+		elapsed = float(r.get("elapsed", 0.0))
+		bonus_hints = int(r.get("bonus", 0))
+		board.queue_redraw()
 
 
 func _build_chips() -> void:
@@ -128,6 +172,8 @@ func _after_change() -> void:
 
 
 func _refresh() -> void:
+	if running and _dirty < 0.0:
+		_dirty = 0.0
 	for card in %Chips.get_children():
 		if card is RuleCard:
 			card.active = card.item == st.active
@@ -248,6 +294,7 @@ func _on_solved() -> void:
 	if not running:
 		return
 	running = false
+	Game.clear_resume()
 	_refresh()
 	var got := Game.stars_for(st.hints_used)
 	if daily:
@@ -274,14 +321,26 @@ func _on_solved() -> void:
 	if last:
 		body += "\n\n" + tr("WIN_ALL")
 	else:
-		buttons.append({"text": tr("NEXT_LEVEL"), "primary": true, "action": func(): Ads.level_finished(index, func(): next_requested.emit(index + 1))})
-	buttons.append({"text": tr("SEE_LEVELS"), "primary": last, "action": func(): Ads.level_finished(index, func(): back_requested.emit())})
+		buttons.append({"text": tr("NEXT_LEVEL"), "primary": true, "action": func(): _after_win(func(): next_requested.emit(index + 1))})
+	buttons.append({"text": tr("SEE_LEVELS"), "primary": last, "action": func(): _after_win(func(): back_requested.emit())})
 	%Sheet.open(tr("WIN_TITLE"), body, Game.texture("vitoria"), buttons,
 		{"stars": got, "dismissable": false})
 
 
+## Depois de ganhar: no fim do 1.º e do 3.º mundo pede uma avaliação (uma vez só);
+## nos outros níveis pode aparecer um anúncio. Nunca os dois seguidos.
+func _after_win(then: Callable) -> void:
+	var w := Game.world_of(index)
+	var last_of_world := index == Game.levels.size() - 1 or Game.world_of(index + 1) != w
+	if last_of_world and w in [0, 2] and Review.ask("mundo%d" % (w + 1)):
+		then.call()
+		return
+	Ads.level_finished(index, then)
+
+
 func _on_daily_solved(got: int) -> void:
 	Game.mark_daily(elapsed, got)
+	Reminder.reschedule()
 	Game.vibrate(60)
 	await board.play_win().finished
 	Sfx.play("vitoria", 1.0, 0.0)
@@ -290,5 +349,8 @@ func _on_daily_solved(got: int) -> void:
 	body += "\n" + (tr("DAILY_STREAK_1") if streak == 1 else tr("DAILY_STREAK_N") % streak)
 	body += "\n\n" + tr("DAILY_COME_BACK")
 	%Sheet.open(tr("WIN_TITLE"), body, Game.texture("vitoria"),
-		[{"text": tr("SEE_LEVELS"), "primary": true, "action": func(): back_requested.emit()}],
+		[{"text": tr("SEE_LEVELS"), "primary": true, "action": func():
+			if streak >= 7:
+				Review.ask("serie7")
+			back_requested.emit()}],
 		{"stars": got, "dismissable": false})

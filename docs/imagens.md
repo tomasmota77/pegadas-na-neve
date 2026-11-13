@@ -220,3 +220,25 @@ Começo comum para as faixas:
 | 4 Pinhal | Warm pale cream sky, tall snowy pine trees on the sides, pine cones on the snow. | A dense snowy pine forest with tall dark green pines, pine cones and a hollow tree trunk. |
 | 5 Montanha | Pale lilac-blue sky, big snowy mountain peaks far away at the top, rocky slopes at the bottom. | Tall snowy mountain peaks with rocky slopes, a small wooden signpost and a nest on a ledge. |
 | 6 Nevão | Grey-blue stormy sky, strong diagonal wind lines and many big snowflakes, snow drifts at the bottom. Still calm in the middle. | A snowstorm over snowy hills, diagonal wind lines, many big snowflakes and deep snow drifts. |
+
+## Roupas dos animais (roupeiro)
+
+São 15 imagens: cada animal com 3 roupas. Nomes: `<animal>_gorro.png`, `<animal>_protetores.png`, `<animal>_festivo.png`, com `<animal>` = `ourico`, `coelho`, `raposa`, `esquilo`, `coruja`. Mesmo tamanho e enquadramento que a imagem normal do animal (ex.: `ourico.png`). **Anexa sempre a imagem normal do animal** ao gerar e pede para manter tudo igual (pose, cara, cores, contorno, tamanho no quadro), mudando só a roupa. Só aparecem no jogo as que existirem; uma roupa sem imagem não é posta à venda.
+
+Começo comum (cola antes de cada linha da tabela):
+> Use the attached character image as the exact base. Keep the same character, same pose, same face, same proportions, same colors, same thick dark navy outline (#34303C), same flat cozy winter mobile game style, same framing and size on the canvas, transparent background, no text. Only add the clothing described below, drawn in the same style with flat colors and one soft shade, fitting naturally on the character's head and body:
+
+| Roupa | Custo | Acrescenta ao começo |
+|---|---|---|
+| `_gorro` | 8 estrelas | A knitted winter beanie in warm red (#D9434F) with a fluffy white pom-pom on top and a folded cuff with a simple cream stripe. Keep the existing scarf. |
+| `_protetores` | 20 estrelas | Round fluffy earmuffs in sky blue (#5AA6E0) connected by a thin navy band over the head, plus a matching sky blue knitted scarf with short tassels replacing the current scarf. |
+| `_festivo` | 35 estrelas | A cozy holiday outfit: a small green knitted bobble hat (#3E9E63) with a tiny gold star on the front, and a green and cream striped scarf with a little gold bell. Cheerful but not busy. |
+
+Notas por animal (acrescenta no fim):
+- **coelho**: the hat sits between the ears, ears stay fully visible and poke out through the hat.
+- **raposa**: the hat sits between the pointy ears, ears stay visible.
+- **coruja**: the earmuffs sit on the sides of the head where the ear tufts are; keep the tufts visible.
+- **esquilo**: keep the big bushy tail exactly as it is.
+
+**`roupas.png`** (256×256, opcional): ícone do botão do roupeiro no menu
+> Simple rounded mobile game UI icon of a small knitted winter beanie with a pom-pom, single flat color dark navy (#20304A), thick rounded strokes, no outline, no shading, no text, centered with generous padding, transparent background.

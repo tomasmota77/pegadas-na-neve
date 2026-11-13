@@ -377,6 +377,37 @@ func hint() -> Dictionary:
 	return {"kind": "reveal", "type": t, "cell": added[0], "cells": added, "complete": is_complete(t)}
 
 
+## Estado do jogador, para guardar e retomar o nível mais tarde.
+func export_state() -> Dictionary:
+	var ps := {}
+	for t in paths:
+		ps[t] = paths[t].map(func(c): return [c.x, c.y])
+	var gs := []
+	for c in givens:
+		gs.append([c.x, c.y, givens[c]])
+	return {"paths": ps, "marks": marks.keys().map(func(c): return [c.x, c.y]),
+		"givens": gs, "hints_used": hints_used}
+
+
+## Repõe um estado guardado com export_state(). Ignora-o se não bater certo com o nível.
+func import_state(d: Dictionary) -> bool:
+	var ps: Dictionary = d.get("paths", {})
+	for a in animals:
+		var arr: Array = ps.get(a.type, [])
+		if arr.is_empty() or Vector2i(int(arr[0][0]), int(arr[0][1])) != a.den:
+			return false
+	for t in ps:
+		paths[t] = ps[t].map(func(c): return Vector2i(int(c[0]), int(c[1])))
+	marks.clear()
+	for c in d.get("marks", []):
+		marks[Vector2i(int(c[0]), int(c[1]))] = true
+	for g in d.get("givens", []):
+		givens[Vector2i(int(g[0]), int(g[1]))] = str(g[2])
+	hints_used = int(d.get("hints_used", 0))
+	_history.clear()
+	return true
+
+
 func _clear_others_at(c: Vector2i, t: String) -> void:
 	var o := occupant(c)
 	if o != "" and o != t:

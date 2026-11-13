@@ -18,8 +18,24 @@ func _ready() -> void:
 	Sfx.refresh_music()
 	_fit_screen()
 	show_menu()
+	_reopen_level()
 	if "--shots" in OS.get_cmdline_user_args():
 		add_child(load("res://tests/shots.gd").new())
+
+
+## Se a app foi fechada a meio de um nível, abre-o logo onde ficou.
+func _reopen_level() -> void:
+	var r: Dictionary = Game.progress.resume
+	if r.is_empty() or not r.get("open", false) or "--shots" in OS.get_cmdline_user_args():
+		return
+	if r.kind == "daily":
+		if r.key == Game.daily_key():
+			start_daily()
+		return
+	for i in Game.levels.size():
+		if Game.level_id(i) == r.key:
+			start_level(i)
+			return
 
 
 func _on_any_button() -> void:

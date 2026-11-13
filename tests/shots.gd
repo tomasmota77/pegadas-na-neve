@@ -76,6 +76,12 @@ func _run() -> void:
 	main._current._show_credits()
 	await _wait(30)
 	await _shot("10c_creditos")
+	main._current._show_more()
+	await _wait(30)
+	await _shot("10d_mais")
+	main._current._show_wardrobe()
+	await _wait(30)
+	await _shot("10e_roupeiro")
 	# nível do Pinhal com esquilo, a meio
 	main.start_level(Game.levels.map(func(l): return l.id).find("w4-06"))
 	await _wait(30)

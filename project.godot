@@ -37,6 +37,10 @@ config/icon="res://icon.png"
 Game="*res://scripts/globals.gd"
 Sfx="*res://scripts/sfx.gd"
 Ads="*res://scripts/ads.gd"
+GodotIapPlugin="*res://addons/godot-iap/godot_iap.gd"
+Store="*res://scripts/store.gd"
+Review="*res://scripts/review.gd"
+Reminder="*res://scripts/reminder.gd"
 
 [display]
 
@@ -50,7 +54,7 @@ window/handheld/orientation=1
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/admob/plugin.cfg")
+enabled=PackedStringArray("res://addons/GMPShared/menu/plugin.cfg", "res://addons/InappReviewPlugin/plugin.cfg", "res://addons/NotificationSchedulerPlugin/plugin.cfg", "res://addons/admob/plugin.cfg", "res://addons/godot-iap/plugin.cfg")
 
 [gui]
 

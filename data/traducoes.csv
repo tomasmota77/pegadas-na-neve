@@ -171,3 +171,19 @@ Erstellt mit der Godot Engine (godotengine.org/license):"
 HINT_AD_TITLE,Mais uma dica?,One more hint?,¿Una pista más?,Un indice de plus ?,Noch ein Tipp?
 HINT_AD_BODY,Já usaste as dicas deste nível. Vê um anúncio curto e ganhas mais uma.,You've used this level's hints. Watch a short ad to get one more.,Ya usaste las pistas de este nivel. Mira un anuncio corto y gana una más.,Tu as utilisé les indices de ce niveau. Regarde une courte publicité pour en gagner un de plus.,Du hast die Tipps dieses Levels verbraucht. Sieh dir eine kurze Werbung an und bekomm noch einen.
 HINT_AD_WATCH,Ver anúncio,Watch ad,Ver anuncio,Voir la pub,Werbung ansehen
+SOUND_MENU,Som e vibração,Sound and vibration,Sonido y vibración,Son et vibration,Ton und Vibration
+REMINDER_BTN,Lembrete diário: %s,Daily reminder: %s,Recordatorio diario: %s,Rappel quotidien : %s,Tägliche Erinnerung: %s
+OFF,desligado,off,desactivado,désactivé,aus
+REMOVE_ADS_BTN,Remover anúncios (%s),Remove ads (%s),Quitar anuncios (%s),Supprimer les pubs (%s),Werbung entfernen (%s)
+MORE_BTN,Mais,More,Más,Plus,Mehr
+RESTORE_BTN,Restaurar compras,Restore purchases,Restaurar compras,Restaurer les achats,Käufe wiederherstellen
+NO_ADS_THANKS,Sem anúncios. Obrigado pelo apoio!,No ads. Thanks for your support!,Sin anuncios. ¡Gracias por tu apoyo!,Sans pubs. Merci pour votre soutien !,Keine Werbung. Danke für deine Unterstützung!
+WARDROBE,Roupeiro,Wardrobe,Armario,Garde-robe,Kleiderschrank
+WARDROBE_BODY,Tens %d estrelas para gastar. Ganha mais a resolver puzzles sem dicas.,You have %d stars to spend. Earn more by solving puzzles without hints.,Tienes %d estrellas para gastar. Gana más resolviendo puzles sin pistas.,Tu as %d étoiles à dépenser. Gagnes-en plus en résolvant sans indices.,"Du hast %d Sterne zum Ausgeben. Verdiene mehr, indem du ohne Hinweise löst."
+WARDROBE_EMPTY,Conhece mais animais para lhes vestires roupa.,Meet more animals to dress them up.,Conoce más animales para vestirlos.,Rencontre plus d'animaux pour les habiller.,"Lerne mehr Tiere kennen, um sie anzuziehen."
+SKIN_WEAR,Vestir,Wear,Poner,Porter,Anziehen
+SKIN_WORN,A usar,Wearing,Puesto,Porté,Getragen
+SKIN_COST,%d estrelas,%d stars,%d estrellas,%d étoiles,%d Sterne
+REMINDER_CHANNEL,Aviso diário quando há um puzzle novo,Daily notice when a new puzzle is ready,Aviso diario cuando hay un puzle nuevo,Avis quotidien quand un nouveau puzzle est prêt,"Tägliche Nachricht, wenn ein neues Rätsel bereit ist"
+REMINDER_TITLE,Pegadas na Neve,Snow Tracks,Huellas en la Nieve,Traces dans la Neige,Spuren im Schnee
+REMINDER_BODY,O puzzle de hoje está pronto.,Today's puzzle is ready.,El puzle de hoy está listo.,Le puzzle du jour est prêt.,Das heutige Rätsel ist bereit.
