@@ -15,6 +15,7 @@ const VOLUME := {
 	"desfazer": -8.0, "limpar": -6.0, "dica": -4.0, "errado": -8.0,
 	"vitoria": -2.0, "estrela": -6.0, "toque": -12.0, "painel": -12.0,
 	"animal_ourico": -4.0, "animal_coelho": -4.0, "animal_raposa": -4.0, "animal_esquilo": -4.0,
+	"animal_coruja": -4.0,
 	"musica": -16.0, "ambiente": -20.0,
 }
 
