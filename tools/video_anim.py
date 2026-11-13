@@ -95,11 +95,15 @@ def convert(video, name, fps, size, start, end, cols, thick=0):
     bg = np.median(border, axis=0).astype(np.float32)
     keyed = [key(f, bg) for f in frames]
     # um corte igual para todos os frames (o animal não "salta" de sítio)
-    boxes = [k.getchannel("A").point(lambda v: 255 if v > 40 else 0).getbbox() for k in keyed]
+    # (inclui as bordas suaves do contorno, para não cortar pontas de orelhas)
+    boxes = [k.getchannel("A").point(lambda v: 255 if v > 8 else 0).getbbox() for k in keyed]
     boxes = [b for b in boxes if b]
     x0 = min(b[0] for b in boxes); y0 = min(b[1] for b in boxes)
     x1 = max(b[2] for b in boxes); y1 = max(b[3] for b in boxes)
-    side = int(max(x1 - x0, y1 - y0) * 1.04)
+    # margem à volta: 6% de cada lado, mais o contorno que se acrescente
+    side = int(max(x1 - x0, y1 - y0) * 1.12)
+    if thick:
+        side += int(2 * thick * side / size) + 4
     cx, cy = (x0 + x1) // 2, (y0 + y1) // 2
     box = (cx - side // 2, cy - side // 2, cx - side // 2 + side, cy - side // 2 + side)
     tiles = [k.crop(box).resize((size, size), Image.LANCZOS) for k in keyed]
