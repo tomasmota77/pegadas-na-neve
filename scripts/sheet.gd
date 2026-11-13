@@ -25,6 +25,8 @@ func open(title: String, body: String, image: Texture2D = null, buttons: Array =
 	%Body.text = "[center]%s[/center]" % body
 	%Image.texture = image
 	%Image.visible = image != null
+	# animação (festa de um animal) um pouco maior do que uma ilustração parada
+	%Image.custom_minimum_size.y = 280.0 if image is AnimatedTexture else 180.0
 	%Stars.visible = opts.has("stars")
 	_dismissable = opts.get("dismissable", true)
 	# conteúdo extra (ex.: a grelha da loja), entre o texto e os botões

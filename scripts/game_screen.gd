@@ -290,6 +290,17 @@ func _on_hint() -> void:
 		_on_solved()
 
 
+## Imagem do painel de vitória: a festa de um dos animais do nível, se houver animação;
+## senão, a ilustração de vitória.
+func _win_image() -> Texture2D:
+	var options := []
+	for a in st.animals:
+		var t := Game.festa(a.type)
+		if t:
+			options.append(t)
+	return options.pick_random() if not options.is_empty() else Game.texture("vitoria")
+
+
 func _on_solved() -> void:
 	if not running:
 		return
@@ -323,7 +334,7 @@ func _on_solved() -> void:
 	else:
 		buttons.append({"text": tr("NEXT_LEVEL"), "primary": true, "action": func(): _after_win(func(): next_requested.emit(index + 1))})
 	buttons.append({"text": tr("SEE_LEVELS"), "primary": last, "action": func(): _after_win(func(): back_requested.emit())})
-	%Sheet.open(tr("WIN_TITLE"), body, Game.texture("vitoria"), buttons,
+	%Sheet.open(tr("WIN_TITLE"), body, _win_image(), buttons,
 		{"stars": got, "dismissable": false})
 
 
@@ -348,7 +359,7 @@ func _on_daily_solved(got: int) -> void:
 	var streak := Game.daily_streak()
 	body += "\n" + (tr("DAILY_STREAK_1") if streak == 1 else tr("DAILY_STREAK_N") % streak)
 	body += "\n\n" + tr("DAILY_COME_BACK")
-	%Sheet.open(tr("WIN_TITLE"), body, Game.texture("vitoria"),
+	%Sheet.open(tr("WIN_TITLE"), body, _win_image(),
 		[{"text": tr("SEE_LEVELS"), "primary": true, "action": func():
 			if streak >= 7:
 				Review.ask("serie7")

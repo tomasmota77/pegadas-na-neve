@@ -187,6 +187,44 @@ func texture_raw(name: String) -> Texture2D:
 	return _textures[name]
 
 
+var _anims := {}  # nome -> AnimatedTexture ou null
+
+
+## Animação de festa de um animal (assets/anim/festa_<animal>.png + .json, feita com
+## tools/video_anim.py), em ciclo. null se não existir ou se o animal tiver roupa vestida
+## (a animação mostra-o sem roupa).
+func festa(animal: String) -> Texture2D:
+	if progress.wear.has(animal):
+		return null
+	return anim("festa_" + animal)
+
+
+func anim(name: String) -> Texture2D:
+	if _anims.has(name):
+		return _anims[name]
+	var tex: AnimatedTexture = null
+	var path := "res://assets/anim/%s.png" % name
+	var meta_path := "res://assets/anim/%s.json" % name
+	if ResourceLoader.exists(path) and FileAccess.file_exists(meta_path):
+		var meta: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(meta_path))
+		# cada frame tem de ser uma textura própria (o AnimatedTexture ignora recortes de atlas)
+		var sheet: Image = (load(path) as Texture2D).get_image()
+		if sheet.is_compressed():
+			sheet.decompress()
+		var n := mini(int(meta.frames), AnimatedTexture.MAX_FRAMES)
+		var size := int(meta.size)
+		var cols := int(meta.cols)
+		tex = AnimatedTexture.new()
+		tex.frames = n
+		tex.speed_scale = float(meta.fps)
+		for i in n:
+			var region := sheet.get_region(Rect2i((i % cols) * size, (i / cols) * size, size, size))
+			tex.set_frame_texture(i, ImageTexture.create_from_image(region))
+			tex.set_frame_duration(i, 1.0)
+	_anims[name] = tex
+	return tex
+
+
 ## O progresso é guardado pelo id do nível (não pelo número), para que mudar a
 ## ordem ou juntar níveis não baralhe o que o jogador já resolveu.
 func level_id(i: int) -> String:
